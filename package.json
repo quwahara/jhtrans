@@ -2,5 +2,6 @@
   "name": "jhtrans",
   "version": "1.0.1",
   "main": "jhtrans.js",
+  "repository": "github:quwahara/jhtrans",
   "license": "MIT"
 }
