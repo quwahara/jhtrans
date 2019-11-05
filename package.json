@@ -1,6 +1,6 @@
 {
   "name": "jhtrans",
   "version": "1.0.3",
-  "main": "jhtrans.js",
+  "main": "libs/jhtrans.js",
   "license": "MIT"
 }
