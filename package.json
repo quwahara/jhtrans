@@ -2,5 +2,8 @@
   "name": "jhtrans",
   "version": "1.0.3",
   "main": "libs/jhtrans.js",
-  "license": "MIT"
+  "license": "MIT",
+  "devDependencies": {
+    "requirejs": "^2.3.6"
+  }
 }
