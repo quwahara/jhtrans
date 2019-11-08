@@ -1,7 +1,6 @@
 # Jhtrans
 
-Translate JavaScript array to HTML DOM object.  
-Templating and replace the placeholder with a template. 
+Translate JavaScript array to HTML DOM object. Templating and replace the placeholder with a template. 
 
 ## Example 1, array to HTML DOM
 
