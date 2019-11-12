@@ -2,6 +2,10 @@
 
 Translate JavaScript array to HTML DOM object. Templating and replace the placeholder with a template. 
 
+## Usage
+
+
+
 ## Example 1, array to HTML DOM
 
 `definitionToElement(array)` translates arrty to HTML DOM
