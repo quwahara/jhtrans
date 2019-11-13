@@ -67,6 +67,7 @@ body {
 .row {
     display: block;
     width: 100%;
+    min-height: 1rem;
 }
 
 .row::after {
@@ -76,7 +77,6 @@ body {
 }
 
 [class*="c-"] {
-    width: 100%;
     /* 
      * Set `float: left` to shrink the space between element and element.
      * `display: inline-block` makes space between element and element
@@ -88,6 +88,8 @@ body {
      */
     display: block;
     float: left;
+    width: 100%;
+    min-height: 1rem;
     /* debug: show off borders */
     border: 1px solid #6ac;
 }

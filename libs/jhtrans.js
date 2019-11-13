@@ -20,12 +20,22 @@
     return v === parseInt(v, 10);
   }
 
+  function isNullOrUndefined(v) {
+    return v == null;
+  }
+
   function isObject(v) {
     return v && !Array.isArray(v) && (typeof v) === "object";
   }
 
   function isString(v) {
     return typeof v === "string";
+  }
+
+  var templateMaker = "~@";
+
+  function isTemplateMarker(s) {
+    return (s || "").indexOf(templateMaker) === 0;
   }
 
   var Jhtrans = function Jhtrans() {
@@ -52,10 +62,11 @@
     );
   };
 
-  Jhtrans.prototype.translateElement = function (elm, map, recursion) {
+  Jhtrans.prototype.translateElement = function (elm, map, recursion, index) {
 
     map = map || {};
     recursion = recursion || 0;
+    index = isNullOrUndefined(index) ? "" : "-" + index;
 
     if (recursion > this.config.RECURSION_MAX) {
       throw Error("recursion was over max");
@@ -63,9 +74,13 @@
 
     var cns = elm.childNodes;
     var cn;
-    var i;
+    var i, j;
     var text;
+    var prop;
+    var value;
+    var item;
     var name;
+    var names;
     var tmpl;
     var trans;
     for (i = 0; i < cns.length; ++i) {
@@ -73,27 +88,61 @@
       if (cn.nodeType === Node.ELEMENT_NODE) {
         this.translateElement(cn, map, recursion + 1);
       } else if (cn.nodeType === Node.TEXT_NODE) {
+        prop = null;
+        value = null;
         name = null;
+        names = null;
         text = (cn.textContent || "").trim();
 
-        if (text.length >= 3 && text.indexOf("~@") === 0) {
+        if (isTemplateMarker(text)) {
+
+          if (text === templateMaker) {
+            prop = "@" + recursion + index;
+          } else {
+            prop = text.substr(2);
+          }
+
           // replace by holder name with map
-          if (!map.hasOwnProperty(text.substr(2))) {
+          if (!map.hasOwnProperty(prop)) {
             throw Error("map not found for: '" + text.substr(2) + "'");
           }
-          name = map[text.substr(2)];
+
+          value = map[prop];
+
         } else if (text.length >= 3 && text.indexOf("~#") === 0) {
           // replace by template name
-          name = text.substr(2);
+          value = text.substr(2);
         }
 
-        if (name !== null) {
-          tmpl = this.getTemplate(name);
-          trans = this.translateElement(tmpl, map, recursion + 1);
-          elm.replaceChild(trans, cn);
+        if (isString(value)) {
+          if (isTemplateMarker(value)) {
+            tmpl = this.getTemplate(value.substr(templateMaker.length));
+            trans = this.translateElement(tmpl, map, recursion + 1, null);
+            elm.replaceChild(trans, cn);
+          } else {
+            elm.removeChild(cn);
+            elm.textContent = value;
+          }
+
+        } else if (isArray(value)) {
+          elm.removeChild(cn);
+          for (j = 0; j < value.length; ++j) {
+            item = value[j];
+            if (isTemplateMarker(item)) {
+              tmpl = this.getTemplate(item.substr(templateMaker.length));
+              trans = this.translateElement(tmpl, map, recursion + 1, j);
+              elm.appendChild(trans);
+            } else {
+              elm.appendChild(document.createTextNode(item));
+            }
+          }
+
+        } else {
+          // do nothing
         }
       }
-    }
+
+    } // End of for
 
     return elm;
   };
