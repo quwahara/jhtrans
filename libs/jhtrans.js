@@ -32,9 +32,17 @@
     return typeof v === "string";
   }
 
-  var templateMaker = "~@";
+  var placeholderMaker = "@";
 
-  function isTemplateMarker(s) {
+  function isPlaceholderKey(s) {
+    return (s || "").indexOf(placeholderMaker) === 0;
+  }
+
+
+
+  var templateMaker = "#";
+
+  function isTemplateKey(s) {
     return (s || "").indexOf(templateMaker) === 0;
   }
 
@@ -52,93 +60,120 @@
       return this.templates[name].cloneNode(true);
     }
 
-    throw Error("template not found for: '" + name + "'");
+    return null;
   };
 
-  Jhtrans.prototype.translate = function (name, map) {
-    return this.translateElement(
-      this.getTemplate(name),
-      map
-    );
-  };
+  Jhtrans.prototype.translate = function (tKey, trMap) {
 
-  Jhtrans.prototype.translateElement = function (elm, map, recursion, index) {
-
-    map = map || {};
-    recursion = recursion || 0;
-    index = isNullOrUndefined(index) ? "" : "-" + index;
-
-    if (recursion > this.config.RECURSION_MAX) {
-      throw Error("recursion was over max");
+    const template = this.getTemplate(tKey);
+    if (isNullOrUndefined(templateMaker)) {
+      throw Error("The template was not found for:'" + tKey + "'.");
     }
 
-    var cns = elm.childNodes;
-    var cn;
-    var i, j;
-    var text;
-    var prop;
-    var value;
-    var item;
-    var name;
-    var names;
-    var tmpl;
-    var trans;
-    for (i = 0; i < cns.length; ++i) {
-      cn = cns.item(i);
+    return this.translateElement(template, trMap);
+  };
+
+  Jhtrans.prototype.translateElement = function (elm, trMap, recursion, index) {
+
+    if (isNullOrUndefined(elm)) {
+      throw Error("The elm was null or undefined.");
+    }
+
+    trMap = trMap || {};
+    recursion = recursion || 0;
+    const indexStr = isNullOrUndefined(index) ? "" : "-" + index;
+
+    if (recursion > this.config.RECURSION_MAX) {
+      throw Error("recursion count was over max");
+    }
+
+    // We will walk down elm.childNodes.
+    // Copying childNodes before walking down,
+    // because childNodes length will change
+    // if elm is appneded child/children.
+    const cns = [];
+    for (let i = 0; i < elm.childNodes.length; ++i) {
+      cns.push(elm.childNodes.item(i));
+    }
+
+    // Walking down childNodes
+    for (let i = 0; i < cns.length; ++i) {
+
+      const cn = cns[i];
+
       if (cn.nodeType === Node.ELEMENT_NODE) {
-        this.translateElement(cn, map, recursion + 1);
-      } else if (cn.nodeType === Node.TEXT_NODE) {
-        prop = null;
-        value = null;
-        name = null;
-        names = null;
-        text = (cn.textContent || "").trim();
+        this.translateElement(cn, trMap, recursion + 1);
+        continue;
+      }
 
-        if (isTemplateMarker(text)) {
+      if (cn.nodeType === Node.TEXT_NODE) {
 
-          if (text === templateMaker) {
-            prop = "@" + recursion + index;
-          } else {
-            prop = text.substr(2);
-          }
+        const text = (cn.textContent || "").trim();
 
-          // replace by holder name with map
-          if (!map.hasOwnProperty(prop)) {
-            throw Error("map not found for: '" + text.substr(2) + "'");
-          }
-
-          value = map[prop];
-
-        } else if (text.length >= 3 && text.indexOf("~#") === 0) {
-          // replace by template name
-          value = text.substr(2);
+        // The text wasn't a place holder.
+        if (!isPlaceholderKey(text)) {
+          // Do nothing
+          continue;
         }
 
-        if (isString(value)) {
-          if (isTemplateMarker(value)) {
-            tmpl = this.getTemplate(value.substr(templateMaker.length));
-            trans = this.translateElement(tmpl, map, recursion + 1, null);
-            elm.replaceChild(trans, cn);
-          } else {
-            elm.removeChild(cn);
-            elm.textContent = value;
-          }
+        // The text was a placeholder
 
-        } else if (isArray(value)) {
-          elm.removeChild(cn);
-          for (j = 0; j < value.length; ++j) {
-            item = value[j];
-            if (isTemplateMarker(item)) {
-              tmpl = this.getTemplate(item.substr(templateMaker.length));
-              trans = this.translateElement(tmpl, map, recursion + 1, j);
-              elm.appendChild(trans);
-            } else {
-              elm.appendChild(document.createTextNode(item));
-            }
-          }
+        // Placeholder location key
+        const plKey = "@" + recursion + indexStr;
+        // Placeholder key
+        const phKey = text;
+        let trValueFound = false;
+        let trValue;
 
+        if (trMap.hasOwnProperty(plKey)) {
+          trValueFound = true;
+          trValue = trMap[plKey];
+        }
+
+        if (trMap.hasOwnProperty(phKey)) {
+          trValueFound = true;
+          trValue = trMap[phKey];
+        }
+
+        // The placeholer was not found
+        if (!trValueFound) {
+          // Do nothing
+          continue;
+        }
+
+        let isAr = false;
+        let trValueArray;
+
+        if (isArray(trValue)) {
+          isAr = true;
+          trValueArray = trValue;
+        } else if (isString(trValue)) {
+          trValueArray = [trValue];
         } else {
-          // do nothing
+          throw Error("The value in translation map must be an array or a string: '" + text.substr(2) + "'");
+        }
+
+        elm.removeChild(cn);
+
+        for (let j = 0; j < trValueArray.length; ++j) {
+
+          const item = trValueArray[j];
+          let toAppend;
+
+          if (isString(item)) {
+            if (isTemplateKey(item)) {
+              const tKey = item;
+              const template = this.getTemplate(tKey.substring(templateMaker.length));
+              if (isNullOrUndefined(template)) {
+                toAppend = document.createTextNode(item);
+              } else {
+                toAppend = this.translateElement(template, trMap, recursion + 1, isAr ? j : null);
+              }
+            } else {
+              toAppend = document.createTextNode(item);
+            }
+            elm.appendChild(toAppend);
+          }
         }
       }
 

@@ -10,63 +10,69 @@ define(function (require) {
   //
 
   jht.putTemplateAll({
+
+    //
+    // row
+    //
     "row": ["div", {
       "class": "row"
-    }, "~@"],
+    }, "@"],
+
+    //
+    // c-1 to c-12
+    //
     "c-1": ["div", {
       "class": "c-1"
-    }, "~@"],
+    }, "@"],
     "c-2": ["div", {
       "class": "c-2"
-    }, "~@"],
+    }, "@"],
     "c-3": ["div", {
       "class": "c-3"
-    }, "~@"],
+    }, "@"],
     "c-4": ["div", {
       "class": "c-4"
-    }, "~@"],
+    }, "@"],
     "c-5": ["div", {
       "class": "c-5"
-    }, "~@"],
+    }, "@"],
     "c-6": ["div", {
       "class": "c-6"
-    }, "~@"],
+    }, "@"],
     "c-7": ["div", {
       "class": "c-7"
-    }, "~@"],
+    }, "@"],
     "c-8": ["div", {
       "class": "c-8"
-    }, "~@"],
+    }, "@"],
     "c-9": ["div", {
       "class": "c-9"
-    }, "~@"],
+    }, "@"],
     "c-10": ["div", {
       "class": "c-10"
-    }, "~@"],
+    }, "@"],
     "c-11": ["div", {
       "class": "c-11"
-    }, "~@"],
+    }, "@"],
     "c-12": ["div", {
       "class": "c-12"
-    }, "~@"],
+    }, "@"],
   });
 
-  var tx = (function (jht) {
-    return function (p1, p2) {
-      return jht.translate(p1, p2);
-    };
-  })(jht);
-
-  var elm = jht.translate("row", {
+  //
+  // crearte a row that has three columns
+  //
+  var row = jht.translate("row", {
     "@0": [
-      "~@c-12",
+      "#c-6",
+      "#c-6",
     ],
     "@1-0": "CCC",
     "@1-1": "111",
     "@1-2": "222",
   });
 
-  document.querySelector(".mount").appendChild(elm);
+  document.querySelector(".mount").appendChild(row);
 
 
 
