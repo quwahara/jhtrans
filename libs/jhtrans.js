@@ -40,6 +40,14 @@
     return !isNullOrUndefined(v) && v.nodeType === Node.TEXT_NODE;
   }
 
+  function isInputFamily(v) {
+    return !isNullOrUndefined(v) && (v.tagName === "INPUT" || v.tagName === "TEXTAREA");
+  }
+
+  function isTerminalTag(v) {
+    return !isNullOrUndefined(v) && (v.tagName === "INPUT" || v.tagName === "TEXTAREA" || v.tagName === "HR");
+  }
+
   var placeholderMaker = "@";
 
   function isPlaceholderKey(s) {
@@ -176,7 +184,7 @@
         const tmKey = objectValue.substring(templateMaker.length);
         const template = this.getTemplate(tmKey);
         if (!isNullOrUndefined(template)) {
-          parentElm.replaceChild(template, objectTextNode);
+          objectTextNode.parentNode.replaceChild(template, objectTextNode);
           this.acceptElementNode(parentElm, template, trMap, recursion, index);
           return template;
         }
@@ -188,12 +196,12 @@
 
         // Placeholder location key
         const indexStr = isNullOrUndefined(index) ? "" : "-" + index;
-        const plKey = "@" + recursion + indexStr;
+        const plKey = recursion + indexStr;
         if (trMap.hasOwnProperty(plKey)) {
           hasTrValue = true;
           trValue = trMap[plKey];
         } else {
-          const phKey = objectValue;
+          const phKey = objectValue.substring(placeholderMaker.length);
           if (trMap.hasOwnProperty(phKey)) {
             hasTrValue = true;
             trValue = trMap[phKey];
@@ -212,7 +220,7 @@
 
     if (isElementNode(objectValue)) {
       const elm = objectValue;
-      parentElm.replaceChild(elm, objectTextNode);
+      objectTextNode.parentNode.replaceChild(elm, objectTextNode);
       this.acceptElementNode(parentElm, elm, trMap, recursion, index);
       return elm;
     }
@@ -229,21 +237,21 @@
       const len = array.length;
 
       if (len === 0) {
-        parentElm.removeChild(objectTextNode);
+        objectTextNode.parentNode.removeChild(objectTextNode);
         return null;
       }
 
       const textNodes = [];
       for (let i = 1; i < len; ++i) {
         const textNode = document.createTextNode("");
-        parentElm.insertBefore(textNode, objectTextNode);
+        objectTextNode.parentNode.insertBefore(textNode, objectTextNode);
         textNodes.push(textNode);
       }
       textNodes.push(objectTextNode);
 
       const accepteds = [];
       for (let i = 0; i < len; ++i) {
-        accepteds.push(this.replaceTextNode(parentElm, textNodes[i], array[i], trMap, recursion + 1, i));
+        accepteds.push(this.replaceTextNode(textNodes[i].parentNode, textNodes[i], array[i], trMap, recursion + 1, i));
       }
       return accepteds;
     }
@@ -306,12 +314,17 @@
     if (definition.length >= 3) {
       var third = definition[2];
       if (isString(third)) {
-        elm.textContent = third;
+        if (isInputFamily(elm)) {
+          elm.value = third;
+        } else {
+          elm.textContent = third;
+        }
       } else if (isArray(third)) {
-        var i;
-        for (i = 0; i < third.length; ++i) {
-          var child = this.definitionToElement(third[i]);
-          elm.appendChild(child);
+        if (!isTerminalTag(elm)) {
+          for (let i = 0; i < third.length; ++i) {
+            var child = this.definitionToElement(third[i]);
+            elm.appendChild(child);
+          }
         }
       }
     }

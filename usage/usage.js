@@ -57,20 +57,50 @@ define(function (require) {
     "c-12": ["div", {
       "class": "c-12"
     }, "@"],
+
+    //
+    // lablel
+    //
+    "label": ["label", null, "@"],
+
+    //
+    // inputs
+    //
+    "i-text": ["input", {
+      "type": "input"
+    }, "@"],
+
   });
 
   //
   // crearte a row that has three columns
   //
   var row = jht.translate("row", {
-    "@0": [
-      "#c-6",
-      "#c-6",
+    "0": [
+      "#c-12",
     ],
-    "@1-0": "CCC",
-    "@1-1": "111",
-    "@1-2": "222",
+    "1-0": [
+      "#label",
+      "#i-text",
+    ]
   });
+
+  // var row = jht.translate("row", {
+  //   "@0": [
+  //     "#c-12",
+  //   ],
+  //   "@1-0": "#i-text",
+  // });
+
+  // var row = jht.translate("row", {
+  //   "@0": [
+  //     "#c-6",
+  //     "#c-6",
+  //   ],
+  //   "@1-0": "CCC",
+  //   "@1-1": "111",
+  //   "@1-2": "222",
+  // });
 
   document.querySelector(".mount").appendChild(row);
 
