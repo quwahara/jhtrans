@@ -64,7 +64,9 @@
     // Dictionary for templates
     this.templates = {};
     this.config = {
-      RECURSION_MAX: 1000
+      RECURSION_MAX: 1000,
+      PUT_PL_CLASS: true,
+      PL_CLASS_PREFIX: "pl-",
     };
   };
 
@@ -86,6 +88,10 @@
 
     if (!isElementNode(template)) {
       throw Error("The template was not ELEMENT_NODE.");
+    }
+
+    if (this.config.PUT_PL_CLASS) {
+      template.classList.add(this.config.PL_CLASS_PREFIX + 0);
     }
 
     // We will walk down objectElementNode.childNodes.
@@ -172,9 +178,16 @@
 
       let rawStrig = objectValue;
 
+      // Placeholder location key
+      const indexStr = isNullOrUndefined(index) ? "" : "-" + index;
+      const plKey = recursion + indexStr;
+
       if (isTemplateKey(objectValue)) {
         const tmKey = objectValue.substring(templateMaker.length);
         const template = this.getTemplate(tmKey);
+        if (this.config.PUT_PL_CLASS && isElementNode(template)) {
+          template.classList.add(this.config.PL_CLASS_PREFIX + plKey);
+        }
         if (!isNullOrUndefined(template)) {
           objectTextNode.parentNode.replaceChild(template, objectTextNode);
           this.acceptElementNode(template, trMap, recursion, index);
@@ -186,9 +199,6 @@
         let hasTrValue = false;
         let trValue = null;
 
-        // Placeholder location key
-        const indexStr = isNullOrUndefined(index) ? "" : "-" + index;
-        const plKey = recursion + indexStr;
         if (trMap.hasOwnProperty(plKey)) {
           hasTrValue = true;
           trValue = trMap[plKey];

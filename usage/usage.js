@@ -68,7 +68,7 @@ define(function (require) {
     //
     "i-text": ["input", {
       "type": "input"
-    }, "@"],
+    }],
 
   });
 
