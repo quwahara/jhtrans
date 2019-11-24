@@ -102,30 +102,30 @@
     // Walking down childNodes
     for (let i = 0; i < cns.length; ++i) {
       const cn = cns[i];
-      this.acceptNode(template, cn, trMap, 0, null);
+      this.acceptNode(cn, trMap, 0, null);
     }
 
     return template;
   };
 
-  Jhtrans.prototype.acceptNode = function (parentElm, objectNode, trMap, recursion, index) {
+  Jhtrans.prototype.acceptNode = function (objectNode, trMap, recursion, index) {
 
     if (isNullOrUndefined(objectNode)) {
       throw Error("The objectNode was null or undefined.");
     }
 
     if (isElementNode(objectNode)) {
-      return this.acceptElementNode(parentElm, objectNode, trMap, recursion, index);
+      return this.acceptElementNode(objectNode, trMap, recursion, index);
     }
 
     if (isTextNode(objectNode)) {
-      return this.acceptTextNode(parentElm, objectNode, trMap, recursion, index);
+      return this.acceptTextNode(objectNode, trMap, recursion, index);
     }
 
     throw Error("The objectNode was not ELEMENT_NODE nor TEXT_NODE.");
   }
 
-  Jhtrans.prototype.acceptElementNode = function (parentElm, objectElementNode, trMap, recursion, index) {
+  Jhtrans.prototype.acceptElementNode = function (objectElementNode, trMap, recursion, index) {
 
     // We will walk down objectElementNode.childNodes.
     // Copying childNodes before walking down,
@@ -139,26 +139,18 @@
     // Walking down childNodes
     for (let i = 0; i < cns.length; ++i) {
       const cn = cns[i];
-      this.acceptNode(parentElm, cn, trMap, recursion, index);
+      this.acceptNode(cn, trMap, recursion, index);
     }
 
     return objectElementNode;
   }
 
-  Jhtrans.prototype.acceptTextNode = function (parentElm, objectTextNode, trMap, recursion, index) {
+  Jhtrans.prototype.acceptTextNode = function (objectTextNode, trMap, recursion, index) {
     const text = (objectTextNode.textContent || "").trim();
-    return this.replaceTextNode(parentElm, objectTextNode, text, trMap, recursion, index);
+    return this.replaceTextNode(objectTextNode, text, trMap, recursion, index);
   }
 
-  Jhtrans.prototype.replaceTextNode = function (parentElm, objectTextNode, objectValue, trMap, recursion, index) {
-
-    if (isNullOrUndefined(parentElm)) {
-      throw Error("The parentElm was null or undefined.");
-    }
-
-    if (!isElementNode(parentElm)) {
-      throw Error("The parentElm was not ELEMENT_NODE.");
-    }
+  Jhtrans.prototype.replaceTextNode = function (objectTextNode, objectValue, trMap, recursion, index) {
 
     if (isNullOrUndefined(objectTextNode)) {
       throw Error("The objectTextNode was null or undefined.");
@@ -185,7 +177,7 @@
         const template = this.getTemplate(tmKey);
         if (!isNullOrUndefined(template)) {
           objectTextNode.parentNode.replaceChild(template, objectTextNode);
-          this.acceptElementNode(parentElm, template, trMap, recursion, index);
+          this.acceptElementNode(template, trMap, recursion, index);
           return template;
         }
         rawStrig = tmKey;
@@ -209,7 +201,7 @@
         }
 
         if (hasTrValue) {
-          return this.replaceTextNode(parentElm, objectTextNode, trValue, trMap, recursion, index);
+          return this.replaceTextNode(objectTextNode, trValue, trMap, recursion, index);
         }
       }
 
@@ -221,14 +213,14 @@
     if (isElementNode(objectValue)) {
       const elm = objectValue;
       objectTextNode.parentNode.replaceChild(elm, objectTextNode);
-      this.acceptElementNode(parentElm, elm, trMap, recursion, index);
+      this.acceptElementNode(elm, trMap, recursion, index);
       return elm;
     }
 
     if (isTextNode(objectValue)) {
       const textNode = objectValue;
       const text = (textNode.textContent || "").trim();
-      return this.replaceTextNode(parentElm, textNode, text, trMap, recursion, index);
+      return this.replaceTextNode(textNode, text, trMap, recursion, index);
     }
 
     if (isArray(objectValue)) {
@@ -251,7 +243,7 @@
 
       const accepteds = [];
       for (let i = 0; i < len; ++i) {
-        accepteds.push(this.replaceTextNode(textNodes[i].parentNode, textNodes[i], array[i], trMap, recursion + 1, i));
+        accepteds.push(this.replaceTextNode(textNodes[i], array[i], trMap, recursion + 1, i));
       }
       return accepteds;
     }
