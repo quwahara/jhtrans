@@ -32,13 +32,19 @@
     return typeof v === "string";
   }
 
+  function isElementNode(v) {
+    return !isNullOrUndefined(v) && v.nodeType === Node.ELEMENT_NODE;
+  }
+
+  function isTextNode(v) {
+    return !isNullOrUndefined(v) && v.nodeType === Node.TEXT_NODE;
+  }
+
   var placeholderMaker = "@";
 
   function isPlaceholderKey(s) {
     return (s || "").indexOf(placeholderMaker) === 0;
   }
-
-
 
   var templateMaker = "#";
 
@@ -70,117 +76,180 @@
       throw Error("The template was not found for:'" + tKey + "'.");
     }
 
-    return this.translateElement(template, trMap);
-  };
+    if (!isElementNode(template)) {
+      throw Error("The template was not ELEMENT_NODE.");
+    }
 
-  Jhtrans.prototype.translateElement = function (elm, trMap, recursion, index) {
-
-    if (isNullOrUndefined(elm)) {
-      throw Error("The elm was null or undefined.");
+    // We will walk down objectElementNode.childNodes.
+    // Copying childNodes before walking down,
+    // because childNodes length will change
+    // if objectElementNode is appneded child/children.
+    const cns = [];
+    for (let i = 0; i < template.childNodes.length; ++i) {
+      cns.push(template.childNodes.item(i));
     }
 
     trMap = trMap || {};
-    recursion = recursion || 0;
-    const indexStr = isNullOrUndefined(index) ? "" : "-" + index;
 
-    if (recursion > this.config.RECURSION_MAX) {
-      throw Error("recursion count was over max");
+    // Walking down childNodes
+    for (let i = 0; i < cns.length; ++i) {
+      const cn = cns[i];
+      this.acceptNode(template, cn, trMap, 0, null);
     }
 
-    // We will walk down elm.childNodes.
+    return template;
+  };
+
+  Jhtrans.prototype.acceptNode = function (parentElm, objectNode, trMap, recursion, index) {
+
+    if (isNullOrUndefined(objectNode)) {
+      throw Error("The objectNode was null or undefined.");
+    }
+
+    if (isElementNode(objectNode)) {
+      return this.acceptElementNode(parentElm, objectNode, trMap, recursion, index);
+    }
+
+    if (isTextNode(objectNode)) {
+      return this.acceptTextNode(parentElm, objectNode, trMap, recursion, index);
+    }
+
+    throw Error("The objectNode was not ELEMENT_NODE nor TEXT_NODE.");
+  }
+
+  Jhtrans.prototype.acceptElementNode = function (parentElm, objectElementNode, trMap, recursion, index) {
+
+    // We will walk down objectElementNode.childNodes.
     // Copying childNodes before walking down,
     // because childNodes length will change
-    // if elm is appneded child/children.
+    // if objectElementNode is appneded child/children.
     const cns = [];
-    for (let i = 0; i < elm.childNodes.length; ++i) {
-      cns.push(elm.childNodes.item(i));
+    for (let i = 0; i < objectElementNode.childNodes.length; ++i) {
+      cns.push(objectElementNode.childNodes.item(i));
     }
 
     // Walking down childNodes
     for (let i = 0; i < cns.length; ++i) {
-
       const cn = cns[i];
+      this.acceptNode(parentElm, cn, trMap, recursion, index);
+    }
 
-      if (cn.nodeType === Node.ELEMENT_NODE) {
-        this.translateElement(cn, trMap, recursion + 1);
-        continue;
-      }
+    return objectElementNode;
+  }
 
-      if (cn.nodeType === Node.TEXT_NODE) {
+  Jhtrans.prototype.acceptTextNode = function (parentElm, objectTextNode, trMap, recursion, index) {
+    const text = (objectTextNode.textContent || "").trim();
+    return this.replaceTextNode(parentElm, objectTextNode, text, trMap, recursion, index);
+  }
 
-        const text = (cn.textContent || "").trim();
+  Jhtrans.prototype.replaceTextNode = function (parentElm, objectTextNode, objectValue, trMap, recursion, index) {
 
-        // The text wasn't a place holder.
-        if (!isPlaceholderKey(text)) {
-          // Do nothing
-          continue;
+    if (isNullOrUndefined(parentElm)) {
+      throw Error("The parentElm was null or undefined.");
+    }
+
+    if (!isElementNode(parentElm)) {
+      throw Error("The parentElm was not ELEMENT_NODE.");
+    }
+
+    if (isNullOrUndefined(objectTextNode)) {
+      throw Error("The objectTextNode was null or undefined.");
+    }
+
+    if (!isTextNode(objectTextNode)) {
+      throw Error("The pobjectTextNode was not TEXT_NODE.");
+    }
+
+    if (isNullOrUndefined(objectValue)) {
+      throw Error("The objectValue was null or undefined.");
+    }
+
+    if (recursion > this.config.RECURSION_MAX) {
+      throw Error("Recursion count was over max.");
+    }
+
+    if (isString(objectValue)) {
+
+      let rawStrig = objectValue;
+
+      if (isTemplateKey(objectValue)) {
+        const tmKey = objectValue.substring(templateMaker.length);
+        const template = this.getTemplate(tmKey);
+        if (!isNullOrUndefined(template)) {
+          parentElm.replaceChild(template, objectTextNode);
+          this.acceptElementNode(parentElm, template, trMap, recursion, index);
+          return template;
         }
+        rawStrig = tmKey;
 
-        // The text was a placeholder
+      } else if (isPlaceholderKey(objectValue)) {
+        let hasTrValue = false;
+        let trValue = null;
 
         // Placeholder location key
+        const indexStr = isNullOrUndefined(index) ? "" : "-" + index;
         const plKey = "@" + recursion + indexStr;
-        // Placeholder key
-        const phKey = text;
-        let trValueFound = false;
-        let trValue;
-
         if (trMap.hasOwnProperty(plKey)) {
-          trValueFound = true;
+          hasTrValue = true;
           trValue = trMap[plKey];
-        }
-
-        if (trMap.hasOwnProperty(phKey)) {
-          trValueFound = true;
-          trValue = trMap[phKey];
-        }
-
-        // The placeholer was not found
-        if (!trValueFound) {
-          // Do nothing
-          continue;
-        }
-
-        let isAr = false;
-        let trValueArray;
-
-        if (isArray(trValue)) {
-          isAr = true;
-          trValueArray = trValue;
-        } else if (isString(trValue)) {
-          trValueArray = [trValue];
         } else {
-          throw Error("The value in translation map must be an array or a string: '" + text.substr(2) + "'");
+          const phKey = objectValue;
+          if (trMap.hasOwnProperty(phKey)) {
+            hasTrValue = true;
+            trValue = trMap[phKey];
+          }
         }
 
-        elm.removeChild(cn);
-
-        for (let j = 0; j < trValueArray.length; ++j) {
-
-          const item = trValueArray[j];
-          let toAppend;
-
-          if (isString(item)) {
-            if (isTemplateKey(item)) {
-              const tKey = item;
-              const template = this.getTemplate(tKey.substring(templateMaker.length));
-              if (isNullOrUndefined(template)) {
-                toAppend = document.createTextNode(item);
-              } else {
-                toAppend = this.translateElement(template, trMap, recursion + 1, isAr ? j : null);
-              }
-            } else {
-              toAppend = document.createTextNode(item);
-            }
-            elm.appendChild(toAppend);
-          }
+        if (hasTrValue) {
+          return this.replaceTextNode(parentElm, objectTextNode, trValue, trMap, recursion, index);
         }
       }
 
-    } // End of for
+      objectTextNode.textContent = rawStrig;
+      return objectTextNode;
+    } // /isString
 
-    return elm;
-  };
+
+    if (isElementNode(objectValue)) {
+      const elm = objectValue;
+      parentElm.replaceChild(elm, objectTextNode);
+      this.acceptElementNode(parentElm, elm, trMap, recursion, index);
+      return elm;
+    }
+
+    if (isTextNode(objectValue)) {
+      const textNode = objectValue;
+      const text = (textNode.textContent || "").trim();
+      return this.replaceTextNode(parentElm, textNode, text, trMap, recursion, index);
+    }
+
+    if (isArray(objectValue)) {
+
+      const array = objectValue;
+      const len = array.length;
+
+      if (len === 0) {
+        parentElm.removeChild(objectTextNode);
+        return null;
+      }
+
+      const textNodes = [];
+      for (let i = 1; i < len; ++i) {
+        const textNode = document.createTextNode("");
+        parentElm.insertBefore(textNode, objectTextNode);
+        textNodes.push(textNode);
+      }
+      textNodes.push(objectTextNode);
+
+      const accepteds = [];
+      for (let i = 0; i < len; ++i) {
+        accepteds.push(this.replaceTextNode(parentElm, textNodes[i], array[i], trMap, recursion + 1, i));
+      }
+      return accepteds;
+    }
+
+    return objectTextNode;
+  }
 
   Jhtrans.prototype.putTemplate = function (name, definition) {
     var template = this.definitionToElement(definition);
