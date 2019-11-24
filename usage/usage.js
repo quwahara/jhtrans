@@ -67,7 +67,10 @@ define(function (require) {
     // inputs
     //
     "i-text": ["input", {
-      "type": "input"
+      "type": "text"
+    }],
+    "i-password": ["input", {
+      "type": "password"
     }],
 
   });
@@ -79,10 +82,11 @@ define(function (require) {
     "0": [
       "#c-12",
     ],
-    "1-0": [
+    "0-1x0-2": [
       "#label",
       "#i-text",
-    ]
+    ],
+    "0-1x0-2-3x0-4": "Username",
   });
 
   // var row = jht.translate("row", {
