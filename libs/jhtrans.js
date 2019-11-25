@@ -214,32 +214,37 @@
     }
 
     if (isArray(objectValue)) {
-
-      const array = objectValue;
-      const len = array.length;
-
-      if (len === 0) {
-        objectTextNode.parentNode.removeChild(objectTextNode);
-        return null;
-      }
-
-      const textNodes = [];
-      for (let i = 1; i < len; ++i) {
-        const textNode = document.createTextNode("");
-        objectTextNode.parentNode.insertBefore(textNode, objectTextNode);
-        textNodes.push(textNode);
-      }
-      textNodes.push(objectTextNode);
-
-      const accepteds = [];
-      for (let i = 0; i < len; ++i) {
-        accepteds.push(this.replaceTextNode(textNodes[i], array[i], trMap, pl, recursion + 1, i));
-      }
-      return accepteds;
+      return this.replaceTextNodeByArray(objectTextNode, objectValue, trMap, pl, recursion, index);
     }
 
     return objectTextNode;
   }
+
+  Jhtrans.prototype.replaceTextNodeByArray = function (objectTextNode, array, trMap, pl, recursion, index) {
+
+    const len = array.length;
+    const parent = objectTextNode.parentNode;
+    if (len === 0) {
+      parent.removeChild(objectTextNode);
+      return null;
+    }
+
+    const textNodes = [];
+    for (let i = 1; i < len; ++i) {
+      const textNode = document.createTextNode("");
+      parent.insertBefore(textNode, objectTextNode);
+      textNodes.push(textNode);
+    }
+    textNodes.push(objectTextNode);
+
+    const accepteds = [];
+    for (let i = 0; i < len; ++i) {
+      accepteds.push(this.replaceTextNode(textNodes[i], array[i], trMap, pl, recursion + 1, i));
+    }
+    return accepteds;
+
+  }
+
 
   Jhtrans.prototype.putTemplate = function (name, definition) {
     var template = this.definitionToElement(definition);
