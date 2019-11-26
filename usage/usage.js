@@ -75,19 +75,32 @@ define(function (require) {
 
   });
 
+  const row = jht.getTemplate("row");
+
+  document.querySelector(".mount").appendChild(row);
+
+  jht.acceptElementNode(row, {
+    "0x0-1x0": [
+      "#c-6",
+      "#c-6",
+    ],
+  }, "", 0, 0);
+
+
   //
   // crearte a row that has three columns
   //
-  var row = jht.translate("row", {
-    "0": [
-      "#c-12",
-    ],
-    "0-1x0-2": [
-      "#label",
-      "#i-text",
-    ],
-    "0-1x0-2-3x0-4": "Username",
-  });
+  // var row = jht.translate("row", {
+  //   "1": [
+  //     "#c-6",
+  //     "#c-6",
+  //   ],
+  //   // "0-1x0-2": [
+  //   //   "#label",
+  //   //   "#i-text",
+  //   // ],
+  //   // "0-1x0-2-3x0-4": "Username",
+  // });
 
   // var row = jht.translate("row", {
   //   "@0": [
@@ -106,7 +119,6 @@ define(function (require) {
   //   "@1-2": "222",
   // });
 
-  document.querySelector(".mount").appendChild(row);
 
 
 
