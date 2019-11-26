@@ -155,51 +155,8 @@
     }
 
     if (isString(objectValue)) {
-
-      let rawStrig = objectValue;
-
-      // Placeholder location key
-      const indexStr = isNullOrUndefined(index) ? "" : "x" + index;
-      const plh = pl + (pl ? "-" : "");
-      const plKey = plh + recursion + indexStr;
-
-      if (isTemplateKey(objectValue)) {
-        const tmKey = objectValue.substring(templateMaker.length);
-        const template = this.getTemplate(tmKey);
-        if (this.config.PUT_PL_CLASS && isElementNode(template)) {
-          template.classList.add(this.config.PL_CLASS_PREFIX + plKey);
-        }
-        if (!isNullOrUndefined(template)) {
-          objectTextNode.parentNode.replaceChild(template, objectTextNode);
-          this.acceptElementNode(template, trMap, plKey, recursion + 1, null);
-          return template;
-        }
-        rawStrig = tmKey;
-
-      } else if (isPlaceholderKey(objectValue)) {
-        let hasTrValue = false;
-        let trValue = null;
-
-        if (trMap.hasOwnProperty(plKey)) {
-          hasTrValue = true;
-          trValue = trMap[plKey];
-        } else {
-          const phKey = objectValue.substring(placeholderMaker.length);
-          if (trMap.hasOwnProperty(phKey)) {
-            hasTrValue = true;
-            trValue = trMap[phKey];
-          }
-        }
-
-        if (hasTrValue) {
-          return this.replaceTextNode(objectTextNode, trValue, trMap, plKey, recursion, index);
-        }
-      }
-
-      objectTextNode.textContent = rawStrig;
-      return objectTextNode;
-    } // /isString
-
+      return this.replaceTextNodeByString(objectTextNode, objectValue, trMap, pl, recursion, index);
+    }
 
     if (isElementNode(objectValue)) {
       const elm = objectValue;
@@ -217,6 +174,71 @@
       return this.replaceTextNodeByArray(objectTextNode, objectValue, trMap, pl, recursion, index);
     }
 
+    return objectTextNode;
+  }
+
+  Jhtrans.prototype.replaceTextNodeByString = function (objectTextNode, objectValue, trMap, pl, recursion, index) {
+
+    if (isTemplateKey(objectValue)) {
+      return this.replaceTextNodeByTemplateKey(objectTextNode, objectValue, trMap, pl, recursion, index);
+    } else if (isPlaceholderKey(objectValue)) {
+      return this.replaceTextNodeByPlaceholderKey(objectTextNode, objectValue, trMap, pl, recursion, index);
+    } else {
+      return this.replaceTextNodeByRawString(objectTextNode, objectValue, trMap, pl, recursion, index);
+    }
+  }
+
+  Jhtrans.prototype.replaceTextNodeByTemplateKey = function (objectTextNode, objectValue, trMap, pl, recursion, index) {
+
+    // Placeholder location key
+    const indexStr = isNullOrUndefined(index) ? "" : "x" + index;
+    const plh = pl + (pl ? "-" : "");
+    const plKey = plh + recursion + indexStr;
+
+    const tmKey = objectValue.substring(templateMaker.length);
+    const template = this.getTemplate(tmKey);
+    if (this.config.PUT_PL_CLASS && isElementNode(template)) {
+      template.classList.add(this.config.PL_CLASS_PREFIX + plKey);
+    }
+    if (!isNullOrUndefined(template)) {
+      objectTextNode.parentNode.replaceChild(template, objectTextNode);
+      this.acceptElementNode(template, trMap, plKey, recursion + 1, null);
+      return template;
+    }
+
+    return this.replaceTextNodeByRawString(objectTextNode, objectValue, trMap, pl, recursion, index);
+  }
+
+  Jhtrans.prototype.replaceTextNodeByPlaceholderKey = function (objectTextNode, objectValue, trMap, pl, recursion, index) {
+
+    // Placeholder location key
+    const indexStr = isNullOrUndefined(index) ? "" : "x" + index;
+    const plh = pl + (pl ? "-" : "");
+    const plKey = plh + recursion + indexStr;
+
+    let hasTrValue = false;
+    let trValue = null;
+
+    if (trMap.hasOwnProperty(plKey)) {
+      hasTrValue = true;
+      trValue = trMap[plKey];
+    } else {
+      const phKey = objectValue.substring(placeholderMaker.length);
+      if (trMap.hasOwnProperty(phKey)) {
+        hasTrValue = true;
+        trValue = trMap[phKey];
+      }
+    }
+
+    if (hasTrValue) {
+      return this.replaceTextNode(objectTextNode, trValue, trMap, plKey, recursion, index);
+    }
+
+    return this.replaceTextNodeByRawString(objectTextNode, objectValue, trMap, pl, recursion, index);
+  }
+
+  Jhtrans.prototype.replaceTextNodeByRawString = function (objectTextNode, rawString, trMap, pl, recursion, index) {
+    objectTextNode.textContent = rawString;
     return objectTextNode;
   }
 
@@ -244,7 +266,6 @@
     return accepteds;
 
   }
-
 
   Jhtrans.prototype.putTemplate = function (name, definition) {
     var template = this.definitionToElement(definition);
