@@ -157,26 +157,26 @@
       throw Error("recursion count was over max.");
     }
 
-    const newRecursion = recursion + 1;
+    const nextRecursion = recursion + 1;
 
     if (isString(objectValue)) {
-      return this.replaceTextNodeByString(objectTextNode, objectValue, trMap, pl, depth, index, newRecursion);
+      return this.replaceTextNodeByString(objectTextNode, objectValue, trMap, pl, depth, index, nextRecursion);
     }
 
     if (isElementNode(objectValue)) {
       const elm = objectValue;
       objectTextNode.parentNode.replaceChild(elm, objectTextNode);
-      this.acceptElementNode(elm, trMap, pl, depth, index, newRecursion);
+      this.acceptElementNode(elm, trMap, pl, depth, index, nextRecursion);
       return elm;
     }
 
     if (isTextNode(objectValue)) {
       const textNode = objectValue;
-      return this.acceptTextNode(textNode, text, trMap, pl, depth, index, newRecursion);
+      return this.acceptTextNode(textNode, text, trMap, pl, depth, index, nextRecursion);
     }
 
     if (isArray(objectValue)) {
-      return this.replaceTextNodeByArray(objectTextNode, objectValue, trMap, pl, depth, index, newRecursion);
+      return this.replaceTextNodeByArray(objectTextNode, objectValue, trMap, pl, depth, index, nextRecursion);
     }
 
     return objectTextNode;
