@@ -66,7 +66,7 @@
     this.config = {
       PL_CLASS_PREFIX: "jh-",
       PUT_PL_CLASS: true,
-      DEPTH_MAX: 1000,
+      RECURSION_MAX: 1000,
       USE_PL_AS_RAW_STRING: true,
     };
   };
@@ -92,10 +92,10 @@
       throw Error("The template was not ELEMENT_NODE.");
     }
 
-    return this.acceptElementNode(template, trMap, "", 0, 0);
+    return this.acceptElementNode(template, trMap, "", 0, 0, 0);
   };
 
-  Jhtrans.prototype.acceptElementNode = function (objectElementNode, trMap, pl, depth, index) {
+  Jhtrans.prototype.acceptElementNode = function (objectElementNode, trMap, pl, depth, index, recursion) {
 
     if (this.config.PUT_PL_CLASS) {
       objectElementNode.classList.add(this.config.PL_CLASS_PREFIX + this.compPlKey(pl, depth, index));
@@ -119,12 +119,12 @@
       const cn = cns[i];
 
       if (isElementNode(cn)) {
-        this.acceptElementNode(cn, trMap, nextPl, depth, i);
+        this.acceptElementNode(cn, trMap, nextPl, depth, i, recursion);
         continue;
       }
 
       if (isTextNode(cn)) {
-        this.acceptTextNode(cn, trMap, nextPl, depth, i);
+        this.acceptTextNode(cn, trMap, nextPl, depth, i, recursion);
         continue;
       }
 
@@ -134,12 +134,12 @@
     return objectElementNode;
   }
 
-  Jhtrans.prototype.acceptTextNode = function (objectTextNode, trMap, pl, depth, index) {
+  Jhtrans.prototype.acceptTextNode = function (objectTextNode, trMap, pl, depth, index, recursion) {
     const text = (objectTextNode.textContent || "").trim();
-    return this.replaceTextNode(objectTextNode, text, trMap, pl, depth, index);
+    return this.replaceTextNode(objectTextNode, text, trMap, pl, depth, index, recursion);
   }
 
-  Jhtrans.prototype.replaceTextNode = function (objectTextNode, objectValue, trMap, pl, depth, index) {
+  Jhtrans.prototype.replaceTextNode = function (objectTextNode, objectValue, trMap, pl, depth, index, recursion) {
 
     if (isNullOrUndefined(objectTextNode)) {
       throw Error("The objectTextNode was null or undefined.");
@@ -153,59 +153,61 @@
       throw Error("The objectValue was null or undefined.");
     }
 
-    if (depth > this.config.DEPTH_MAX) {
-      throw Error("depth was over max.");
+    if (recursion > this.config.RECURSION_MAX) {
+      throw Error("recursion count was over max.");
     }
 
+    const newRecursion = recursion + 1;
+
     if (isString(objectValue)) {
-      return this.replaceTextNodeByString(objectTextNode, objectValue, trMap, pl, depth, index);
+      return this.replaceTextNodeByString(objectTextNode, objectValue, trMap, pl, depth, index, newRecursion);
     }
 
     if (isElementNode(objectValue)) {
       const elm = objectValue;
       objectTextNode.parentNode.replaceChild(elm, objectTextNode);
-      this.acceptElementNode(elm, trMap, pl, depth, index);
+      this.acceptElementNode(elm, trMap, pl, depth, index, newRecursion);
       return elm;
     }
 
     if (isTextNode(objectValue)) {
       const textNode = objectValue;
-      return this.acceptTextNode(textNode, text, trMap, pl, depth, index);
+      return this.acceptTextNode(textNode, text, trMap, pl, depth, index, newRecursion);
     }
 
     if (isArray(objectValue)) {
-      return this.replaceTextNodeByArray(objectTextNode, objectValue, trMap, pl, depth, index);
+      return this.replaceTextNodeByArray(objectTextNode, objectValue, trMap, pl, depth, index, newRecursion);
     }
 
     return objectTextNode;
   }
 
-  Jhtrans.prototype.replaceTextNodeByString = function (objectTextNode, objectValue, trMap, pl, depth, index) {
+  Jhtrans.prototype.replaceTextNodeByString = function (objectTextNode, objectValue, trMap, pl, depth, index, recursion) {
 
     if (isTemplateKey(objectValue)) {
-      return this.replaceTextNodeByTemplateKey(objectTextNode, objectValue, trMap, pl, depth, index);
+      return this.replaceTextNodeByTemplateKey(objectTextNode, objectValue, trMap, pl, depth, index, recursion);
     } else if (isPlaceholderKey(objectValue)) {
-      return this.replaceTextNodeByPlaceholderKey(objectTextNode, objectValue, trMap, pl, depth, index);
+      return this.replaceTextNodeByPlaceholderKey(objectTextNode, objectValue, trMap, pl, depth, index, recursion);
     } else {
-      return this.replaceTextNodeByRawString(objectTextNode, objectValue, trMap, pl, depth, index);
+      return this.replaceTextNodeByRawString(objectTextNode, objectValue, trMap, pl, depth, index, recursion);
     }
   }
 
-  Jhtrans.prototype.replaceTextNodeByTemplateKey = function (objectTextNode, objectValue, trMap, pl, depth, index) {
+  Jhtrans.prototype.replaceTextNodeByTemplateKey = function (objectTextNode, objectValue, trMap, pl, depth, index, recursion) {
 
     const tmKey = objectValue.substring(templateMaker.length);
     const template = this.getTemplate(tmKey);
 
     if (!isNullOrUndefined(template)) {
       objectTextNode.parentNode.replaceChild(template, objectTextNode);
-      this.acceptElementNode(template, trMap, pl, depth, index);
+      this.acceptElementNode(template, trMap, pl, depth, index, recursion);
       return template;
     }
 
-    return this.replaceTextNodeByRawString(objectTextNode, objectValue, trMap, pl, depth, index);
+    return this.replaceTextNodeByRawString(objectTextNode, objectValue, trMap, pl, depth, index, recursion);
   }
 
-  Jhtrans.prototype.replaceTextNodeByPlaceholderKey = function (objectTextNode, objectValue, trMap, pl, depth, index) {
+  Jhtrans.prototype.replaceTextNodeByPlaceholderKey = function (objectTextNode, objectValue, trMap, pl, depth, index, recursion) {
 
     const plKey = this.compPlKey(pl, depth, index);
     let hasTrValue = false;
@@ -223,12 +225,12 @@
     }
 
     if (hasTrValue) {
-      return this.replaceTextNode(objectTextNode, trValue, trMap, pl, depth, index);
+      return this.replaceTextNode(objectTextNode, trValue, trMap, pl, depth, index, recursion);
     }
 
     const rawString = this.config.USE_PL_AS_RAW_STRING ? plKey : objectValue;
 
-    return this.replaceTextNodeByRawString(objectTextNode, rawString, trMap, pl, depth, index);
+    return this.replaceTextNodeByRawString(objectTextNode, rawString, trMap, pl, depth, index, recursion);
   }
 
   Jhtrans.prototype.compPlKey = function (pl, depth, index) {
@@ -238,12 +240,12 @@
     return plKey;
   }
 
-  Jhtrans.prototype.replaceTextNodeByRawString = function (objectTextNode, rawString, trMap, pl, depth, index) {
+  Jhtrans.prototype.replaceTextNodeByRawString = function (objectTextNode, rawString, trMap, pl, depth, index, recursion) {
     objectTextNode.textContent = rawString;
     return objectTextNode;
   }
 
-  Jhtrans.prototype.replaceTextNodeByArray = function (objectTextNode, array, trMap, pl, depth, index) {
+  Jhtrans.prototype.replaceTextNodeByArray = function (objectTextNode, array, trMap, pl, depth, index, recursion) {
 
     const len = array.length;
     const parent = objectTextNode.parentNode;
@@ -264,7 +266,7 @@
 
     const accepteds = [];
     for (let i = 0; i < len; ++i) {
-      accepteds.push(this.replaceTextNode(textNodes[i], array[i], trMap, pl, depth, i));
+      accepteds.push(this.replaceTextNode(textNodes[i], array[i], trMap, pl, depth, i, recursion));
     }
     return accepteds;
 
