@@ -3,13 +3,16 @@ define(function (require) {
   var Jhtrans = require('../libs/jhtrans');
   const jht = new Jhtrans();
 
-
-
   //
   // putTemplateAll test
   //
 
   jht.putTemplateAll({
+
+    //
+    // row
+    //
+    "div": ["div", null, "@"],
 
     //
     // row
@@ -58,6 +61,19 @@ define(function (require) {
       "class": "c-12"
     }, "@"],
 
+    "row--c-12--pad6": ["div", {
+      "class": "row"
+    }, [
+        ["div", {
+          "class": "c-12"
+        }, [
+            ["div", {
+              "class": "pad6"
+            }, "@"]
+          ]]
+      ]
+    ],
+
     //
     // lablel
     //
@@ -68,24 +84,71 @@ define(function (require) {
     //
     "i-text": ["input", {
       "type": "text"
-    }],
+    }, ""],
     "i-password": ["input", {
       "type": "password"
-    }],
+    }, ""],
 
+    //
+    // buttons
+    //
+    "b-button": ["button", {
+      "type": "button"
+    }, "@"],
   });
 
-  const row = jht.getTemplate("row");
+  const div = jht.getTemplate("div");
 
-  document.querySelector(".mount").appendChild(row);
+  document.querySelector(".mount").appendChild(div);
 
-  jht.acceptElementNode(row, {
+  const trMap = {
     "0x0-1x0": [
+      "#row",
+      "#row",
+      "#row--c-12",
+    ],
+    "0x0-1x0-2x0": [
+      "#c-3",
+      "#c-6",
+      "#c-3",
+    ],
+    "0x0-1x0-2x1-3x0": [
+      "#row--c-12--pad6",
+      "#row--c-12--pad6",
+      "#row--c-12--pad6",
+    ],
+    "0x0-1x0-2x1-3x0-4x0-5x0-6x0": [
+      "#label",
+      "#i-text",
+    ],
+    "0x0-1x0-2x1-3x0-4x0-5x0-6x0-7x0": "Username",
+    "0x0-1x0-2x1-3x1-4x0-5x0-6x0": [
+      "#label",
+      "#i-password",
+    ],
+    "0x0-1x0-2x1-3x1-4x0-5x0-6x0-7x0": "Password",
+    "0x0-1x0-2x1-3x2-4x0-5x0-6x0": [
       "#c-6",
       "#c-6",
     ],
-  }, "", 0, 0, 0);
+    "0x0-1x0-2x1-3x2-4x0-5x0-6x0-7x0": "#b-button",
+    "0x0-1x0-2x1-3x2-4x0-5x0-6x0-7x0-8x0": "Login",
+    "0x0-1x0-2x1-3x2-4x0-5x0-6x1-7x0": "#b-button",
+    "0x0-1x0-2x1-3x2-4x0-5x0-6x1-7x0-8x0": "Cancel",
 
+  };
+
+  jht.acceptElementNode(div, trMap, "", 0, 0, 0);
+
+  // 2019-11-27
+  // const row = jht.getTemplate("row");
+  // document.querySelector(".mount").appendChild(row);
+  // jht.acceptElementNode(row, {
+  //   "0x0-1x0": [
+  //     "#c-6",
+  //     "#c-6",
+  //   ],
+  // }, "", 0, 0, 0);
 
   //
   // crearte a row that has three columns

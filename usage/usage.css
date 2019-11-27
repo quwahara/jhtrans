@@ -10,6 +10,18 @@
   refs http://kia-king.com/code-guide/#css-syntax
  */
 
+/*
+ * # Utility
+ ******************************************************************************/
+
+.pad3 {
+    padding: 3px;
+}
+
+.pad6 {
+    padding: 6px;
+}
+
 * {
     box-sizing: border-box;
     margin: 0;
@@ -26,9 +38,12 @@ body {
     padding: 0;
 }
 
-label,
-.label {
+label, .label {
     display: block;
+}
+
+button, input {
+    width: 100%;
 }
 
 /*
@@ -45,14 +60,12 @@ label,
     min-height: calc(100vh - 5px);
 }
 
-
 .contents {
     width: 100%;
     min-height: 100%;
     /* padding-left: 1rem; */
     display: inline-block;
 }
-
 
 /* 
  * Grid
@@ -73,6 +86,8 @@ label,
     display: block;
     width: 100%;
     min-height: 1rem;
+    /* debug: show off borders */
+    border: 1px solid #6ca;
 }
 
 .row::after {
@@ -101,73 +116,57 @@ label,
 
 /* viewport-width >= 768px: prime width = 768px
  **************************************************************************/
+
 @media only screen and (min-width: 768px) {
     .prime {
         margin-left: calc((100% - 768px) / 2);
         max-width: 768px;
     }
-
-
     /*
      * Grid for desktop
      */
-
     .contents {
         /* placeholder */
     }
-
     .row {
         /* placeholder */
     }
-
     [class*="c-"] {
         /* placeholder */
     }
-
     .c-1 {
         width: 8.33%;
     }
-
     .c-2 {
         width: 16.66%;
     }
-
     .c-3 {
         width: 25%;
     }
-
     .c-4 {
         width: 33.33%;
     }
-
     .c-5 {
         width: 41.66%;
     }
-
     .c-6 {
         width: 50%;
     }
-
     .c-7 {
         width: 58.33%;
     }
-
     .c-8 {
         width: 66.66%;
     }
-
     .c-9 {
         width: 75%;
     }
-
     .c-10 {
         width: 83.33%;
     }
-
     .c-11 {
         width: 91.66%;
     }
-
     .c-12 {
         width: 100%;
     }
@@ -176,6 +175,7 @@ label,
 /*
  * # colors
  ******************************************************************************/
+
 .global {
     background-color: #ddd;
 }
