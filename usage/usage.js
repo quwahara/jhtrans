@@ -105,7 +105,7 @@ define(function (require) {
     "0x0-1x0": [
       "#row",
       "#row",
-      "#row--c-12",
+      "#row",
     ],
     "0x0-1x0-2x0": [
       "#c-3",
@@ -138,7 +138,7 @@ define(function (require) {
 
   };
 
-  jht.acceptElementNode(div, trMap, "", 0, 0, 0);
+  jht.translateElementNode(div, trMap);
 
   // 2019-11-27
   // const row = jht.getTemplate("row");
