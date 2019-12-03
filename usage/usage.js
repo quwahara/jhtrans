@@ -97,48 +97,94 @@ define(function (require) {
     }, "@"],
   });
 
-  const div = jht.getTemplate("div");
+  // const div = jht.getTemplate("div");
 
-  document.querySelector(".mount").appendChild(div);
+  // document.querySelector(".mount").appendChild(div);
 
-  const trMap = {
-    "0x0-1x0": [
+  // const trMap = {
+  //   "0x0-1x0": [
+  //     "#row",
+  //     "#row",
+  //     "#row",
+  //   ],
+  //   "0x0-1x0-2x0": [
+  //     "#c-3",
+  //     "#c-6",
+  //     "#c-3",
+  //   ],
+  //   "0x0-1x0-2x1-3x0": [
+  //     "#row--c-12--pad6",
+  //     "#row--c-12--pad6",
+  //     "#row--c-12--pad6",
+  //   ],
+  //   "0x0-1x0-2x1-3x0-4x0-5x0-6x0": [
+  //     "#label",
+  //     "#i-text",
+  //   ],
+  //   "0x0-1x0-2x1-3x0-4x0-5x0-6x0-7x0": "Username",
+  //   "0x0-1x0-2x1-3x1-4x0-5x0-6x0": [
+  //     "#label",
+  //     "#i-password",
+  //   ],
+  //   "0x0-1x0-2x1-3x1-4x0-5x0-6x0-7x0": "Password",
+  //   "0x0-1x0-2x1-3x2-4x0-5x0-6x0": [
+  //     "#c-6",
+  //     "#c-6",
+  //   ],
+  //   "0x0-1x0-2x1-3x2-4x0-5x0-6x0-7x0": "#b-button",
+  //   "0x0-1x0-2x1-3x2-4x0-5x0-6x0-7x0-8x0": "Login",
+  //   "0x0-1x0-2x1-3x2-4x0-5x0-6x1-7x0": "#b-button",
+  //   "0x0-1x0-2x1-3x2-4x0-5x0-6x1-7x0-8x0": "Cancel",
+
+  // };
+
+  // jht.translateElementNode(div, trMap);
+
+  // const trMap2 = {
+  //   "0x0-1x0": [
+  //     "#row",
+  //     ["#row", [
+  //       "#c-3",
+  //       ["#c-6", [
+  //         ["#row--c-12--pad6", [
+  //           ["#label", "Username"],
+  //           "#i-text",
+  //         ]],
+  //         ["#row--c-12--pad6", [
+  //           ["#label", "Password"],
+  //           "#i-password",
+  //         ]],
+  //         ["#row--c-12--pad6", [
+  //           ["#c-6", ["#b-button", "Login"]],
+  //           ["#c-6", ["#b-button", "Cancel"]],
+  //         ]],
+  //       ]],
+  //       "#c-3",
+  //     ]],
+  //     "#row",
+  //   ],
+  // };
+
+  let walkedl, div;
+
+  // div = jht.getTemplate("div");
+  // walked = jht.walkNode(div, ["xxx"]);
+  // document.querySelector(".mount").appendChild(walked);
+
+  // div = jht.getTemplate("div");
+  // walked = jht.walkNode(div, ["#row"]);
+  // document.querySelector(".mount").appendChild(walked);
+
+  div = jht.getTemplate("div");
+  walked = jht.walkNode(div, ["#row", [
+    "#c-4",
+    ["#c-4", [
       "#row",
-      "#row",
-      "#row",
-    ],
-    "0x0-1x0-2x0": [
-      "#c-3",
-      "#c-6",
-      "#c-3",
-    ],
-    "0x0-1x0-2x1-3x0": [
-      "#row--c-12--pad6",
-      "#row--c-12--pad6",
-      "#row--c-12--pad6",
-    ],
-    "0x0-1x0-2x1-3x0-4x0-5x0-6x0": [
-      "#label",
-      "#i-text",
-    ],
-    "0x0-1x0-2x1-3x0-4x0-5x0-6x0-7x0": "Username",
-    "0x0-1x0-2x1-3x1-4x0-5x0-6x0": [
-      "#label",
-      "#i-password",
-    ],
-    "0x0-1x0-2x1-3x1-4x0-5x0-6x0-7x0": "Password",
-    "0x0-1x0-2x1-3x2-4x0-5x0-6x0": [
-      "#c-6",
-      "#c-6",
-    ],
-    "0x0-1x0-2x1-3x2-4x0-5x0-6x0-7x0": "#b-button",
-    "0x0-1x0-2x1-3x2-4x0-5x0-6x0-7x0-8x0": "Login",
-    "0x0-1x0-2x1-3x2-4x0-5x0-6x1-7x0": "#b-button",
-    "0x0-1x0-2x1-3x2-4x0-5x0-6x1-7x0-8x0": "Cancel",
+    ]],
+    "#c-4",
+  ]]);
+  document.querySelector(".mount").appendChild(walked);
 
-  };
-
-  jht.translateElementNode(div, trMap);
 
   // 2019-11-27
   // const row = jht.getTemplate("row");

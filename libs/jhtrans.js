@@ -386,5 +386,109 @@
     return elm;
   };
 
+  // Jhtrans.prototype.readRows = function (rows) {
+  //   for (let i = 0; i < rows.length; ++i) {
+
+  //   }
+  // };
+
+  // Jhtrans.prototype.readRow = function (row) {
+
+  //   if (row.length !== 2) {
+  //     throw Error("Two items required for row");
+  //   }
+
+  //   const key = row[0];
+
+  //   const elm = this.getTemplate(key);
+
+  //   if (isNullOrUndefined(elm)) {
+  //     throw Error("An element was not found for the key:" + key);
+  //   }
+
+  //   const replacements = row[1];
+
+  //   return this.walkNode(elm, replacements);
+  // };
+
+  Jhtrans.prototype.walkNode = function (node, replacements) {
+
+    let outNode;
+
+    if (isElementNode(node)) {
+      const cns = node.childNodes;
+      for (let i = 0; i < cns.length; ++i) {
+        this.walkNode(cns[i], replacements);
+      }
+      outNode = node;
+    }
+    else if (isTextNode(node)) {
+      outNode = this.replace(node, replacements);
+    } else {
+      outNode = node;
+    }
+
+    return outNode;
+  };
+
+  Jhtrans.prototype.replace = function (textNode, replacements) {
+
+    const text = textNode.textContent.trim();
+
+    if (!isPlaceholderKey(text)) {
+      return textNode;
+    }
+
+    const r = replacements.shift();
+
+    return this.replaceX(textNode, r, replacements);
+  };
+
+  Jhtrans.prototype.replaceX = function (textNode, r, replacements) {
+
+    if (isString(r)) {
+      return this.replaceString(textNode, r, replacements);
+    }
+    else if (isArray(r)) {
+      // Justify number of text node to be equivalent with the array length.
+      const textNodes = [];
+      for (let i = 1; i < r.length; ++i) {
+        const createdTextNode = document.createTextNode("");
+        textNode.parentNode.insertBefore(createdTextNode, textNode);
+        textNodes.push(createdTextNode);
+      }
+      textNodes.push(textNode);
+
+      let lastNode = textNode;
+      for (let i = 0; i < r.length; ++i) {
+        if (isString(r[i])) {
+          lastNode = this.replaceX(textNodes[i], r[i], replacements);
+        }
+        else if (isArray(r[i])) {
+          lastNode = this.replaceX(textNodes[i], r[i][0], r[i][1]);
+        }
+      }
+      return lastNode.parentNode.childNodes;
+    }
+    else if (isObject(r)) {
+      throw Error("Not implemented");
+    }
+    else {
+      return textNode;
+    }
+  };
+
+  Jhtrans.prototype.replaceString = function (textNode, string, replacements) {
+    if (isTemplateKey(string)) {
+      const templ = this.getTemplate(string.substring(1));
+      if (!isNullOrUndefined(templ)) {
+        textNode.parentNode.replaceChild(templ, textNode);
+        return this.walkNode(templ, replacements);
+      }
+    }
+    textNode.textContent = string;
+    return textNode;
+  };
+
   return Jhtrans;
 });
