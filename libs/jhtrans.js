@@ -60,6 +60,15 @@
     return (s || "").indexOf(templateMaker) === 0;
   }
 
+  function copyChildNodes(childNodes) {
+    const copies = [];
+    copies.length = childNodes.length;
+    for (let i = 0; i < childNodes.length; ++i) {
+      copies[i] = childNodes[i];
+    }
+    return copies;
+  }
+
   const Context = function Context(parentContext) {
     this.parentContext = parentContext;
     this.depth = 0;
@@ -119,199 +128,6 @@
 
     return null;
   };
-
-  Jhtrans.prototype.translate = function (tKey, trMap) {
-
-    const template = this.getTemplate(tKey);
-
-    if (isNullOrUndefined(template)) {
-      throw Error("The template was not found for:'" + tKey + "'.");
-    }
-
-    return this.translateElementNode(template, trMap);
-  };
-
-  Jhtrans.prototype.translateElementNode = function (elementNode, trMap) {
-
-    if (!isElementNode(elementNode)) {
-      throw Error("The elementNode was not ELEMENT_NODE.");
-    }
-
-    return this.acceptElementNode(elementNode, trMap, new Context(null));
-  };
-
-  Jhtrans.prototype.acceptElementNode = function (objectElementNode, trMap, ctx) {
-
-    if (this.config.PUT_PL_CLASS) {
-      objectElementNode.classList.add(this.config.PL_CLASS_PREFIX + ctx.getPlKey());
-    }
-
-    // We will walk down objectElementNode.childNodes.
-    // Copying childNodes before walking down,
-    // because childNodes length will change
-    // if objectElementNode is appneded child/children.
-    const cns = [];
-    for (let i = 0; i < objectElementNode.childNodes.length; ++i) {
-      cns.push(objectElementNode.childNodes.item(i));
-    }
-
-    const deeperCtx = ctx.sink();
-
-    // Walking down childNodes
-    for (deeperCtx.resetIndex(); deeperCtx.index < cns.length; deeperCtx.incIndex()) {
-      const cn = cns[deeperCtx.index];
-
-      if (isElementNode(cn)) {
-        this.acceptElementNode(cn, trMap, deeperCtx);
-        continue;
-      }
-
-      if (isTextNode(cn)) {
-        this.acceptTextNode(cn, trMap, deeperCtx);
-        continue;
-      }
-
-      throw Error("A child node was not ELEMENT_NODE nor TEXT_NODE.");
-    }
-
-    return objectElementNode;
-  }
-
-  Jhtrans.prototype.acceptTextNode = function (objectTextNode, trMap, ctx) {
-    const text = (objectTextNode.textContent || "").trim();
-    return this.replaceTextNode(objectTextNode, text, trMap, ctx);
-  }
-
-  Jhtrans.prototype.replaceTextNode = function (objectTextNode, objectValue, trMap, ctx) {
-
-    if (isNullOrUndefined(objectTextNode)) {
-      throw Error("The objectTextNode was null or undefined.");
-    }
-
-    if (!isTextNode(objectTextNode)) {
-      throw Error("The pobjectTextNode was not TEXT_NODE.");
-    }
-
-    if (isNullOrUndefined(objectValue)) {
-      throw Error("The objectValue was null or undefined.");
-    }
-
-    if (ctx.recursion > this.config.RECURSION_MAX) {
-      throw Error("recursion count was over max.");
-    }
-
-    ctx.incRecursion();
-
-    let result;
-    if (isString(objectValue)) {
-      result = this.replaceTextNodeByString(objectTextNode, objectValue, trMap, ctx);
-    }
-    else if (isElementNode(objectValue)) {
-      const elm = objectValue;
-      objectTextNode.parentNode.replaceChild(elm, objectTextNode);
-      this.acceptElementNode(elm, trMap, ctx);
-      result = elm;
-    }
-    else if (isTextNode(objectValue)) {
-      const textNode = objectValue;
-      result = this.acceptTextNode(textNode, text, trMap, ctx);
-    }
-    else if (isArray(objectValue)) {
-      result = this.replaceTextNodeByArray(objectTextNode, objectValue, trMap, ctx);
-    }
-    else {
-      result = objectTextNode;
-    }
-
-    ctx.decRecursion();
-
-    return result;
-  }
-
-  Jhtrans.prototype.replaceTextNodeByString = function (objectTextNode, objectValue, trMap, ctx) {
-
-    if (isTemplateKey(objectValue)) {
-      return this.replaceTextNodeByTemplateKey(objectTextNode, objectValue, trMap, ctx);
-    } else if (isPlaceholderKey(objectValue)) {
-      return this.replaceTextNodeByPlaceholderKey(objectTextNode, objectValue, trMap, ctx);
-    } else {
-      return this.replaceTextNodeByRawString(objectTextNode, objectValue, trMap, ctx);
-    }
-  }
-
-  Jhtrans.prototype.replaceTextNodeByTemplateKey = function (objectTextNode, objectValue, trMap, ctx) {
-
-    const tmKey = objectValue.substring(templateMaker.length);
-    const template = this.getTemplate(tmKey);
-
-    if (!isNullOrUndefined(template)) {
-      objectTextNode.parentNode.replaceChild(template, objectTextNode);
-      this.acceptElementNode(template, trMap, ctx);
-      return template;
-    }
-
-    return this.replaceTextNodeByRawString(objectTextNode, objectValue, trMap, ctx);
-  }
-
-  Jhtrans.prototype.replaceTextNodeByPlaceholderKey = function (objectTextNode, objectValue, trMap, ctx) {
-
-    const plKey = ctx.getPlKey();
-    let hasTrValue = false;
-    let trValue = null;
-
-    if (trMap.hasOwnProperty(plKey)) {
-      hasTrValue = true;
-      trValue = trMap[plKey];
-    } else {
-      const phKey = objectValue.substring(placeholderMaker.length);
-      if (phKey.length > 0 && trMap.hasOwnProperty(phKey)) {
-        hasTrValue = true;
-        trValue = trMap[phKey];
-      }
-    }
-
-    if (hasTrValue) {
-      return this.replaceTextNode(objectTextNode, trValue, trMap, ctx);
-    }
-
-    const rawString = this.config.USE_PL_AS_RAW_STRING ? plKey : objectValue;
-
-    return this.replaceTextNodeByRawString(objectTextNode, rawString, trMap, ctx);
-  }
-
-  Jhtrans.prototype.replaceTextNodeByRawString = function (objectTextNode, rawString, trMap, ctx) {
-    objectTextNode.textContent = rawString;
-    return objectTextNode;
-  }
-
-  Jhtrans.prototype.replaceTextNodeByArray = function (objectTextNode, array, trMap, ctx) {
-
-    const len = array.length;
-    const parent = objectTextNode.parentNode;
-    if (len === 0) {
-      parent.removeChild(objectTextNode);
-      return null;
-    }
-
-    const textNodes = [];
-
-    // Justify number of text node to be equivalent with the array length.
-    for (let i = 1; i < len; ++i) {
-      const textNode = document.createTextNode("");
-      parent.insertBefore(textNode, objectTextNode);
-      textNodes.push(textNode);
-    }
-    textNodes.push(objectTextNode);
-
-    const accepteds = [];
-    const indexBuf = ctx.index;
-    for (ctx.resetIndex(); ctx.index < len; ctx.incIndex()) {
-      accepteds.push(this.replaceTextNode(textNodes[ctx.index], array[ctx.index], trMap, ctx));
-    }
-    ctx.index = indexBuf;
-
-    return accepteds;
-  }
 
   Jhtrans.prototype.putTemplate = function (name, definition) {
     var template = this.definitionToElement(definition);
@@ -386,44 +202,138 @@
     return elm;
   };
 
-  // Jhtrans.prototype.readRows = function (rows) {
-  //   for (let i = 0; i < rows.length; ++i) {
+  function isPlaceholderTextNode(node) {
+    return isTextNode(node) && isPlaceholderKey(node.textContent.trim());
+  }
 
-  //   }
-  // };
+  function findPlaceholder(elementNode) {
 
-  // Jhtrans.prototype.readRow = function (row) {
+    const copies = copyChildNodes(elementNode.childNodes);
 
-  //   if (row.length !== 2) {
-  //     throw Error("Two items required for row");
-  //   }
+    for (let i = 0; i < copies.length; ++i) {
+      if (isPlaceholderTextNode(copies[i])) {
+        return copies[i];
+      }
+    }
 
-  //   const key = row[0];
+    for (let i = 0; i < copies.length; ++i) {
+      if (isElementNode(copies[i])) {
+        const found = findPlaceholder(copies[i]);
+        if (found) {
+          return found;
+        }
+      }
+    }
 
-  //   const elm = this.getTemplate(key);
+    return null;
+  }
 
-  //   if (isNullOrUndefined(elm)) {
-  //     throw Error("An element was not found for the key:" + key);
-  //   }
 
-  //   const replacements = row[1];
+  Jhtrans.prototype.translate = function (key, replacements) {
 
-  //   return this.walkNode(elm, replacements);
-  // };
+    let elementNode;
 
-  Jhtrans.prototype.walkNode = function (node, replacements) {
+    if (isElementNode(key)) {
+      elementNode = key;
+    }
+    else if (isString(key)) {
+      if (!isTemplateKey(key)) {
+        throw Error("Template key is required for the key.");
+      }
+
+      elementNode = this.getTemplate(key.substring(1));
+      if (isNullOrUndefined(elementNode)) {
+        throw Error("Template was not found for the key:'" + key.substring(1) + "'");
+      }
+
+      if (!isElementNode(elementNode)) {
+        throw Error("Template for the key was not an element. key:'" + key.substring(1) + "'");
+      }
+
+    }
+    else {
+      throw Error("The key was unsupported type.");
+    }
+
+    const textNode = findPlaceholder(elementNode);
+    if (!textNode) {
+      return textNode;
+    }
+
+    if (isNullOrUndefined(replacements) || replacements.length === 0) {
+      // textNode.parentNode.removeChild(textNode);
+      return elementNode;
+    }
+
+    // Justify number of text node to be equivalent with the array length.
+    const textNodes = [];
+    for (let i = 1; i < replacements.length; ++i) {
+      const createdTextNode = document.createTextNode("");
+      textNode.parentNode.insertBefore(createdTextNode, textNode);
+      textNodes.push(createdTextNode);
+    }
+    textNodes.push(textNode);
+
+    let lastNode = textNode;
+    for (let i = 0; i < replacements.length; ++i) {
+      lastNode = this.processTextNodeBy2(textNodes[i], replacements[i]);
+    }
+    return elementNode;
+  }
+
+  Jhtrans.prototype.processTextNodeBy2 = function (textNode, replacement) {
+
+    console.log("processTextNodeBy", { "textNode": textNode, "replacement": replacement });
+
+    if (isString(replacement)) {
+      return this.replaceString2(textNode, replacement);
+    }
+    else if (isObject(replacement)) {
+      if (!replacement.hasOwnProperty("k")) {
+        throw Error("'k' was not found for the replacement object.");
+      }
+      if (!replacement.hasOwnProperty("rs")) {
+        throw Error("'rs' was not found for the replacement object.");
+      }
+
+      const translated = this.translate(replacement.k, replacement.rs);
+
+      textNode.parentNode.replaceChild(translated, textNode);
+
+      return translated;
+    }
+    else {
+      throw Error("The replacement is unsupported.");
+    }
+  };
+
+  Jhtrans.prototype.replaceString2 = function (textNode, string) {
+    if (isTemplateKey(string)) {
+      const templ = this.getTemplate(string.substring(1));
+      if (!isNullOrUndefined(templ)) {
+        textNode.parentNode.replaceChild(templ, textNode);
+        return templ;
+      }
+    }
+    textNode.textContent = string;
+    return textNode;
+  };
+
+
+
+
+  Jhtrans.prototype.processNode = function (node, replacements) {
 
     let outNode;
 
-    if (isElementNode(node)) {
-      const cns = node.childNodes;
-      for (let i = 0; i < cns.length; ++i) {
-        this.walkNode(cns[i], replacements);
-      }
-      outNode = node;
+    if (isNullOrUndefined(replacements) || replacements.length === 0) {
+      return node;
+    }
+    else if (isElementNode(node)) {
+      outNode = this.processElementNode(node, replacements);
     }
     else if (isTextNode(node)) {
-      outNode = this.replace(node, replacements);
+      outNode = this.processTextNode(node, replacements);
     } else {
       outNode = node;
     }
@@ -431,7 +341,20 @@
     return outNode;
   };
 
-  Jhtrans.prototype.replace = function (textNode, replacements) {
+  Jhtrans.prototype.processElementNode = function (elementNode, replacements) {
+
+    const cns = copyChildNodes(elementNode.childNodes);
+
+    console.log("processElementNode", { "elementNode": elementNode, "childNodes": cns, "replacements": replacements });
+
+    for (let i = 0; i < cns.length; ++i) {
+      this.processNode(cns[i], replacements);
+    }
+
+    return elementNode;
+  };
+
+  Jhtrans.prototype.processTextNode = function (textNode, replacements) {
 
     const text = textNode.textContent.trim();
 
@@ -439,20 +362,36 @@
       return textNode;
     }
 
-    const r = replacements.shift();
+    const replacement = replacements.shift();
 
-    return this.replaceX(textNode, r, replacements);
+    return this.processTextNodeBy(textNode, replacement, replacements);
   };
 
-  Jhtrans.prototype.replaceX = function (textNode, r, replacements) {
+  Jhtrans.prototype.processTextNodeBy = function (textNode, replacement, replacements) {
 
-    if (isString(r)) {
-      return this.replaceString(textNode, r, replacements);
+    console.log("processTextNodeBy", { "textNode": textNode, "replacement": replacement, "replacements": replacements });
+
+    if (isString(replacement)) {
+      return this.replaceString(textNode, replacement, replacements);
     }
-    else if (isArray(r)) {
+    else if (isObject(replacement)) {
+      if (!replacement.hasOwnProperty("k")) {
+        throw Error("'k' was not found for the replacement object.");
+      }
+      if (!replacement.hasOwnProperty("rs")) {
+        throw Error("'rs' was not found for the replacement object.");
+      }
+
+      const translated = this.translate(replacement.k, replacement.rs);
+
+      textNode.parentNode.replaceChild(translated, textNode);
+
+      return translated;
+    }
+    else if (isArray(replacement)) {
       // Justify number of text node to be equivalent with the array length.
       const textNodes = [];
-      for (let i = 1; i < r.length; ++i) {
+      for (let i = 1; i < replacement.length; ++i) {
         const createdTextNode = document.createTextNode("");
         textNode.parentNode.insertBefore(createdTextNode, textNode);
         textNodes.push(createdTextNode);
@@ -460,18 +399,15 @@
       textNodes.push(textNode);
 
       let lastNode = textNode;
-      for (let i = 0; i < r.length; ++i) {
-        if (isString(r[i])) {
-          lastNode = this.replaceX(textNodes[i], r[i], replacements);
+      for (let i = 0; i < replacement.length; ++i) {
+        if (isString(replacement[i])) {
+          lastNode = this.processTextNodeBy(textNodes[i], replacement[i], replacements);
         }
-        else if (isArray(r[i])) {
-          lastNode = this.replaceX(textNodes[i], r[i][0], r[i][1]);
+        else if (isArray(replacement[i])) {
+          lastNode = this.processTextNodeBy(textNodes[i], replacement[i][0], replacement[i][1]);
         }
       }
       return lastNode.parentNode.childNodes;
-    }
-    else if (isObject(r)) {
-      throw Error("Not implemented");
     }
     else {
       return textNode;
@@ -483,7 +419,7 @@
       const templ = this.getTemplate(string.substring(1));
       if (!isNullOrUndefined(templ)) {
         textNode.parentNode.replaceChild(templ, textNode);
-        return this.walkNode(templ, replacements);
+        return this.processNode(templ, replacements);
       }
     }
     textNode.textContent = string;

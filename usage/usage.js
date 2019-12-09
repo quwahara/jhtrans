@@ -175,15 +175,62 @@ define(function (require) {
   // walked = jht.walkNode(div, ["#row"]);
   // document.querySelector(".mount").appendChild(walked);
 
-  div = jht.getTemplate("div");
-  walked = jht.walkNode(div, ["#row", [
-    "#c-4",
-    ["#c-4", [
-      "#row",
-    ]],
-    "#c-4",
-  ]]);
-  document.querySelector(".mount").appendChild(walked);
+  // div = jht.getTemplate("div");
+  // walked = jht.processNode(div, ["#row", [
+  //   "#c-3",
+  //   ["#c-6", [
+  //     ["#row", [
+  //       "#row--c-12--pad6"
+  //     ]],
+  //   ]],
+  //   "#c-3",
+  // ]]);
+  // document.querySelector(".mount").appendChild(walked);
+
+  // { "k": "#row", "rs": [] },
+
+
+  const translated = jht.translate("#div", [
+    {
+      "k": "#row", "rs": [
+        "#c-3",
+        {
+          "k": "#c-6", "rs": [
+            {
+              "k": "#row--c-12--pad6", "rs": [
+                { "k": "#label", "rs": ["Username"] },
+                "#i-text",
+              ]
+            },
+            {
+              "k": "#row--c-12--pad6", "rs": [
+                { "k": "#label", "rs": ["Password"] },
+                "#i-password",
+              ]
+            },
+            {
+              "k": "#row--c-12--pad6", "rs": [
+                {
+                  "k": "#c-6", "rs": [
+                    { "k": "#b-button", "rs": ["Login"] },
+                  ]
+                },
+                {
+                  "k": "#c-6", "rs": [
+                    { "k": "#b-button", "rs": ["Cancel"] },
+                  ]
+                },
+              ]
+            },
+          ]
+        },
+        "#c-3",
+      ]
+    }
+  ]);
+
+
+  document.querySelector(".mount").appendChild(translated);
 
 
   // 2019-11-27
