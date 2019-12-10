@@ -97,44 +97,42 @@ define(function (require) {
     }, "@"],
   });
 
-  const translated = jht.translate("div", [
-    {
-      "#": "row", "rs": [
-        "c-3",
-        {
-          "#": "c-6", "rs": [
-            {
-              "#": "row--c-12--pad6", "rs": [
-                { "#": "label", "rs": "Username" },
-                "i-text",
-              ]
-            },
-            {
-              "#": "row--c-12--pad6", "rs": [
-                { "#": "label", "rs": "Password" },
-                "i-password",
-              ]
-            },
-            {
-              "#": "row--c-12--pad6", "rs": [
-                {
-                  "#": "c-6", "rs": [
-                    { "#": "b-button", "rs": "Login" },
-                  ]
-                },
-                {
-                  "#": "c-6", "rs": [
-                    { "#": "b-button", "rs": "Cancel" },
-                  ]
-                },
-              ]
-            },
-          ]
-        },
-        "c-3",
-      ]
-    }
-  ]);
+  const translated = jht.translate({
+    "#": "div", "@": [
+      "c-3",
+      {
+        "#": "c-6", "@": [
+          {
+            "#": "row--c-12--pad6", "@": [
+              { "#": "label", "@": "Username" },
+              "i-text",
+            ]
+          },
+          {
+            "#": "row--c-12--pad6", "@": [
+              { "#": "label", "@": "Password" },
+              "i-password",
+            ]
+          },
+          {
+            "#": "row--c-12--pad6", "@": [
+              {
+                "#": "c-6", "@": [
+                  { "#": "b-button", "@": "Login" },
+                ]
+              },
+              {
+                "#": "c-6", "@": [
+                  { "#": "b-button", "@": "Cancel" },
+                ]
+              },
+            ]
+          },
+        ]
+      },
+      "c-3"
+    ]
+  });
 
   document.querySelector(".mount").appendChild(translated);
 

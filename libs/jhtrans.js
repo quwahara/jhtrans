@@ -188,7 +188,13 @@
     return null;
   }
 
-  Jhtrans.prototype.translate = function (key, replacements) {
+  Jhtrans.prototype.translate = function (desc) {
+
+    if (!desc.hasOwnProperty("#")) {
+      throw Error("'#' was not found for the desc object.");
+    }
+
+    const key = desc["#"];
 
     let elementNode;
 
@@ -212,8 +218,16 @@
 
     const textNode = findPlaceholder(elementNode);
     if (!textNode) {
-      return textNode;
+      return elementNode;
     }
+
+    const placeholder = textNode.textContent.trim();
+
+    if (!desc.hasOwnProperty(placeholder)) {
+      return elementNode;
+    }
+
+    const replacements = desc[placeholder];
 
     let replacements2;
     if (isString(replacements)) {
@@ -253,11 +267,8 @@
       if (!replacement.hasOwnProperty("#")) {
         throw Error("'#' was not found for the replacement object.");
       }
-      if (!replacement.hasOwnProperty("rs")) {
-        throw Error("'rs' was not found for the replacement object.");
-      }
 
-      const translated = this.translate(replacement["#"], replacement.rs);
+      const translated = this.translate(replacement);
 
       textNode.parentNode.replaceChild(translated, textNode);
 
