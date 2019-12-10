@@ -105,13 +105,13 @@ define(function (require) {
           "#": "c-6", "rs": [
             {
               "#": "row--c-12--pad6", "rs": [
-                { "#": "label", "rs": ["Username"] },
+                { "#": "label", "rs": "Username" },
                 "i-text",
               ]
             },
             {
               "#": "row--c-12--pad6", "rs": [
-                { "#": "label", "rs": ["Password"] },
+                { "#": "label", "rs": "Password" },
                 "i-password",
               ]
             },
@@ -119,12 +119,12 @@ define(function (require) {
               "#": "row--c-12--pad6", "rs": [
                 {
                   "#": "c-6", "rs": [
-                    { "#": "b-button", "rs": ["Login"] },
+                    { "#": "b-button", "rs": "Login" },
                   ]
                 },
                 {
                   "#": "c-6", "rs": [
-                    { "#": "b-button", "rs": ["Cancel"] },
+                    { "#": "b-button", "rs": "Cancel" },
                   ]
                 },
               ]

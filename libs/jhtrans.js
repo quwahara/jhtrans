@@ -215,23 +215,29 @@
       return textNode;
     }
 
-    if (isNullOrUndefined(replacements) || replacements.length === 0) {
+    let replacements2;
+    if (isString(replacements)) {
+      replacements2 = [replacements];
+    } else {
+      replacements2 = replacements;
+    }
+
+    if (isNullOrUndefined(replacements2) || replacements2.length === 0) {
       // textNode.parentNode.removeChild(textNode);
       return elementNode;
     }
 
     // Justify number of text node to be equivalent with the array length.
     const textNodes = [];
-    for (let i = 1; i < replacements.length; ++i) {
+    for (let i = 1; i < replacements2.length; ++i) {
       const createdTextNode = document.createTextNode("");
       textNode.parentNode.insertBefore(createdTextNode, textNode);
       textNodes.push(createdTextNode);
     }
     textNodes.push(textNode);
 
-    let lastNode = textNode;
-    for (let i = 0; i < replacements.length; ++i) {
-      lastNode = this.processReplacement(textNodes[i], replacements[i]);
+    for (let i = 0; i < replacements2.length; ++i) {
+      this.processReplacement(textNodes[i], replacements2[i]);
     }
     return elementNode;
   }
