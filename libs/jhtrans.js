@@ -196,17 +196,13 @@
       elementNode = key;
     }
     else if (isString(key)) {
-      if (!isTemplateKey(key)) {
-        throw Error("Template key is required for the key.");
-      }
-
-      elementNode = this.getTemplate(key.substring(1));
+      elementNode = this.getTemplate(key);
       if (isNullOrUndefined(elementNode)) {
-        throw Error("Template was not found for the key:'" + key.substring(1) + "'");
+        throw Error("Template was not found for the key:'" + key + "'");
       }
 
       if (!isElementNode(elementNode)) {
-        throw Error("Template for the key was not an element. key:'" + key.substring(1) + "'");
+        throw Error("Template for the key was not an element. key:'" + key + "'");
       }
 
     }
@@ -248,14 +244,14 @@
       return this.processString(textNode, replacement);
     }
     else if (isObject(replacement)) {
-      if (!replacement.hasOwnProperty("k")) {
-        throw Error("'k' was not found for the replacement object.");
+      if (!replacement.hasOwnProperty("#")) {
+        throw Error("'#' was not found for the replacement object.");
       }
       if (!replacement.hasOwnProperty("rs")) {
         throw Error("'rs' was not found for the replacement object.");
       }
 
-      const translated = this.translate(replacement.k, replacement.rs);
+      const translated = this.translate(replacement["#"], replacement.rs);
 
       textNode.parentNode.replaceChild(translated, textNode);
 
@@ -270,15 +266,14 @@
 
     console.log("processString", { "textNode": textNode, "string": string });
 
-    if (isTemplateKey(string)) {
-      const templ = this.getTemplate(string.substring(1));
-      if (!isNullOrUndefined(templ)) {
-        textNode.parentNode.replaceChild(templ, textNode);
-        return templ;
-      }
+    const templ = this.getTemplate(string);
+    if (!isNullOrUndefined(templ)) {
+      textNode.parentNode.replaceChild(templ, textNode);
+      return templ;
+    } else {
+      textNode.textContent = string;
+      return textNode;
     }
-    textNode.textContent = string;
-    return textNode;
   };
 
   return Jhtrans;
