@@ -166,26 +166,23 @@
     return isTextNode(node) && isPlaceholderKey(node.textContent.trim());
   }
 
-  function findPlaceholder(elementNode) {
+  function collectPlaceholder(elementNode, outCollections) {
 
     const copies = copyChildNodes(elementNode.childNodes);
 
     for (let i = 0; i < copies.length; ++i) {
       if (isPlaceholderTextNode(copies[i])) {
-        return copies[i];
+        outCollections.push(copies[i]);
       }
     }
 
     for (let i = 0; i < copies.length; ++i) {
       if (isElementNode(copies[i])) {
-        const found = findPlaceholder(copies[i]);
-        if (found) {
-          return found;
-        }
+        collectPlaceholder(copies[i], outCollections);
       }
     }
 
-    return null;
+    return outCollections;
   }
 
   Jhtrans.prototype.translate = function (desc) {
@@ -216,43 +213,47 @@
       throw Error("The key was unsupported type.");
     }
 
-    const textNode = findPlaceholder(elementNode);
-    if (!textNode) {
+    const collections = collectPlaceholder(elementNode, []);
+
+    if (collections.length === 0) {
       return elementNode;
     }
 
-    const placeholder = textNode.textContent.trim();
+    for (let i = 0; i < collections.length; ++i) {
+      const textNode = collections[i];
+      const placeholder = textNode.textContent.trim();
 
-    if (!desc.hasOwnProperty(placeholder)) {
-      return elementNode;
+      if (!desc.hasOwnProperty(placeholder)) {
+        continue;
+      }
+
+      const replacements = desc[placeholder];
+
+      let replacements2;
+      if (isString(replacements)) {
+        replacements2 = [replacements];
+      } else {
+        replacements2 = replacements;
+      }
+
+      if (isNullOrUndefined(replacements2) || replacements2.length === 0) {
+        continue;
+      }
+
+      // Justify number of text node to be equivalent with the array length.
+      const textNodes = [];
+      for (let i = 1; i < replacements2.length; ++i) {
+        const createdTextNode = document.createTextNode("");
+        textNode.parentNode.insertBefore(createdTextNode, textNode);
+        textNodes.push(createdTextNode);
+      }
+      textNodes.push(textNode);
+
+      for (let i = 0; i < replacements2.length; ++i) {
+        this.processReplacement(textNodes[i], replacements2[i]);
+      }
     }
 
-    const replacements = desc[placeholder];
-
-    let replacements2;
-    if (isString(replacements)) {
-      replacements2 = [replacements];
-    } else {
-      replacements2 = replacements;
-    }
-
-    if (isNullOrUndefined(replacements2) || replacements2.length === 0) {
-      // textNode.parentNode.removeChild(textNode);
-      return elementNode;
-    }
-
-    // Justify number of text node to be equivalent with the array length.
-    const textNodes = [];
-    for (let i = 1; i < replacements2.length; ++i) {
-      const createdTextNode = document.createTextNode("");
-      textNode.parentNode.insertBefore(createdTextNode, textNode);
-      textNodes.push(createdTextNode);
-    }
-    textNodes.push(textNode);
-
-    for (let i = 0; i < replacements2.length; ++i) {
-      this.processReplacement(textNodes[i], replacements2[i]);
-    }
     return elementNode;
   }
 

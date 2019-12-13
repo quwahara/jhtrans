@@ -1,139 +1,51 @@
 define(function (require) {
+  "use strict";
 
+  // require Jhtrans
   var Jhtrans = require('../libs/jhtrans');
+
+  // prepare an instance of Jhtrans
   const jht = new Jhtrans();
 
-  //
-  // putTemplateAll test
-  //
-
+  // puts template to the instance
+  // putTemplateAll draws one Object.
+  // Object key represents a name of template.
+  // Object value represents declaration of Element node.
+  // It calls "Element declaration".
   jht.putTemplateAll({
-
-    //
-    // row
-    //
-    "div": ["div", null, "@"],
-
-    //
-    // row
-    //
-    "row": ["div", {
-      "class": "row"
-    }, "@"],
-
-    //
-    // c-1 to c-12
-    //
-    "c-1": ["div", {
-      "class": "c-1"
-    }, "@"],
-    "c-2": ["div", {
-      "class": "c-2"
-    }, "@"],
-    "c-3": ["div", {
-      "class": "c-3"
-    }, "@"],
-    "c-4": ["div", {
-      "class": "c-4"
-    }, "@"],
-    "c-5": ["div", {
-      "class": "c-5"
-    }, "@"],
-    "c-6": ["div", {
-      "class": "c-6"
-    }, "@"],
-    "c-7": ["div", {
-      "class": "c-7"
-    }, "@"],
-    "c-8": ["div", {
-      "class": "c-8"
-    }, "@"],
-    "c-9": ["div", {
-      "class": "c-9"
-    }, "@"],
-    "c-10": ["div", {
-      "class": "c-10"
-    }, "@"],
-    "c-11": ["div", {
-      "class": "c-11"
-    }, "@"],
-    "c-12": ["div", {
-      "class": "c-12"
-    }, "@"],
-
-    "row--c-12--pad6": ["div", {
-      "class": "row"
-    }, [
-        ["div", {
-          "class": "c-12"
-        }, [
-            ["div", {
-              "class": "pad6"
-            }, "@"]
-          ]]
-      ]
-    ],
-
-    //
-    // lablel
-    //
-    "label": ["label", null, "@"],
-
-    //
-    // inputs
-    //
-    "i-text": ["input", {
-      "type": "text"
-    }, ""],
-    "i-password": ["input", {
-      "type": "password"
-    }, ""],
-
-    //
-    // buttons
-    //
-    "b-button": ["button", {
-      "type": "button"
-    }, "@"],
+    "row": ["div", { "class": "row" }, "@"],
+    "col-4":
+      // This Element declaration becomes: `<div class="col">@</div>`.
+      // The items of Element declaration represents: 
+      [
+        "div",				// -- Tag name
+        { "class": "col-4" },	// -- Attributes, you can put null or omit.
+        "@"					// -- Contents, you can put String, null or omit.
+      ],
+    "two-spans": ["div", null,
+      [						// -- Contents, you can put Array and 
+        //    Element declaration in it.
+        //    They become child element nodes.
+        ["span", null, "@1"],
+        ["span", null, "@2"]
+      ]]
   });
 
   const translated = jht.translate({
-    "#": "div", "@": [
-      "c-3",
+    "#": "row", "@": [
+      "col-4",
       {
-        "#": "c-6", "@": [
+        "#": "col-4", "@": [
           {
-            "#": "row--c-12--pad6", "@": [
-              { "#": "label", "@": "Username" },
-              "i-text",
-            ]
-          },
-          {
-            "#": "row--c-12--pad6", "@": [
-              { "#": "label", "@": "Password" },
-              "i-password",
-            ]
-          },
-          {
-            "#": "row--c-12--pad6", "@": [
-              {
-                "#": "c-6", "@": [
-                  { "#": "b-button", "@": "Login" },
-                ]
-              },
-              {
-                "#": "c-6", "@": [
-                  { "#": "b-button", "@": "Cancel" },
-                ]
-              },
-            ]
-          },
+            "#": "two-spans",
+            "@1": ["Hello"],
+            "@2": [", World!"]
+          }
         ]
       },
-      "c-3"
+      "col-4"
     ]
   });
 
   document.querySelector(".mount").appendChild(translated);
-
 });
