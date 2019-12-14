@@ -97,9 +97,6 @@
 
   Jhtrans.prototype.putTemplateAll = function (nameDeclarations) {
     for (var name in nameDeclarations) {
-      if (!Object.prototype.hasOwnProperty.call(nameDeclarations, name)) {
-        continue;
-      }
       this.putTemplate(name, nameDeclarations[name]);
     }
     return this;
