@@ -90,9 +90,18 @@
   };
 
   Jhtrans.prototype.putTemplate = function (name, declaration) {
-    var template = this.declarationToElement(declaration);
-    this.templates[name] = template;
-    return this;
+
+    if (isArray(declaration)) {
+      var template = this.declarationToElement(declaration);
+      this.templates[name] = template;
+      return this;
+    }
+    else if (isElementNode(declaration)) {
+      this.templates[name] = declaration;
+      return this;
+    }
+
+    throw Error("The declaration was unsupported type.");
   };
 
   Jhtrans.prototype.putTemplateAll = function (nameDeclarations) {
