@@ -95,12 +95,12 @@
     return this;
   };
 
-  Jhtrans.prototype.putTemplateAll = function (namedeclarations) {
-    for (var name in namedeclarations) {
-      if (!Object.prototype.hasOwnProperty.call(namedeclarations, name)) {
+  Jhtrans.prototype.putTemplateAll = function (nameDeclarations) {
+    for (var name in nameDeclarations) {
+      if (!Object.prototype.hasOwnProperty.call(nameDeclarations, name)) {
         continue;
       }
-      this.putTemplate(name, namedeclarations[name]);
+      this.putTemplate(name, nameDeclarations[name]);
     }
     return this;
   };
