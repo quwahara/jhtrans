@@ -105,3 +105,7 @@ define(function (require) {
   document.querySelector(".mount").appendChild(translated);
 });
 ```
+
+## License
+
+MIT
