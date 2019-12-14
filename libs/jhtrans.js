@@ -100,6 +100,10 @@
       this.templates[name] = declaration;
       return this;
     }
+    else if (isObject(declaration)) {
+      this.templates[name] = this.translate(declaration);
+      return this;
+    }
 
     throw Error("The declaration was unsupported type.");
   };

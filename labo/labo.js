@@ -52,18 +52,23 @@ define(function (require) {
     }, "@"],
   };
 
-  jht.putTemplateAll(gridTemplates);
-
   const layoutTemplates = {
-    "row__col-3--col-6--col-3": jht.translate({
-      "#": "row", "@": ["col-3", "col-6", "col-3"]
-    })
+    "row{col-3 col-6 col-3}": {
+      "#": "row", "@": [
+        { "#": "col-3", "@": "@1" },
+        { "#": "col-6", "@": "@2" },
+        { "#": "col-3", "@": "@3" }
+      ]
+    }
   };
 
+  jht.putTemplateAll(gridTemplates);
   jht.putTemplateAll(layoutTemplates);
 
   const contents = jht.translate({
-    "#": "row", "@": "xxx"
+    "#": "row", "@": [
+      "row{col-3 col-6 col-3}"
+    ]
   })
 
   document.querySelector("body").appendChild(contents);
