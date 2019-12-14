@@ -89,48 +89,48 @@
     return null;
   };
 
-  Jhtrans.prototype.putTemplate = function (name, definition) {
-    var template = this.definitionToElement(definition);
+  Jhtrans.prototype.putTemplate = function (name, declaration) {
+    var template = this.declarationToElement(declaration);
     this.templates[name] = template;
     return this;
   };
 
-  Jhtrans.prototype.putTemplateAll = function (nameDefinitions) {
-    for (var name in nameDefinitions) {
-      if (!Object.prototype.hasOwnProperty.call(nameDefinitions, name)) {
+  Jhtrans.prototype.putTemplateAll = function (namedeclarations) {
+    for (var name in namedeclarations) {
+      if (!Object.prototype.hasOwnProperty.call(namedeclarations, name)) {
         continue;
       }
-      this.putTemplate(name, nameDefinitions[name]);
+      this.putTemplate(name, namedeclarations[name]);
     }
     return this;
   };
 
-  Jhtrans.prototype.definitionToElement = function (definition) {
+  Jhtrans.prototype.declarationToElement = function (declaration) {
 
-    if (!isArray(definition)) {
-      throw Error("definition argument requires an array");
+    if (!isArray(declaration)) {
+      throw Error("declaration argument requires an array");
     }
 
-    if (definition.length < 1) {
-      throw Error("definition array requires one item at least");
+    if (declaration.length < 1) {
+      throw Error("declaration array requires one item at least");
     }
 
-    var tag = definition[0];
+    var tag = declaration[0];
     if (typeof tag !== "string") {
-      throw Error("First item in definition must be string");
+      throw Error("First item in declaration must be string");
     }
 
     if (tag.length === "") {
       throw Error("First item was empty string");
     }
 
-    // definition[0] must be a tag name
+    // declaration[0] must be a tag name
     var elm = document.createElement(tag);
 
-    // definition[1] must be object which represents attributes,
+    // declaration[1] must be object which represents attributes,
     // or null if it is not attributes
-    if (definition.length >= 2 && isObject(definition[1])) {
-      var object = definition[1];
+    if (declaration.length >= 2 && isObject(declaration[1])) {
+      var object = declaration[1];
       for (var key in object) {
         if (!Object.prototype.hasOwnProperty.call(object, key)) {
           continue;
@@ -139,10 +139,10 @@
       }
     }
 
-    // definition[1] must be object which represents attributes,
+    // declaration[1] must be object which represents attributes,
     // or null if it is not attributes
-    if (definition.length >= 3) {
-      var third = definition[2];
+    if (declaration.length >= 3) {
+      var third = declaration[2];
       if (isString(third)) {
         if (isInputFamily(elm)) {
           elm.value = third;
@@ -152,7 +152,7 @@
       } else if (isArray(third)) {
         if (!isTerminalTag(elm)) {
           for (let i = 0; i < third.length; ++i) {
-            var child = this.definitionToElement(third[i]);
+            var child = this.declarationToElement(third[i]);
             elm.appendChild(child);
           }
         }
