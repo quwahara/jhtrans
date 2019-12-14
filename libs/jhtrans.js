@@ -117,7 +117,7 @@
       throw Error("First item in declaration must be string");
     }
 
-    if (tag.length === "") {
+    if (tag === "") {
       throw Error("First item was empty string");
     }
 
