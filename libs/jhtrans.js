@@ -240,7 +240,7 @@
       const replacements = desc[placeholder];
 
       let replacements2;
-      if (isString(replacements)) {
+      if (!isArray(replacements)) {
         replacements2 = [replacements];
       } else {
         replacements2 = replacements;
@@ -284,6 +284,14 @@
       textNode.parentNode.replaceChild(translated, textNode);
 
       return translated;
+    }
+    else if (isArray(replacement)) {
+
+      const elementNode = this.declarationToElement(replacement);
+
+      textNode.parentNode.replaceChild(elementNode, textNode);
+
+      return elementNode;
     }
     else {
       throw Error("The replacement is unsupported.");
