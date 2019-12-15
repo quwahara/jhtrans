@@ -39,7 +39,7 @@ define(function (require) {
 
   const componentTemplates = {
     "button@button": ["button", { "type": "button" }, "@"],
-    "input@text": ["input", { "type": "text" }],
+    "input@text": ["input", { "type": "text", "name": "@name" }],
     "input@password": ["input", { "type": "password" }],
     "labeled": {
       "#": "pad6", "@": [
@@ -55,6 +55,7 @@ define(function (require) {
 
   const contents = jht.translate({
     "#": "row", "@": [
+      { "#": "input@text", "@name": "xxx" },
       {
         "#": "row{col-3.col-6.col-3}",
         "@1": "",
@@ -83,8 +84,17 @@ define(function (require) {
         ],
       }
     ]
-  })
+  });
 
   document.querySelector("body").appendChild(contents);
 
+
+  let data = {
+    user: {
+      username: "",
+      password: ""
+    }
+  };
+
+  // jht.withValue(data.user, "username", document.querySelector(""));
 });
