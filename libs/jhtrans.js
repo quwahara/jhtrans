@@ -45,11 +45,18 @@
   }
 
   function isInputFamily(v) {
-    return !isNullOrUndefined(v) && (v.tagName === "INPUT" || v.tagName === "TEXTAREA");
+    return !isNullOrUndefined(v) && (v.tagName === "INPUT" || v.tagName === "TEXTAREA" || v.tagName === "SELECT");
   }
 
   function isTerminalTag(v) {
     return !isNullOrUndefined(v) && (v.tagName === "INPUT" || v.tagName === "TEXTAREA" || v.tagName === "HR");
+  }
+
+  var RID_MIN = 100000000000000;
+  var RID_MAX = RID_MIN * 10 - 1;
+
+  function rid() {
+    return "_" + (Math.floor(Math.random() * (RID_MAX - RID_MIN + 1)) + RID_MIN).toString(10);
   }
 
   const placeholderMaker = "@";
@@ -83,6 +90,9 @@
       USE_PL_AS_RAW_STRING: true,
     };
   };
+
+  // A dictionary to keep unique for DataPropRels instances
+  Jhtrans._dataPropRelDic = {};
 
   Jhtrans.prototype.getTemplate = function (name) {
 
@@ -340,6 +350,163 @@
       return textNode;
     }
   };
+
+  Jhtrans.prototype._prepareDataPropRels = function (data) {
+
+    if (!data._rid) {
+      let _rid = rid();
+
+      while (Jhtrans._dataPropRelDic[_rid]) {
+        _rid = rid();
+      }
+
+      Object.defineProperty(data, "_rid", {
+        writable: false,
+        value: _rid
+      });
+    }
+
+    let _dprs = Jhtrans._dataPropRelDic[data._rid];
+    if (_dprs) {
+      return _dprs;
+    }
+
+    _dprs = new DataPropRels(data)
+    Jhtrans._dataPropRelDic[data._rid] = _dprs;
+
+    return _dprs;
+  }
+
+  Jhtrans.prototype._preparePropInputRels = function (dataPropRels, propName) {
+
+    let _pers = Jhtrans._dataPropRelDic[propName];
+    if (_pers) {
+      return _pers;
+    }
+
+    _pers = new PropInputRels(dataPropRels, propName);
+
+    Jhtrans._dataPropRelDic[propName] = _pers;
+
+    return _pers;
+  }
+
+  Jhtrans.prototype.withValue = function (data, propName, input, eventType) {
+
+    if (!isObject(data)) {
+      throw Error("The data was not an object.");
+    }
+
+    if (!isString(propName)) {
+      throw Error("The propName was not a string.");
+    }
+
+    if (!Object.prototype.hasOwnProperty.call(data, propName)) {
+      throw Error("The propName was not a property of object.");
+    }
+
+    if (!isInputFamily(input)) {
+      throw Error("The input was not an input, select nor textarea.");
+    }
+
+    if (isNullOrUndefined(eventType)) {
+      eventType = "change";
+    }
+
+    const dprs = this._prepareDataPropRels(data);
+    const pers = this._preparePropInputRels(dprs, propName);
+    pers.bindInput(eventType, input);
+
+  };
+
+  const DataPropRels = function DataPropRels(data) {
+    this._data = data;
+    this._propElemRelDic = {};
+    this._isPropergating = false;
+  };
+
+  const PropInputRels = function PropInputRels(dataPropRels, propName) {
+    this._dataPropRels = dataPropRels;
+    this._propName = propName;
+    this._value = dataPropRels._data[propName];
+
+    (function (self) {
+      Object.defineProperty(dataPropRels._data, propName, {
+        get: function () {
+          return self._value;
+        },
+        set: function (value) {
+          self._value = value;
+          self._propagate(self, value);
+        },
+      });
+
+    })(this);
+
+    // Holding contents are:
+    // key = eventType
+    // value = {
+    //    listener: <function>,
+    //    inputs: [<input>]
+    // }
+    this._listenerContexts = {};
+  };
+
+  PropInputRels.prototype.bindInput = function (eventType, input) {
+
+    let ctx = this._listenerContexts[eventType];
+    if (isNullOrUndefined(ctx)) {
+      ctx = {
+        listener: (function (self) {
+          return function (event) {
+            self._propagate(event.target, event.target.value);
+          };
+        })(this),
+        inputs: [],
+      };
+      this._listenerContexts[eventType] = ctx;
+    }
+
+    const index = ctx.inputs.indexOf(input);
+
+    // The input of argument has been bound.
+    if (index >= 0) {
+      return;
+    }
+
+    ctx.inputs.push(input);
+    input.value = this._value;
+    input.addEventListener(eventType, ctx.listener);
+  }
+
+  PropInputRels.prototype._propagate = function (source, value) {
+
+    if (this._dataPropRels._isPropergating) {
+      return;
+    }
+
+    this._dataPropRels._isPropergating = true;
+    try {
+      if (source !== this) {
+        this._value = value;
+      }
+
+      for (let eventType in this._listenerContexts) {
+        const ctx = this._listenerContexts[eventType];
+        const inputs = ctx.inputs;
+        for (let i = 0; i < inputs.length; ++i) {
+          const input = inputs[i];
+          if (input === source) {
+            continue;
+          }
+          input.value = value;
+        }
+      }
+
+    } finally {
+      this._dataPropRels._isPropergating = false;
+    }
+  }
 
   return Jhtrans;
 });

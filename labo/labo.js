@@ -38,7 +38,7 @@ define(function (require) {
   };
 
   const componentTemplates = {
-    "button@button": ["button", { "type": "button" }, "@"],
+    "button@button": ["button", { "type": "button", "name": "@name" }, "@"],
     "input@text": ["input", { "type": "text", "name": "@name" }],
     "input@password": ["input", { "type": "password" }],
     "labeled": {
@@ -55,7 +55,6 @@ define(function (require) {
 
   const contents = jht.translate({
     "#": "row", "@": [
-      { "#": "input@text", "@name": "xxx" },
       {
         "#": "row{col-3.col-6.col-3}",
         "@1": "",
@@ -65,7 +64,9 @@ define(function (require) {
             "#": "row", "@": {
               "#": "labeled",
               "@label": "Username",
-              "@target": "input@text",
+              "@target": {
+                "#": "input@text", "@name": "name"
+              },
             }
           },
           {
@@ -77,8 +78,8 @@ define(function (require) {
           },
           {
             "#": "row", "@": [
-              { "#": "col-6", "@": { "#": "button@button", "@": "Login" }, },
-              { "#": "col-6", "@": { "#": "button@button", "@": "Cancel" }, },
+              { "#": "col-6", "@": { "#": "button@button", "@": "Login", "@name": "ok" }, },
+              { "#": "col-6", "@": { "#": "button@button", "@": "Cancel", "@name": "cancel" }, },
             ]
           },
         ],
@@ -96,5 +97,12 @@ define(function (require) {
     }
   };
 
-  // jht.withValue(data.user, "username", document.querySelector(""));
+  jht.withValue(data.user, "username", document.querySelector("input[name='name']"));
+
+  document.querySelector("button[name='ok']").onclick = function (event) {
+    console.log("data.user.username", data.user.username);
+  }
+  document.querySelector("button[name='cancel']").onclick = function (event) {
+    data.user.username = (new Date()).toISOString();
+  }
 });
