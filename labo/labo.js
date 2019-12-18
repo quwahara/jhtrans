@@ -38,6 +38,7 @@ define(function (require) {
   };
 
   const componentTemplates = {
+    "span": ["span", { "class": "@class" }, "@"],
     "button@button": ["button", { "type": "button", "name": "@name" }, "@"],
     "input@text": ["input", { "type": "text", "name": "@name" }],
     "input@password": ["input", { "type": "password" }],
@@ -55,6 +56,7 @@ define(function (require) {
 
   const contents = jht.translate({
     "#": "row", "@": [
+      { "#": "row", "@": { "#": "span", "@class": "xxx", "@": "xxx" } },
       {
         "#": "row{col-3.col-6.col-3}",
         "@1": "",
@@ -105,4 +107,6 @@ define(function (require) {
   document.querySelector("button[name='cancel']").onclick = function (event) {
     data.user.username = (new Date()).toISOString();
   }
+
+  jht.toText(data.user, "username", document.querySelector("span.xxx"));
 });

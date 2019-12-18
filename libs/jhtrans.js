@@ -419,7 +419,29 @@
     const dprs = this._prepareDataPropRels(data);
     const pers = this._preparePropInputRels(dprs, propName);
     pers._bindInput(eventType, input);
+  };
 
+  Jhtrans.prototype.toText = function (data, propName, element) {
+
+    if (!isObject(data)) {
+      throw Error("The data was not an object.");
+    }
+
+    if (!isString(propName)) {
+      throw Error("The propName was not a string.");
+    }
+
+    if (!Object.prototype.hasOwnProperty.call(data, propName)) {
+      throw Error("The propName was not a property of object.");
+    }
+
+    if (!isElementNode(element)) {
+      throw Error("The element was not an ElementNode.");
+    }
+
+    const dprs = this._prepareDataPropRels(data);
+    const pers = this._preparePropInputRels(dprs, propName);
+    pers._bindElement(element);
   };
 
   const DataPropRels = function DataPropRels(data) {
@@ -453,6 +475,8 @@
     //    inputs: [<input>]
     // }
     this._listenerContexts = {};
+
+    this._elements = [];
   };
 
   /**
@@ -487,6 +511,19 @@
     input.addEventListener(eventType, ctx.listener);
   }
 
+  PropInputRels.prototype._bindElement = function (element) {
+
+    const index = this._elements.indexOf(element);
+
+    // The input of argument has been bound.
+    if (index >= 0) {
+      return;
+    }
+
+    this._elements.push(element);
+    element.textContent = this._value;
+  }
+
   /**
    * It propergates value to among the inputs and related object property.
    */
@@ -512,6 +549,14 @@
           }
           input.value = value;
         }
+      }
+
+      for (let i = 0; i < this._elements.length; ++i) {
+        const element = this._elements[i];
+        if (element === source) {
+          continue;
+        }
+        element.textContent = value;
       }
 
     } finally {
