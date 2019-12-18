@@ -391,6 +391,9 @@
     return _pers;
   }
 
+  /**
+   * Set bidirection data binding between object property and input.
+   */
   Jhtrans.prototype.withValue = function (data, propName, input, eventType) {
 
     if (!isObject(data)) {
@@ -415,7 +418,7 @@
 
     const dprs = this._prepareDataPropRels(data);
     const pers = this._preparePropInputRels(dprs, propName);
-    pers.bindInput(eventType, input);
+    pers._bindInput(eventType, input);
 
   };
 
@@ -452,7 +455,12 @@
     this._listenerContexts = {};
   };
 
-  PropInputRels.prototype.bindInput = function (eventType, input) {
+  /**
+   * It adds a single event listener for an event among number of inputs.
+   * The listener delivers the value of event target to other inputs and
+   * property value of related object. 
+   */
+  PropInputRels.prototype._bindInput = function (eventType, input) {
 
     let ctx = this._listenerContexts[eventType];
     if (isNullOrUndefined(ctx)) {
@@ -479,6 +487,9 @@
     input.addEventListener(eventType, ctx.listener);
   }
 
+  /**
+   * It propergates value to among the inputs and related object property.
+   */
   PropInputRels.prototype._propagate = function (source, value) {
 
     if (this._dataPropRels._isPropergating) {
