@@ -93,6 +93,8 @@
       RECURSION_MAX: 1000,
       USE_PL_AS_RAW_STRING: true,
     };
+    // object to be bound in method chaining
+    this._staging = null;
   };
 
   // A dictionary to keep unique for DataPropRels instances
@@ -375,120 +377,87 @@
       return _dprs;
     }
 
-    _dprs = new DataPropRels(data)
+    _dprs = new DataPropRels(this, data)
     Jhtrans._dataPropRelDic[data._rid] = _dprs;
 
     return _dprs;
   }
 
-  Jhtrans.prototype._preparePropElemRels = function (dataPropRels, propName) {
-    let _pers = dataPropRels._propElemRelDic[propName];
+  /**
+   * Stage a data to be bound.
+   */
+  Jhtrans.prototype.stage = function (data) {
+
+    if (!isObject(data)) {
+      throw Error("The data was not an object.");
+    }
+
+    this._staging = this._prepareDataPropRels(data);
+
+    return this._staging;
+  };
+
+  const DataPropRels = function DataPropRels(jht, data) {
+    this._jht = jht;
+    this._data = data;
+    this._propElemRelDic = {};
+    this._isPropergating = false;
+
+    Object.defineProperty(this, "___", {
+      writable: false,
+      value: this
+    });
+
+    Object.defineProperty(this, "_______", {
+      writable: false,
+      value: this
+    });
+  };
+
+  DataPropRels.prototype._preparePropElemRels = function (propName) {
+
+    let _pers = this._propElemRelDic[propName];
     if (_pers) {
       return _pers;
     }
 
-    _pers = new PropElemRels(dataPropRels, propName);
+    _pers = new PropElemRels(this, propName);
 
-    dataPropRels._propElemRelDic[propName] = _pers;
+    this._propElemRelDic[propName] = _pers;
 
     return _pers;
   }
 
   /**
-   * Set bidirection data binding between object property and input.
+   * Select a property to be bound.
    */
-  Jhtrans.prototype.withValue = function (data, propName, input, eventType) {
-
-    if (!isObject(data)) {
-      throw Error("The data was not an object.");
-    }
+  DataPropRels.prototype.spot = function (propName) {
 
     if (!isString(propName)) {
       throw Error("The propName was not a string.");
     }
 
-    if (!Object.prototype.hasOwnProperty.call(data, propName)) {
-      throw Error("The propName was not a property of object.");
+    if (!Object.prototype.hasOwnProperty.call(this._data, propName)) {
+      throw Error("The propName was not a property of staging data.");
     }
 
-    if (!isInputFamily(input)) {
-      throw Error("The input was not an input, select nor textarea.");
-    }
-
-    if (isNullOrUndefined(eventType)) {
-      eventType = "change";
-    }
-
-    const dprs = this._prepareDataPropRels(data);
-    const pers = this._preparePropElemRels(dprs, propName);
-    pers._bindInput(eventType, input);
-  };
-
-  Jhtrans.prototype.toText = function (data, propName, element) {
-
-    if (!isObject(data)) {
-      throw Error("The data was not an object.");
-    }
-
-    if (!isString(propName)) {
-      throw Error("The propName was not a string.");
-    }
-
-    if (!Object.prototype.hasOwnProperty.call(data, propName)) {
-      throw Error("The propName was not a property of object.");
-    }
-
-    if (!isElementNode(element)) {
-      throw Error("The element was not an ElementNode.");
-    }
-
-    const dprs = this._prepareDataPropRels(data);
-    const pers = this._preparePropElemRels(dprs, propName);
-    pers._bindElement(element);
-  };
-
-  Jhtrans.prototype.each = function (data, propName, element, callback) {
-
-    if (!isObject(data)) {
-      throw Error("The data was not an object.");
-    }
-
-    if (!isString(propName)) {
-      throw Error("The propName was not a string.");
-    }
-
-    if (!isArray(data[propName])) {
-      throw Error("The propName was not a string.");
-    }
-
-    if (!Object.prototype.hasOwnProperty.call(data, propName)) {
-      throw Error("The propName was not a property of object.");
-    }
-
-    if (!isElementNode(element)) {
-      throw Error("The element was not an ElementNode.");
-    }
-
-    if (!isFunction(callback)) {
-      throw Error("The callback was not a function.");
-    }
-
-    const dprs = this._prepareDataPropRels(data);
-    const pers = this._preparePropElemRels(dprs, propName);
-    pers._bindEachElement(callback, element);
-
-  };
-
-  const DataPropRels = function DataPropRels(data) {
-    this._data = data;
-    this._propElemRelDic = {};
-    this._isPropergating = false;
+    return this._preparePropElemRels(propName);
   };
 
   const PropElemRels = function PropElemRels(dataPropRels, propName) {
     this._dataPropRels = dataPropRels;
     this._propName = propName;
     this._value = dataPropRels._data[propName];
+
+    Object.defineProperty(this, "___", {
+      writable: false,
+      value: this
+    });
+
+    Object.defineProperty(this, "_______", {
+      writable: false,
+      value: this
+    });
 
     (function (self) {
       Object.defineProperty(dataPropRels._data, propName, {
@@ -521,6 +490,85 @@
     //    element: <ElementNode>
     // }
     this._eachContexts = [];
+  };
+
+  /**
+   * Stage a data to be bound.
+   */
+  PropElemRels.prototype.stage = function (data) {
+    return this._dataPropRels._jht.stage(data);
+  };
+
+  /**
+   * Select a property to be bound.
+   */
+  PropElemRels.prototype.spot = function (propName) {
+    return this._dataPropRels.spot(propName);
+  };
+
+  PropElemRels.prototype.spot = function (input, eventType) {
+
+    if (!isInputFamily(input)) {
+      throw Error("The input was not an input, select nor textarea.");
+    }
+
+    if (isNullOrUndefined(eventType)) {
+      eventType = "change";
+    }
+
+    this._bindInput(eventType, input);
+
+    return this;
+  };
+
+  /**
+   * Set bidirection data binding between object property and input.
+   */
+  PropElemRels.prototype.withValue = function (input, eventType) {
+
+    if (!isInputFamily(input)) {
+      throw Error("The input was not an input, select nor textarea.");
+    }
+
+    if (isNullOrUndefined(eventType)) {
+      eventType = "change";
+    }
+
+    this._bindInput(eventType, input);
+
+    return this;
+  };
+
+  /**
+   * Set one direction data binding between object property and ElementNode.
+   */
+  PropElemRels.prototype.toText = function (element) {
+
+    if (!isElementNode(element)) {
+      throw Error("The element was not an ElementNode.");
+    }
+
+    this._bindElement(element);
+
+    return this;
+  };
+
+  /**
+   * Set ElementNode generation by array.
+   */
+  PropElemRels.prototype.each = function (element, callback) {
+
+    if (!isElementNode(element)) {
+      throw Error("The element was not an ElementNode.");
+    }
+
+    if (!isFunction(callback)) {
+      throw Error("The callback was not a function.");
+    }
+
+    this._bindEachElement(callback, element);
+
+    return this;
   };
 
   /**

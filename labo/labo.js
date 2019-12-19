@@ -109,26 +109,30 @@ define(function (require) {
     ]
   };
 
-  jht.withValue(data.user, "username", document.querySelector("input[name='name']"));
-
   document.querySelector("button[name='ok']").onclick = function (event) {
     console.log("data.user.username", data.user.username);
   }
+
   document.querySelector("button[name='cancel']").onclick = function (event) {
     data.user.username = (new Date()).toISOString();
   }
 
-  jht.toText(data.user, "username", document.querySelector("span.to-text"));
-
-  jht.each(data, "list", document.querySelector("div.each"), function (elem, item) {
-
-    const rowElm = jht.translate({
-      "#": "div", "@class": "row", "@": [
-        { "#": "div", "@class": "name", "@": "" }
-      ]
-    });
-    jht.toText(item, "name", rowElm);
-    elem.appendChild(rowElm);
-  });
+  jht
+    .stage(data)
+    .___.spot("list")
+    ._______.each(document.querySelector("div.each"), function (elem, item) {
+      const rowElm = jht.translate({
+        "#": "div", "@class": "row", "@": [
+          { "#": "div", "@class": "name", "@": "" }
+        ]
+      });
+      jht.stage(item).spot("name").toText(rowElm);
+      elem.appendChild(rowElm);
+    })
+    .stage(data.user)
+    .___.spot("username")
+    ._______.withValue(document.querySelector("input[name='name']"))
+    ._______.toText(document.querySelector("span.to-text"))
+    ;
 
 });
