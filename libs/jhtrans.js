@@ -506,21 +506,6 @@
     return this._dataPropRels.spot(propName);
   };
 
-  PropElemRels.prototype.spot = function (input, eventType) {
-
-    if (!isInputFamily(input)) {
-      throw Error("The input was not an input, select nor textarea.");
-    }
-
-    if (isNullOrUndefined(eventType)) {
-      eventType = "change";
-    }
-
-    this._bindInput(eventType, input);
-
-    return this;
-  };
-
   /**
    * Set bidirection data binding between object property and input.
    */
