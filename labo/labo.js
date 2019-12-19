@@ -120,19 +120,20 @@ define(function (require) {
   jht
     .stage(data)
     .___.spot("list")
-    ._______.each(document.querySelector("div.each"), function (elem, item) {
+    ._______.select("div.each")
+    ._______.each(function (elem, item) {
       const rowElm = jht.translate({
         "#": "div", "@class": "row", "@": [
           { "#": "div", "@class": "name", "@": "" }
         ]
       });
-      jht.stage(item).spot("name").toText(rowElm);
       elem.appendChild(rowElm);
+      jht.stage(item).spot("name").select(rowElm).toText();
     })
     .stage(data.user)
     .___.spot("username")
-    ._______.withValue(document.querySelector("input[name='name']"))
-    ._______.toText(document.querySelector("span.to-text"))
+    ._______.select("input[name='name']").withValue()
+    ._______.select("span.to-text").toText()
     ;
 
 });

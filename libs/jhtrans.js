@@ -448,6 +448,7 @@
     this._dataPropRels = dataPropRels;
     this._propName = propName;
     this._value = dataPropRels._data[propName];
+    this._selected = null;
 
     Object.defineProperty(this, "___", {
       writable: false,
@@ -506,20 +507,31 @@
     return this._dataPropRels.spot(propName);
   };
 
+  PropElemRels.prototype.select = function (queryOrElement) {
+
+    if (isString(queryOrElement)) {
+      this._selected = document.querySelector(queryOrElement);
+    }
+    else if (isElementNode(queryOrElement)) {
+      this._selected = queryOrElement;
+    }
+    else {
+      throw Error("The queryOrElement requires query string or ElementNode.");
+    }
+
+    return this;
+  };
+
   /**
    * Set bidirection data binding between object property and input.
    */
-  PropElemRels.prototype.withValue = function (input, eventType) {
-
-    if (!isInputFamily(input)) {
-      throw Error("The input was not an input, select nor textarea.");
-    }
+  PropElemRels.prototype.withValue = function (eventType) {
 
     if (isNullOrUndefined(eventType)) {
       eventType = "change";
     }
 
-    this._bindInput(eventType, input);
+    this._bindInput(eventType);
 
     return this;
   };
@@ -527,13 +539,9 @@
   /**
    * Set one direction data binding between object property and ElementNode.
    */
-  PropElemRels.prototype.toText = function (element) {
+  PropElemRels.prototype.toText = function () {
 
-    if (!isElementNode(element)) {
-      throw Error("The element was not an ElementNode.");
-    }
-
-    this._bindElement(element);
+    this._bindElement();
 
     return this;
   };
@@ -541,17 +549,13 @@
   /**
    * Set ElementNode generation by array.
    */
-  PropElemRels.prototype.each = function (element, callback) {
-
-    if (!isElementNode(element)) {
-      throw Error("The element was not an ElementNode.");
-    }
+  PropElemRels.prototype.each = function (callback) {
 
     if (!isFunction(callback)) {
       throw Error("The callback was not a function.");
     }
 
-    this._bindEachElement(callback, element);
+    this._bindEachElement(callback);
 
     return this;
   };
@@ -561,7 +565,15 @@
    * The listener delivers the value of event target to other inputs and
    * property value of related object. 
    */
-  PropElemRels.prototype._bindInput = function (eventType, input) {
+  PropElemRels.prototype._bindInput = function (eventType) {
+
+    if (!isElementNode(this._selected)) {
+      throw Error("No ElementNode was selected.");
+    }
+
+    if (!isInputFamily(this._selected)) {
+      throw Error("Selected NodeElement was not an input, select nor textarea.");
+    }
 
     let ctx = this._listenerContexts[eventType];
     if (isNullOrUndefined(ctx)) {
@@ -576,6 +588,7 @@
       this._listenerContexts[eventType] = ctx;
     }
 
+    const input = this._selected;
     const index = ctx.inputs.indexOf(input);
 
     // The input of argument has been bound.
@@ -588,7 +601,13 @@
     input.addEventListener(eventType, ctx.listener);
   }
 
-  PropElemRels.prototype._bindElement = function (element) {
+  PropElemRels.prototype._bindElement = function () {
+
+    if (!isElementNode(this._selected)) {
+      throw Error("No ElementNode was selected.");
+    }
+
+    const element = this._selected;
 
     const index = this._elements.indexOf(element);
 
@@ -601,11 +620,17 @@
     element.textContent = this._value;
   }
 
-  PropElemRels.prototype._bindEachElement = function (callback, element) {
+  PropElemRels.prototype._bindEachElement = function (callback) {
+
+    if (!isElementNode(this._selected)) {
+      throw Error("No ElementNode was selected.");
+    }
+
     this._eachContexts.push({
       callback: callback,
-      element: element
+      element: this._selected
     });
+
     this._propagate(null, this._value);
   }
 
