@@ -38,6 +38,7 @@ define(function (require) {
   };
 
   const componentTemplates = {
+    "div": ["div", { "class": "@class" }, "@"],
     "span": ["span", { "class": "@class" }, "@"],
     "button@button": ["button", { "type": "button", "name": "@name" }, "@"],
     "input@text": ["input", { "type": "text", "name": "@name" }],
@@ -56,7 +57,12 @@ define(function (require) {
 
   const contents = jht.translate({
     "#": "row", "@": [
-      { "#": "row", "@": { "#": "span", "@class": "xxx", "@": "xxx" } },
+      { "#": "row", "@": { "#": "span", "@class": "to-text", "@": "xxx" } },
+      {
+        "#": "row", "@": {
+          "#": "div", "@class": "each", "@": "ttt"
+        }
+      },
       {
         "#": "row{col-3.col-6.col-3}",
         "@1": "",
@@ -96,7 +102,11 @@ define(function (require) {
     user: {
       username: "",
       password: ""
-    }
+    },
+    list: [
+      { name: "Alice" },
+      { name: "Bob" },
+    ]
   };
 
   jht.withValue(data.user, "username", document.querySelector("input[name='name']"));
@@ -108,5 +118,17 @@ define(function (require) {
     data.user.username = (new Date()).toISOString();
   }
 
-  jht.toText(data.user, "username", document.querySelector("span.xxx"));
+  jht.toText(data.user, "username", document.querySelector("span.to-text"));
+
+  jht.each(data, "list", document.querySelector("div.each"), function (elem, item) {
+
+    const rowElm = jht.translate({
+      "#": "div", "@class": "row", "@": [
+        { "#": "div", "@class": "name", "@": "" }
+      ]
+    });
+    jht.toText(item, "name", rowElm);
+    elem.appendChild(rowElm);
+  });
+
 });

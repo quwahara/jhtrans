@@ -16,6 +16,10 @@
     return Array.isArray(v);
   }
 
+  function isFunction(fun) {
+    return fun && {}.toString.call(fun) === '[object Function]';
+  }
+
   function isInt(v) {
     return v === parseInt(v, 10);
   }
@@ -378,15 +382,14 @@
   }
 
   Jhtrans.prototype._preparePropInputRels = function (dataPropRels, propName) {
-
-    let _pers = Jhtrans._dataPropRelDic[propName];
+    let _pers = dataPropRels._propElemRelDic[propName];
     if (_pers) {
       return _pers;
     }
 
     _pers = new PropInputRels(dataPropRels, propName);
 
-    Jhtrans._dataPropRelDic[propName] = _pers;
+    dataPropRels._propElemRelDic[propName] = _pers;
 
     return _pers;
   }
@@ -444,6 +447,38 @@
     pers._bindElement(element);
   };
 
+  Jhtrans.prototype.each = function (data, propName, element, callback) {
+
+    if (!isObject(data)) {
+      throw Error("The data was not an object.");
+    }
+
+    if (!isString(propName)) {
+      throw Error("The propName was not a string.");
+    }
+
+    if (!isArray(data[propName])) {
+      throw Error("The propName was not a string.");
+    }
+
+    if (!Object.prototype.hasOwnProperty.call(data, propName)) {
+      throw Error("The propName was not a property of object.");
+    }
+
+    if (!isElementNode(element)) {
+      throw Error("The element was not an ElementNode.");
+    }
+
+    if (!isFunction(callback)) {
+      throw Error("The callback was not a function.");
+    }
+
+    const dprs = this._prepareDataPropRels(data);
+    const pers = this._preparePropInputRels(dprs, propName);
+    pers._bindEachElement(callback, element);
+
+  };
+
   const DataPropRels = function DataPropRels(data) {
     this._data = data;
     this._propElemRelDic = {};
@@ -477,6 +512,8 @@
     this._listenerContexts = {};
 
     this._elements = [];
+
+    this._eachContexts = [];
   };
 
   /**
@@ -524,6 +561,14 @@
     element.textContent = this._value;
   }
 
+  PropInputRels.prototype._bindEachElement = function (callback, element) {
+    this._eachContexts.push({
+      callback: callback,
+      element: element
+    });
+    this._propagate(null, this._value);
+  }
+
   /**
    * It propergates value to among the inputs and related object property.
    */
@@ -557,6 +602,15 @@
           continue;
         }
         element.textContent = value;
+      }
+
+      for (let i = 0; i < this._eachContexts.length; ++i) {
+        const ctx = this._eachContexts[i];
+        for (let j = 0; j < value.length; ++j) {
+          if (false === ctx.callback.call(this, ctx.element, value[j])) {
+            break;
+          }
+        }
       }
 
     } finally {
