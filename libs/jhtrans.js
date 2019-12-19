@@ -381,13 +381,13 @@
     return _dprs;
   }
 
-  Jhtrans.prototype._preparePropInputRels = function (dataPropRels, propName) {
+  Jhtrans.prototype._preparePropElemRels = function (dataPropRels, propName) {
     let _pers = dataPropRels._propElemRelDic[propName];
     if (_pers) {
       return _pers;
     }
 
-    _pers = new PropInputRels(dataPropRels, propName);
+    _pers = new PropElemRels(dataPropRels, propName);
 
     dataPropRels._propElemRelDic[propName] = _pers;
 
@@ -420,7 +420,7 @@
     }
 
     const dprs = this._prepareDataPropRels(data);
-    const pers = this._preparePropInputRels(dprs, propName);
+    const pers = this._preparePropElemRels(dprs, propName);
     pers._bindInput(eventType, input);
   };
 
@@ -443,7 +443,7 @@
     }
 
     const dprs = this._prepareDataPropRels(data);
-    const pers = this._preparePropInputRels(dprs, propName);
+    const pers = this._preparePropElemRels(dprs, propName);
     pers._bindElement(element);
   };
 
@@ -474,7 +474,7 @@
     }
 
     const dprs = this._prepareDataPropRels(data);
-    const pers = this._preparePropInputRels(dprs, propName);
+    const pers = this._preparePropElemRels(dprs, propName);
     pers._bindEachElement(callback, element);
 
   };
@@ -485,7 +485,7 @@
     this._isPropergating = false;
   };
 
-  const PropInputRels = function PropInputRels(dataPropRels, propName) {
+  const PropElemRels = function PropElemRels(dataPropRels, propName) {
     this._dataPropRels = dataPropRels;
     this._propName = propName;
     this._value = dataPropRels._data[propName];
@@ -511,8 +511,15 @@
     // }
     this._listenerContexts = {};
 
+    // Holding contents are:
+    //    <ElementNode>
     this._elements = [];
 
+    // Holding contents are:
+    // {
+    //    callback: <function>,
+    //    element: <ElementNode>
+    // }
     this._eachContexts = [];
   };
 
@@ -521,7 +528,7 @@
    * The listener delivers the value of event target to other inputs and
    * property value of related object. 
    */
-  PropInputRels.prototype._bindInput = function (eventType, input) {
+  PropElemRels.prototype._bindInput = function (eventType, input) {
 
     let ctx = this._listenerContexts[eventType];
     if (isNullOrUndefined(ctx)) {
@@ -548,7 +555,7 @@
     input.addEventListener(eventType, ctx.listener);
   }
 
-  PropInputRels.prototype._bindElement = function (element) {
+  PropElemRels.prototype._bindElement = function (element) {
 
     const index = this._elements.indexOf(element);
 
@@ -561,7 +568,7 @@
     element.textContent = this._value;
   }
 
-  PropInputRels.prototype._bindEachElement = function (callback, element) {
+  PropElemRels.prototype._bindEachElement = function (callback, element) {
     this._eachContexts.push({
       callback: callback,
       element: element
@@ -572,7 +579,7 @@
   /**
    * It propergates value to among the inputs and related object property.
    */
-  PropInputRels.prototype._propagate = function (source, value) {
+  PropElemRels.prototype._propagate = function (source, value) {
 
     if (this._dataPropRels._isPropergating) {
       return;
