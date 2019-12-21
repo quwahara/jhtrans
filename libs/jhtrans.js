@@ -36,6 +36,10 @@
     return typeof v === "string";
   }
 
+  function isEmptyString(v) {
+    return isNullOrUndefined(v) || (isString(v) && v === "");
+  }
+
   function isAttr(v) {
     return !isNullOrUndefined(v) && v.nodeType === Node.ATTRIBUTE_NODE;
   }
@@ -403,12 +407,20 @@
     this._propElemRelDic = {};
     this._isPropergating = false;
 
+    // dot + 3
     Object.defineProperty(this, "___", {
       writable: false,
       value: this
     });
 
+    // dot + 7
     Object.defineProperty(this, "_______", {
+      writable: false,
+      value: this
+    });
+
+    // dot + 11
+    Object.defineProperty(this, "___________", {
       writable: false,
       value: this
     });
@@ -448,6 +460,7 @@
     this._dataPropRels = dataPropRels;
     this._propName = propName;
     this._value = dataPropRels._data[propName];
+    this._previousValue = dataPropRels._data[propName];
     this._selected = null;
 
     Object.defineProperty(this, "___", {
@@ -491,6 +504,10 @@
     //    elements: [<ElementNode>]
     // }
     this._attrContexts = {};
+
+    // Holding contents are:
+    //    <ElementNode>
+    this._toClassElements = [];
 
     // Holding contents are:
     // {
@@ -579,6 +596,29 @@
 
     context.elements.push(element);
     element.setAttribute(attrName, this._value);
+
+    return this;
+  };
+
+  PropElemRels.prototype.toClass = function () {
+
+    if (!isElementNode(this._selected)) {
+      throw Error("No ElementNode was selected.");
+    }
+
+    const element = this._selected;
+
+    const index = this._toClassElements.indexOf(element);
+
+    // The input of argument has been bound.
+    if (index >= 0) {
+      return;
+    }
+
+    this._toClassElements.push(element);
+    if (!isEmptyString(this._value)) {
+      element.classList.add(this._value);
+    }
 
     return this;
   };
@@ -704,6 +744,20 @@
           continue;
         }
         element.textContent = value;
+      }
+
+      for (let i = 0; i < this._toClassElements.length; ++i) {
+        const element = this._toClassElements[i];
+        if (element === source) {
+          continue;
+        }
+        const classList = element.classList;
+        if (!isEmptyString(this._previousValue)) {
+          classList.remove(this._previousValue);
+        }
+        if (!isEmptyString(value)) {
+          classList.add(value);
+        }
       }
 
       for (let attrName in this._attrContexts) {

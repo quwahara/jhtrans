@@ -59,6 +59,7 @@ define(function (require) {
 
   const contents = jht.translate({
     "#": "row", "@": [
+      { "#": "row", "@": { "#": "a", "@class": "to-attr", "@href": "", "@": "Yahoo!" } },
       { "#": "row", "@": { "#": "span", "@class": "to-text", "@": "xxx" } },
       {
         "#": "row", "@": {
@@ -108,7 +109,9 @@ define(function (require) {
     list: [
       { name: "Alice", href: "#alice" },
       { name: "Bob", href: "#bob" },
-    ]
+    ],
+    href: "http://www.yahoo.co.jp",
+    class: "aaa"
   };
 
   document.querySelector("button[name='ok']").onclick = function (event) {
@@ -121,6 +124,8 @@ define(function (require) {
 
   jht
     .stage(data)
+    .___.spot("href").select("a.to-attr").toAttr("href")
+    .___.spot("class").select("a.to-attr").toClass()
     .___.spot("list")
     ._______.select("div.each")
     ._______.each(function (elem, item) {
