@@ -483,7 +483,14 @@
 
     // Holding contents are:
     //    <ElementNode>
-    this._elements = [];
+    this._toTextElements = [];
+
+    // Holding contents are:
+    // key = attrName
+    // value = {
+    //    elements: [<ElementNode>]
+    // }
+    this._attrContexts = {};
 
     // Holding contents are:
     // {
@@ -542,6 +549,36 @@
   PropElemRels.prototype.toText = function () {
 
     this._bindElement();
+
+    return this;
+  };
+
+  PropElemRels.prototype.toAttr = function (attrName) {
+
+    if (!isElementNode(this._selected)) {
+      throw Error("No ElementNode was selected.");
+    }
+
+    const element = this._selected;
+
+    let context = this._attrContexts[attrName];
+    if (isNullOrUndefined(context)) {
+      context = {
+        attrName: attrName,
+        elements: []
+      }
+      this._attrContexts[attrName] = context;
+    }
+
+    const index = context.elements.indexOf(element);
+
+    // The input of argument has been bound.
+    if (index >= 0) {
+      return;
+    }
+
+    context.elements.push(element);
+    element.setAttribute(attrName, this._value);
 
     return this;
   };
@@ -609,14 +646,14 @@
 
     const element = this._selected;
 
-    const index = this._elements.indexOf(element);
+    const index = this._toTextElements.indexOf(element);
 
     // The input of argument has been bound.
     if (index >= 0) {
       return;
     }
 
-    this._elements.push(element);
+    this._toTextElements.push(element);
     element.textContent = this._value;
   }
 
@@ -661,12 +698,24 @@
         }
       }
 
-      for (let i = 0; i < this._elements.length; ++i) {
-        const element = this._elements[i];
+      for (let i = 0; i < this._toTextElements.length; ++i) {
+        const element = this._toTextElements[i];
         if (element === source) {
           continue;
         }
         element.textContent = value;
+      }
+
+      for (let attrName in this._attrContexts) {
+        const ctx = this._attrContexts[attrName];
+        const elements = ctx.elements;
+        for (let i = 0; i < elements.length; ++i) {
+          const element = elements[i];
+          if (element === source) {
+            continue;
+          }
+          element.setAttribute(attrName, value);
+        }
       }
 
       for (let i = 0; i < this._eachContexts.length; ++i) {

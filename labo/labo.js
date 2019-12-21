@@ -1,3 +1,4 @@
+let data;
 define(function (require) {
 
   var Jhtrans = require('../libs/jhtrans');
@@ -40,6 +41,7 @@ define(function (require) {
   const componentTemplates = {
     "div": ["div", { "class": "@class" }, "@"],
     "span": ["span", { "class": "@class" }, "@"],
+    "a": ["a", { "class": "@class", "href": "@href" }, "@"],
     "button@button": ["button", { "type": "button", "name": "@name" }, "@"],
     "input@text": ["input", { "type": "text", "name": "@name" }],
     "input@password": ["input", { "type": "password" }],
@@ -98,14 +100,14 @@ define(function (require) {
   document.querySelector("body").appendChild(contents);
 
 
-  let data = {
+  data = {
     user: {
       username: "",
       password: ""
     },
     list: [
-      { name: "Alice" },
-      { name: "Bob" },
+      { name: "Alice", href: "#alice" },
+      { name: "Bob", href: "#bob" },
     ]
   };
 
@@ -124,11 +126,15 @@ define(function (require) {
     ._______.each(function (elem, item) {
       const rowElm = jht.translate({
         "#": "div", "@class": "row", "@": [
-          { "#": "div", "@class": "name", "@": "" }
+          { "#": "a", "@class": "name", "@": "" }
         ]
       });
       elem.appendChild(rowElm);
-      jht.stage(item).spot("name").select(rowElm).toText();
+      const a = rowElm.querySelector("a");
+      jht.stage(item)
+        .___.spot("name").select(a).toText()
+        .___.spot("href").select(a).toAttr("href")
+        ;
     })
     .stage(data.user)
     .___.spot("username")
