@@ -570,6 +570,14 @@
     return this;
   };
 
+  PropElemRels.prototype.toSrc = function () {
+    return this.toAttr("src");
+  }
+
+  PropElemRels.prototype.toHref = function () {
+    return this.toAttr("href");
+  }
+
   PropElemRels.prototype.toAttr = function (attrName) {
 
     if (!isElementNode(this._selected)) {
