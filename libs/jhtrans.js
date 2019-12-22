@@ -101,8 +101,8 @@
     this._staging = null;
   };
 
-  // A dictionary to keep unique for DataPropRels instances
-  Jhtrans._dataPropRelDic = {};
+  // A dictionary to keep unique for DataStage instances
+  Jhtrans._dataStageDic = {};
 
   Jhtrans.prototype.getTemplate = function (name) {
 
@@ -361,12 +361,12 @@
     }
   };
 
-  Jhtrans.prototype._prepareDataPropRels = function (data) {
+  Jhtrans.prototype._prepareDataStage = function (data) {
 
     if (!data._rid) {
       let _rid = rid();
 
-      while (Jhtrans._dataPropRelDic[_rid]) {
+      while (Jhtrans._dataStageDic[_rid]) {
         _rid = rid();
       }
 
@@ -376,15 +376,15 @@
       });
     }
 
-    let _dprs = Jhtrans._dataPropRelDic[data._rid];
-    if (_dprs) {
-      return _dprs;
+    let dataStage = Jhtrans._dataStageDic[data._rid];
+    if (dataStage) {
+      return dataStage;
     }
 
-    _dprs = new DataPropRels(this, data)
-    Jhtrans._dataPropRelDic[data._rid] = _dprs;
+    dataStage = new DataStage(this, data)
+    Jhtrans._dataStageDic[data._rid] = dataStage;
 
-    return _dprs;
+    return dataStage;
   }
 
   /**
@@ -396,15 +396,15 @@
       throw Error("The data was not an object.");
     }
 
-    this._staging = this._prepareDataPropRels(data);
+    this._staging = this._prepareDataStage(data);
 
     return this._staging;
   };
 
-  const DataPropRels = function DataPropRels(jht, data) {
+  const DataStage = function DataStage(jht, data) {
     this._jht = jht;
     this._data = data;
-    this._propElemRelDic = {};
+    this._propSpotDic = {};
     this._isPropergating = false;
 
     // dot + 3
@@ -426,24 +426,24 @@
     });
   };
 
-  DataPropRels.prototype._preparePropElemRels = function (propName) {
+  DataStage.prototype._preparePropSpot = function (propName) {
 
-    let _pers = this._propElemRelDic[propName];
-    if (_pers) {
-      return _pers;
+    let propSpot = this._propSpotDic[propName];
+    if (propSpot) {
+      return propSpot;
     }
 
-    _pers = new PropElemRels(this, propName);
+    propSpot = new PropSpot(this, propName);
 
-    this._propElemRelDic[propName] = _pers;
+    this._propSpotDic[propName] = propSpot;
 
-    return _pers;
+    return propSpot;
   }
 
   /**
    * Select a property to be bound.
    */
-  DataPropRels.prototype.spot = function (propName) {
+  DataStage.prototype.spot = function (propName) {
 
     if (!isString(propName)) {
       throw Error("The propName was not a string.");
@@ -453,14 +453,14 @@
       throw Error("The propName was not a property of staging data.");
     }
 
-    return this._preparePropElemRels(propName);
+    return this._preparePropSpot(propName);
   };
 
-  const PropElemRels = function PropElemRels(dataPropRels, propName) {
-    this._dataPropRels = dataPropRels;
+  const PropSpot = function PropSpot(dataStage, propName) {
+    this._dataStage = dataStage;
     this._propName = propName;
-    this._value = dataPropRels._data[propName];
-    this._previousValue = dataPropRels._data[propName];
+    this._value = dataStage._data[propName];
+    this._previousValue = dataStage._data[propName];
     this._selected = null;
 
     Object.defineProperty(this, "___", {
@@ -474,7 +474,7 @@
     });
 
     (function (self) {
-      Object.defineProperty(dataPropRels._data, propName, {
+      Object.defineProperty(dataStage._data, propName, {
         get: function () {
           return self._value;
         },
@@ -504,7 +504,7 @@
     //    attrName: <attrName:string>,
     //    elements: [<ElementNode>]
     // }
-    this._attrContexts = {};
+    this._toAttrContexts = {};
 
     // Holding contents are:
     //    <ElementNode>
@@ -530,18 +530,18 @@
   /**
    * Stage a data to be bound.
    */
-  PropElemRels.prototype.stage = function (data) {
-    return this._dataPropRels._jht.stage(data);
+  PropSpot.prototype.stage = function (data) {
+    return this._dataStage._jht.stage(data);
   };
 
   /**
    * Select a property to be bound.
    */
-  PropElemRels.prototype.spot = function (propName) {
-    return this._dataPropRels.spot(propName);
+  PropSpot.prototype.spot = function (propName) {
+    return this._dataStage.spot(propName);
   };
 
-  PropElemRels.prototype.select = function (queryOrElement) {
+  PropSpot.prototype.select = function (queryOrElement) {
 
     if (isString(queryOrElement)) {
       this._selected = document.querySelector(queryOrElement);
@@ -559,7 +559,7 @@
   /**
    * Set bidirection data binding between object property and input.
    */
-  PropElemRels.prototype.withValue = function (eventType) {
+  PropSpot.prototype.withValue = function (eventType) {
 
     if (isNullOrUndefined(eventType)) {
       eventType = "change";
@@ -573,22 +573,22 @@
   /**
    * Set one direction data binding between object property and ElementNode.
    */
-  PropElemRels.prototype.toText = function () {
+  PropSpot.prototype.toText = function () {
 
     this._bindElement();
 
     return this;
   };
 
-  PropElemRels.prototype.toSrc = function () {
+  PropSpot.prototype.toSrc = function () {
     return this.toAttr("src");
   }
 
-  PropElemRels.prototype.toHref = function () {
+  PropSpot.prototype.toHref = function () {
     return this.toAttr("href");
   }
 
-  PropElemRels.prototype.toAttr = function (attrName) {
+  PropSpot.prototype.toAttr = function (attrName) {
 
     if (!isElementNode(this._selected)) {
       throw Error("No ElementNode was selected.");
@@ -596,13 +596,13 @@
 
     const element = this._selected;
 
-    let context = this._attrContexts[attrName];
+    let context = this._toAttrContexts[attrName];
     if (isNullOrUndefined(context)) {
       context = {
         attrName: attrName,
         elements: []
       }
-      this._attrContexts[attrName] = context;
+      this._toAttrContexts[attrName] = context;
     }
 
     const index = context.elements.indexOf(element);
@@ -618,7 +618,7 @@
     return this;
   };
 
-  PropElemRels.prototype.toClass = function () {
+  PropSpot.prototype.toClass = function () {
 
     if (!isElementNode(this._selected)) {
       throw Error("No ElementNode was selected.");
@@ -641,15 +641,15 @@
     return this;
   };
 
-  PropElemRels.prototype.turnClassOn = function (className) {
+  PropSpot.prototype.turnClassOn = function (className) {
     return this.turnClass(className, true);
   }
 
-  PropElemRels.prototype.turnClassOff = function (className) {
+  PropSpot.prototype.turnClassOff = function (className) {
     return this.turnClass(className, false);
   }
 
-  PropElemRels.prototype.turnClass = function (className, onOrOff) {
+  PropSpot.prototype.turnClass = function (className, onOrOff) {
 
     if (!isElementNode(this._selected)) {
       throw Error("No ElementNode was selected.");
@@ -689,7 +689,7 @@
   /**
  * Set ElementNode generation by array.
  */
-  PropElemRels.prototype.each = function (callback) {
+  PropSpot.prototype.each = function (callback) {
 
     if (!isFunction(callback)) {
       throw Error("The callback was not a function.");
@@ -705,7 +705,7 @@
    * The listener delivers the value of event target to other inputs and
    * property value of related object. 
    */
-  PropElemRels.prototype._bindInput = function (eventType) {
+  PropSpot.prototype._bindInput = function (eventType) {
 
     if (!isElementNode(this._selected)) {
       throw Error("No ElementNode was selected.");
@@ -741,7 +741,7 @@
     input.addEventListener(eventType, ctx.listener);
   }
 
-  PropElemRels.prototype._bindElement = function () {
+  PropSpot.prototype._bindElement = function () {
 
     if (!isElementNode(this._selected)) {
       throw Error("No ElementNode was selected.");
@@ -760,7 +760,7 @@
     element.textContent = this._value;
   }
 
-  PropElemRels.prototype._bindEachElement = function (callback) {
+  PropSpot.prototype._bindEachElement = function (callback) {
 
     if (!isElementNode(this._selected)) {
       throw Error("No ElementNode was selected.");
@@ -777,13 +777,13 @@
   /**
    * It propergates value to among the inputs and related object property.
    */
-  PropElemRels.prototype._propagate = function (source, value) {
+  PropSpot.prototype._propagate = function (source, value) {
 
-    if (this._dataPropRels._isPropergating) {
+    if (this._dataStage._isPropergating) {
       return;
     }
 
-    this._dataPropRels._isPropergating = true;
+    this._dataStage._isPropergating = true;
     try {
       if (source !== this) {
         this._value = value;
@@ -840,8 +840,8 @@
         }
       }
 
-      for (let attrName in this._attrContexts) {
-        const context = this._attrContexts[attrName];
+      for (let attrName in this._toAttrContexts) {
+        const context = this._toAttrContexts[attrName];
         const elements = context.elements;
         for (let i = 0; i < elements.length; ++i) {
           const element = elements[i];
@@ -862,7 +862,7 @@
       }
 
     } finally {
-      this._dataPropRels._isPropergating = false;
+      this._dataStage._isPropergating = false;
     }
   }
 
