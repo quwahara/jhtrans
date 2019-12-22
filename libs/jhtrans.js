@@ -32,6 +32,12 @@
     return v && !Array.isArray(v) && (typeof v) === "object";
   }
 
+  function isPrimitive(v) {
+    if (v == null) return false;
+    var t = typeof v;
+    return t === "string" || t === "number" || t === "boolean";
+  }
+
   function isString(v) {
     return typeof v === "string";
   }
@@ -103,6 +109,7 @@
 
   // A dictionary to keep unique for DataStage instances
   Jhtrans._dataStageDic = {};
+  Jhtrans._objectPropDic = {};
 
   Jhtrans.prototype.getTemplate = function (name) {
 
@@ -360,6 +367,187 @@
       return textNode;
     }
   };
+
+  Jhtrans.prototype.stage2 = function (object) {
+    if (!isObject(data)) {
+      throw Error("The argument type was not object.");
+    }
+
+    let prop = new ObjectProp(this, null, null, object);
+
+    return prop;
+  }
+
+  const ObjectProp = function ObjectProp(jht, owner, nameInOwner, object) {
+    this._jht = jht;
+    this._owner = owner;
+    this._nameInOwner = nameInOwner;
+    this._object = object;
+    this._propDic = {};
+
+    for (let key in object) {
+      const value = object[key];
+      let prop;
+      if (isNullOrUndefined(value) || isPrimitive(value)) {
+        prop = new PrimitiveProp(jht, this, key);
+      }
+      else if (isObject(value)) {
+
+        if (!value._rid) {
+          let _rid = rid();
+
+          while (Jhtrans._objectPropDic[_rid]) {
+            _rid = rid();
+          }
+
+          Object.defineProperty(value, "_rid", {
+            enumerable: false,
+            writable: false,
+            value: _rid
+          });
+
+          prop = new ObjectProp(jht, object, key, value);
+
+          Jhtrans._objectPropDic[_rid] = prop;
+        }
+        else {
+          prop = Jhtrans._objectPropDic[_rid];
+        }
+      }
+      else {
+        throw Error("Unsupported type");
+      }
+      this._propDic[key] = prop;
+
+      (function (self, key, prop) {
+        Object.defineProperty(self, key, {
+          enumerable: true,
+          writable: false,
+          value: prop
+        });
+      })(this, key, prop);
+    }
+
+    if (isObject(owner) && isString(nameInOwner)) {
+      (function (self) {
+        Object.defineProperty(owner, nameInOwner, {
+          enumerable: true,
+          get: function () {
+            return self._object;
+          },
+          set: function (value) {
+            if (isNullOrUndefined(value)) {
+              for (let key in self._propDic) {
+                self._propDic[key]._propagate(self, null);
+              }
+            }
+            else if (isObject(value)) {
+              for (let key in self._propDic) {
+                self._propDic[key]._propagate(self, value[key]);
+              }
+            }
+            else {
+              throw Error("Value type was unmatch");
+            }
+          }
+        });
+      })(this);
+    }
+  };
+
+  ObjectProp.prototype._propagate = function (source, value) {
+
+    if (source === this) {
+      return;
+    }
+
+    if (isNullOrUndefined(value)) {
+      for (let key in this._propDic) {
+        this._propDic[key]._propagate(this, null);
+      }
+    }
+    else if (isObject(value)) {
+      for (let key in this._propDic) {
+        this._propDic[key]._propagate(this, value[key]);
+      }
+    }
+    else {
+      throw Error("Value type was unmatch");
+    }
+  }
+
+  const PrimitiveProp = function PrimitiveProp(jht, objectProp, nameInObject) {
+    this._jht = jht;
+    this._objectProp = objectProp;
+    this._nameInObject = nameInObject;
+    this._value = objectProp._object[nameInObject];
+    this._selected = null;
+    this._toTextElements = [];
+
+    Object.defineProperty(objectProp._object, nameInObject, {
+      enumerable: true,
+      get: (function (self) {
+        return function () {
+          return self._value;
+        };
+      })(this),
+      set: (function (self) {
+        return function (value) {
+          self._value = value;
+          self._propagate(self, value);
+        };
+      })(this),
+    });
+  };
+
+  PrimitiveProp.prototype.select = function (queryOrElement) {
+
+    if (isString(queryOrElement)) {
+      this._selected = document.querySelector(queryOrElement);
+    }
+    else if (isElementNode(queryOrElement)) {
+      this._selected = queryOrElement;
+    }
+    else {
+      throw Error("The queryOrElement requires query string or ElementNode.");
+    }
+
+    return this;
+  };
+
+  PrimitiveProp.prototype.toText = function (source, value) {
+
+    if (!isElementNode(this._selected)) {
+      throw Error("No ElementNode was selected.");
+    }
+
+    const element = this._selected;
+
+    const index = this._toTextElements.indexOf(element);
+
+    // The input of argument has been bound.
+    if (index >= 0) {
+      return;
+    }
+
+    this._toTextElements.push(element);
+    element.textContent = this._value;
+  }
+
+  /**
+   * It propergates value to among the inputs and related object property.
+   */
+  PrimitiveProp.prototype._propagate = function (source, value) {
+
+    for (let i = 0; i < this._toTextElements.length; ++i) {
+      const element = this._toTextElements[i];
+      if (element === source) {
+        continue;
+      }
+      element.textContent = value;
+    }
+
+  }
 
   /**
    * Stage a data to be bound.

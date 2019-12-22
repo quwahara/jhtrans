@@ -1,4 +1,4 @@
-let data;
+let data, data2;
 define(function (require) {
 
   var Jhtrans = require('../libs/jhtrans');
@@ -149,4 +149,16 @@ define(function (require) {
     ._______.select("span.to-text").toText()
     ;
 
+  data2 = {
+    sub: {
+      prop: "value"
+    }
+  };
+
+  jht
+    .stage2(data2)
+    .sub.prop.select("a.to-attr").toText();
+
+
+  data2.sub.prop = "yyy";
 });
