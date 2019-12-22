@@ -495,12 +495,13 @@
     this._listenerContexts = {};
 
     // Holding contents are:
-    //    <ElementNode>
+    //    [<ElementNode>]
     this._toTextElements = [];
 
     // Holding contents are:
     // key = attrName
     // value = {
+    //    attrName: <attrName:string>,
     //    elements: [<ElementNode>]
     // }
     this._attrContexts = {};
@@ -508,6 +509,15 @@
     // Holding contents are:
     //    <ElementNode>
     this._toClassElements = [];
+
+    // Holding contents are:
+    // key = className + ("_on" | "_off")
+    // value = {
+    //    className: <className:string>,
+    //    onOrOff: <onOrOff:boolean>,
+    //    elements: [<ElementNode>]
+    // }
+    this._turnClassContexts = {};
 
     // Holding contents are:
     // {
@@ -631,9 +641,54 @@
     return this;
   };
 
+  PropElemRels.prototype.turnClassOn = function (className) {
+    return this.turnClass(className, true);
+  }
+
+  PropElemRels.prototype.turnClassOff = function (className) {
+    return this.turnClass(className, false);
+  }
+
+  PropElemRels.prototype.turnClass = function (className, onOrOff) {
+
+    if (!isElementNode(this._selected)) {
+      throw Error("No ElementNode was selected.");
+    }
+
+    const element = this._selected;
+    const key = className + "_" + (onOrOff ? "on" : "off");
+
+    let context = this._turnClassContexts[key];
+    if (isNullOrUndefined(context)) {
+      context = {
+        className: className,
+        onOrOff: onOrOff,
+        elements: []
+      }
+      this._turnClassContexts[key] = context;
+    }
+
+    const index = context.elements.indexOf(element);
+
+    // The input of argument has been bound.
+    if (index >= 0) {
+      return;
+    }
+
+    context.elements.push(element);
+    const on = context.onOrOff ? this._value : !this._value;
+    if (on) {
+      element.classList.add(context.className);
+    } else {
+      element.classList.remove(context.className);
+    }
+
+    return this;
+  };
+
   /**
-   * Set ElementNode generation by array.
-   */
+ * Set ElementNode generation by array.
+ */
   PropElemRels.prototype.each = function (callback) {
 
     if (!isFunction(callback)) {
@@ -735,8 +790,8 @@
       }
 
       for (let eventType in this._listenerContexts) {
-        const ctx = this._listenerContexts[eventType];
-        const inputs = ctx.inputs;
+        const context = this._listenerContexts[eventType];
+        const inputs = context.inputs;
         for (let i = 0; i < inputs.length; ++i) {
           const input = inputs[i];
           if (input === source) {
@@ -768,9 +823,26 @@
         }
       }
 
+      for (let key in this._turnClassContexts) {
+        const context = this._turnClassContexts[key];
+        const elements = context.elements;
+        for (let i = 0; i < elements.length; ++i) {
+          const element = elements[i];
+          if (element === source) {
+            continue;
+          }
+          const on = context.onOrOff ? value : !value;
+          if (on) {
+            element.classList.add(context.className);
+          } else {
+            element.classList.remove(context.className);
+          }
+        }
+      }
+
       for (let attrName in this._attrContexts) {
-        const ctx = this._attrContexts[attrName];
-        const elements = ctx.elements;
+        const context = this._attrContexts[attrName];
+        const elements = context.elements;
         for (let i = 0; i < elements.length; ++i) {
           const element = elements[i];
           if (element === source) {
@@ -781,9 +853,9 @@
       }
 
       for (let i = 0; i < this._eachContexts.length; ++i) {
-        const ctx = this._eachContexts[i];
+        const context = this._eachContexts[i];
         for (let j = 0; j < value.length; ++j) {
-          if (false === ctx.callback.call(this, ctx.element, value[j])) {
+          if (false === context.callback.call(this, context.element, value[j])) {
             break;
           }
         }

@@ -111,7 +111,8 @@ define(function (require) {
       { name: "Bob", href: "#bob" },
     ],
     href: "http://www.yahoo.co.jp",
-    class: "aaa"
+    toClass: "aaa",
+    turnClassOn: true
   };
 
   document.querySelector("button[name='ok']").onclick = function (event) {
@@ -124,8 +125,9 @@ define(function (require) {
 
   jht
     .stage(data)
-    .___.spot("href").select("a.to-attr").toAttr("href")
-    .___.spot("class").select("a.to-attr").toClass()
+    .___.spot("href").select("a.to-attr").toHref()
+    .___.spot("toClass").select("a.to-attr").toClass()
+    .___.spot("turnClassOn").select("a.to-attr").turnClassOn("here")
     .___.spot("list")
     ._______.select("div.each")
     ._______.each(function (elem, item) {
