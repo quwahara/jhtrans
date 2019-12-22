@@ -361,6 +361,20 @@
     }
   };
 
+  /**
+   * Stage a data to be bound.
+   */
+  Jhtrans.prototype.stage = function (data) {
+
+    if (!isObject(data)) {
+      throw Error("The data was not an object.");
+    }
+
+    this._staging = this._prepareDataStage(data);
+
+    return this._staging;
+  };
+
   Jhtrans.prototype._prepareDataStage = function (data) {
 
     if (!data._rid) {
@@ -387,20 +401,6 @@
     return dataStage;
   }
 
-  /**
-   * Stage a data to be bound.
-   */
-  Jhtrans.prototype.stage = function (data) {
-
-    if (!isObject(data)) {
-      throw Error("The data was not an object.");
-    }
-
-    this._staging = this._prepareDataStage(data);
-
-    return this._staging;
-  };
-
   const DataStage = function DataStage(jht, data) {
     this._jht = jht;
     this._data = data;
@@ -426,20 +426,6 @@
     });
   };
 
-  DataStage.prototype._preparePropSpot = function (propName) {
-
-    let propSpot = this._propSpotDic[propName];
-    if (propSpot) {
-      return propSpot;
-    }
-
-    propSpot = new PropSpot(this, propName);
-
-    this._propSpotDic[propName] = propSpot;
-
-    return propSpot;
-  }
-
   /**
    * Select a property to be bound.
    */
@@ -455,6 +441,20 @@
 
     return this._preparePropSpot(propName);
   };
+
+  DataStage.prototype._preparePropSpot = function (propName) {
+
+    let propSpot = this._propSpotDic[propName];
+    if (propSpot) {
+      return propSpot;
+    }
+
+    propSpot = new PropSpot(this, propName);
+
+    this._propSpotDic[propName] = propSpot;
+
+    return propSpot;
+  }
 
   const PropSpot = function PropSpot(dataStage, propName) {
     this._dataStage = dataStage;
