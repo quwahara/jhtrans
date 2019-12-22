@@ -565,7 +565,42 @@
       eventType = "change";
     }
 
-    this._bindInput(eventType);
+    // It adds a single event listener for an event among number of inputs.
+    // The listener delivers the value of event target to other inputs and
+    // property value of related object. 
+
+    if (!isElementNode(this._selected)) {
+      throw Error("No ElementNode was selected.");
+    }
+
+    if (!isInputFamily(this._selected)) {
+      throw Error("Selected NodeElement was not an input, select nor textarea.");
+    }
+
+    let ctx = this._listenerContexts[eventType];
+    if (isNullOrUndefined(ctx)) {
+      ctx = {
+        listener: (function (self) {
+          return function (event) {
+            self._propagate(event.target, event.target.value);
+          };
+        })(this),
+        inputs: [],
+      };
+      this._listenerContexts[eventType] = ctx;
+    }
+
+    const input = this._selected;
+    const index = ctx.inputs.indexOf(input);
+
+    // The input of argument has been bound.
+    if (index >= 0) {
+      return;
+    }
+
+    ctx.inputs.push(input);
+    input.value = this._value;
+    input.addEventListener(eventType, ctx.listener);
 
     return this;
   };
@@ -575,7 +610,21 @@
    */
   PropSpot.prototype.toText = function () {
 
-    this._bindElement();
+    if (!isElementNode(this._selected)) {
+      throw Error("No ElementNode was selected.");
+    }
+
+    const element = this._selected;
+
+    const index = this._toTextElements.indexOf(element);
+
+    // The input of argument has been bound.
+    if (index >= 0) {
+      return;
+    }
+
+    this._toTextElements.push(element);
+    element.textContent = this._value;
 
     return this;
   };
@@ -695,73 +744,6 @@
       throw Error("The callback was not a function.");
     }
 
-    this._bindEachElement(callback);
-
-    return this;
-  };
-
-  /**
-   * It adds a single event listener for an event among number of inputs.
-   * The listener delivers the value of event target to other inputs and
-   * property value of related object. 
-   */
-  PropSpot.prototype._bindInput = function (eventType) {
-
-    if (!isElementNode(this._selected)) {
-      throw Error("No ElementNode was selected.");
-    }
-
-    if (!isInputFamily(this._selected)) {
-      throw Error("Selected NodeElement was not an input, select nor textarea.");
-    }
-
-    let ctx = this._listenerContexts[eventType];
-    if (isNullOrUndefined(ctx)) {
-      ctx = {
-        listener: (function (self) {
-          return function (event) {
-            self._propagate(event.target, event.target.value);
-          };
-        })(this),
-        inputs: [],
-      };
-      this._listenerContexts[eventType] = ctx;
-    }
-
-    const input = this._selected;
-    const index = ctx.inputs.indexOf(input);
-
-    // The input of argument has been bound.
-    if (index >= 0) {
-      return;
-    }
-
-    ctx.inputs.push(input);
-    input.value = this._value;
-    input.addEventListener(eventType, ctx.listener);
-  }
-
-  PropSpot.prototype._bindElement = function () {
-
-    if (!isElementNode(this._selected)) {
-      throw Error("No ElementNode was selected.");
-    }
-
-    const element = this._selected;
-
-    const index = this._toTextElements.indexOf(element);
-
-    // The input of argument has been bound.
-    if (index >= 0) {
-      return;
-    }
-
-    this._toTextElements.push(element);
-    element.textContent = this._value;
-  }
-
-  PropSpot.prototype._bindEachElement = function (callback) {
-
     if (!isElementNode(this._selected)) {
       throw Error("No ElementNode was selected.");
     }
@@ -772,7 +754,9 @@
     });
 
     this._propagate(null, this._value);
-  }
+
+    return this;
+  };
 
   /**
    * It propergates value to among the inputs and related object property.
