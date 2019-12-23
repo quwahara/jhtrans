@@ -414,6 +414,9 @@
           prop = Jhtrans._objectPropDic[value._rid];
         }
       }
+      else if (isArray(value)) {
+        prop = new ArrayProp(jht, this, key);
+      }
       else {
         throw Error("Unsupported type");
       }
@@ -475,6 +478,94 @@
       throw Error("Value type was unmatch");
     }
   }
+
+  const ArrayProp = function ArrayProp(jht, objectProp, nameInObject) {
+    this._jht = jht;
+    this._objectProp = objectProp;
+    this._nameInObject = nameInObject;
+    this._value = objectProp._object[nameInObject];
+    if (isNullOrUndefined(objectProp._object[nameInObject])) {
+      this._previousValue = "";
+    } else {
+      this._previousValue = "" + objectProp._object[nameInObject];
+    }
+    this._selected = null;
+
+    // Holding contents are:
+    // {
+    //    callback: <function>,
+    //    element: <ElementNode>
+    // }
+    this._eachContexts = [];
+
+    Object.defineProperty(objectProp._object, nameInObject, {
+      enumerable: true,
+      get: (function (self) {
+        return function () {
+          return self._value;
+        };
+      })(this),
+      set: (function (self) {
+        return function (value) {
+          self._value = value;
+          self._propagate(self, value);
+        };
+      })(this),
+    });
+
+  }
+
+  ArrayProp.prototype.select = function (queryOrElement) {
+
+    if (isString(queryOrElement)) {
+      this._selected = document.querySelector(queryOrElement);
+    }
+    else if (isElementNode(queryOrElement)) {
+      this._selected = queryOrElement;
+    }
+    else {
+      throw Error("The queryOrElement requires query string or ElementNode.");
+    }
+
+    return this;
+  };
+
+  ArrayProp.prototype.each = function (callback) {
+
+    if (!isFunction(callback)) {
+      throw Error("The callback was not a function.");
+    }
+
+    if (!isElementNode(this._selected)) {
+      throw Error("No ElementNode was selected.");
+    }
+
+    this._eachContexts.push({
+      callback: callback,
+      element: this._selected
+    });
+
+    this._propagate(null, this._value);
+
+    return this;
+  };
+
+  ArrayProp.prototype._propagate = function (source, value) {
+
+    if (source !== this) {
+      this._value = value;
+    }
+
+    for (let i = 0; i < this._eachContexts.length; ++i) {
+      const context = this._eachContexts[i];
+      for (let j = 0; j < value.length; ++j) {
+        if (false === context.callback.call(this, context.element, value[j])) {
+          break;
+        }
+      }
+    }
+
+  };
 
   const PrimitiveProp = function PrimitiveProp(jht, objectProp, nameInObject) {
     this._jht = jht;

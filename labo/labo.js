@@ -98,7 +98,11 @@ define(function (require) {
 
       { "#": "row", "@": { "#": "input@text", "@name": "username2" } },
       { "#": "row", "@": { "#": "a", "@": "link", "@class": "to-attr2", "@href": "" } },
-
+      {
+        "#": "row", "@": {
+          "#": "div", "@class": "each2", "@": "222"
+        }
+      },
     ]
   });
 
@@ -160,7 +164,11 @@ define(function (require) {
     username2: "username2",
     a: "http://www.yahoo.co.jp",
     toClass: "to-class",
-    turnClassOn: true
+    turnClassOn: true,
+    list: [
+      { name: "Alice", href: "#alice" },
+      { name: "Bob", href: "#bob" },
+    ],
   };
 
   jht
@@ -171,6 +179,17 @@ define(function (require) {
   jht.stage2(data2).a.select("a.to-attr2").toAttr("href");
   jht.stage2(data2).toClass.select("a.to-attr2").toClass();
   jht.stage2(data2).turnClassOn.select("a.to-attr2").turnClassOn("turn-on");
+  jht.stage2(data2).list.select("div.each2").each(function (elem, item) {
+    const rowElm = jht.translate({
+      "#": "div", "@class": "row", "@": [
+        { "#": "a", "@class": "name", "@": "" }
+      ]
+    });
+    elem.appendChild(rowElm);
+    const a = rowElm.querySelector("a");
+    jht.stage2(item).name.select(a).toText();
+    jht.stage2(item).href.select(a).toAttr("href");
+  });
 
   data2.sub.prop = "yyy";
   data2.username2 = "333";
