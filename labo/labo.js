@@ -94,7 +94,11 @@ define(function (require) {
             ]
           },
         ],
-      }
+      },
+
+      { "#": "row", "@": { "#": "input@text", "@name": "username2" } },
+
+
     ]
   });
 
@@ -152,13 +156,18 @@ define(function (require) {
   data2 = {
     sub: {
       prop: "value"
-    }
+    },
+    username2: "username2",
   };
 
   jht
     .stage2(data2)
     .sub.prop.select("a.to-attr").toText();
 
+  jht
+    .stage2(data2)
+    .username2.select("input[name='username2']").withValue();
 
   data2.sub.prop = "yyy";
+  data2.username2 = "333";
 });

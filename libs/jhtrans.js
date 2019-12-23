@@ -411,7 +411,7 @@
           Jhtrans._objectPropDic[_rid] = prop;
         }
         else {
-          prop = Jhtrans._objectPropDic[_rid];
+          prop = Jhtrans._objectPropDic[value._rid];
         }
       }
       else {
@@ -482,6 +482,17 @@
     this._nameInObject = nameInObject;
     this._value = objectProp._object[nameInObject];
     this._selected = null;
+
+    // Holding contents are:
+    // key = eventType
+    // value = {
+    //    listener: <function>,
+    //    inputs: [<input>]
+    // }
+    this._listenerContexts = {};
+
+    // Holding contents are:
+    //    [<ElementNode>]
     this._toTextElements = [];
 
     Object.defineProperty(objectProp._object, nameInObject, {
@@ -515,6 +526,52 @@
     return this;
   };
 
+  PrimitiveProp.prototype.withValue = function (eventType) {
+
+    if (isNullOrUndefined(eventType)) {
+      eventType = "change";
+    }
+
+    // It adds a single event listener for an event among number of inputs.
+    // The listener delivers the value of event target to other inputs and
+    // property value of related object. 
+
+    if (!isElementNode(this._selected)) {
+      throw Error("No ElementNode was selected.");
+    }
+
+    if (!isInputFamily(this._selected)) {
+      throw Error("Selected NodeElement was not an input, select nor textarea.");
+    }
+
+    let context = this._listenerContexts[eventType];
+    if (isNullOrUndefined(context)) {
+      context = {
+        listener: (function (self) {
+          return function (event) {
+            self._propagate(event.target, event.target.value);
+          };
+        })(this),
+        inputs: [],
+      };
+      this._listenerContexts[eventType] = context;
+    }
+
+    const input = this._selected;
+    const index = context.inputs.indexOf(input);
+
+    // The input of argument has been bound.
+    if (index >= 0) {
+      return;
+    }
+
+    context.inputs.push(input);
+    input.value = this._value;
+    input.addEventListener(eventType, context.listener);
+
+    return this;
+  }
+
   PrimitiveProp.prototype.toText = function (source, value) {
 
     if (!isElementNode(this._selected)) {
@@ -538,6 +595,22 @@
    * It propergates value to among the inputs and related object property.
    */
   PrimitiveProp.prototype._propagate = function (source, value) {
+
+    if (source !== this) {
+      this._value = value;
+    }
+
+    for (let eventType in this._listenerContexts) {
+      const context = this._listenerContexts[eventType];
+      const inputs = context.inputs;
+      for (let i = 0; i < inputs.length; ++i) {
+        const input = inputs[i];
+        if (input === source) {
+          continue;
+        }
+        input.value = value;
+      }
+    }
 
     for (let i = 0; i < this._toTextElements.length; ++i) {
       const element = this._toTextElements[i];
