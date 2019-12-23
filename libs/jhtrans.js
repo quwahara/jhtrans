@@ -495,6 +495,14 @@
     //    [<ElementNode>]
     this._toTextElements = [];
 
+    // Holding contents are:
+    // key = attrName
+    // value = {
+    //    attrName: <attrName:string>,
+    //    elements: [<ElementNode>]
+    // }
+    this._toAttrContexts = {};
+
     Object.defineProperty(objectProp._object, nameInObject, {
       enumerable: true,
       get: (function (self) {
@@ -591,6 +599,44 @@
     element.textContent = this._value;
   }
 
+  PrimitiveProp.prototype.toSrc = function () {
+    return this.toAttr("src");
+  }
+
+  PrimitiveProp.prototype.toHref = function () {
+    return this.toAttr("href");
+  }
+
+  PrimitiveProp.prototype.toAttr = function (attrName) {
+
+    if (!isElementNode(this._selected)) {
+      throw Error("No ElementNode was selected.");
+    }
+
+    const element = this._selected;
+
+    let context = this._toAttrContexts[attrName];
+    if (isNullOrUndefined(context)) {
+      context = {
+        attrName: attrName,
+        elements: []
+      }
+      this._toAttrContexts[attrName] = context;
+    }
+
+    const index = context.elements.indexOf(element);
+
+    // The input of argument has been bound.
+    if (index >= 0) {
+      return;
+    }
+
+    context.elements.push(element);
+    element.setAttribute(attrName, this._value);
+
+    return this;
+  };
+
   /**
    * It propergates value to among the inputs and related object property.
    */
@@ -618,6 +664,18 @@
         continue;
       }
       element.textContent = value;
+    }
+
+    for (let attrName in this._toAttrContexts) {
+      const context = this._toAttrContexts[attrName];
+      const elements = context.elements;
+      for (let i = 0; i < elements.length; ++i) {
+        const element = elements[i];
+        if (element === source) {
+          continue;
+        }
+        element.setAttribute(attrName, value);
+      }
     }
 
   }

@@ -97,7 +97,7 @@ define(function (require) {
       },
 
       { "#": "row", "@": { "#": "input@text", "@name": "username2" } },
-
+      { "#": "row", "@": { "#": "a", "@": "link", "@class": "to-attr2", "@href": "" } },
 
     ]
   });
@@ -158,15 +158,15 @@ define(function (require) {
       prop: "value"
     },
     username2: "username2",
+    a: "http://www.yahoo.co.jp"
   };
 
   jht
     .stage2(data2)
     .sub.prop.select("a.to-attr").toText();
 
-  jht
-    .stage2(data2)
-    .username2.select("input[name='username2']").withValue();
+  jht.stage2(data2).username2.select("input[name='username2']").withValue();
+  jht.stage2(data2).a.select("a.to-attr2").toAttr("href");
 
   data2.sub.prop = "yyy";
   data2.username2 = "333";
