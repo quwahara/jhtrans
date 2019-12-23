@@ -481,6 +481,11 @@
     this._objectProp = objectProp;
     this._nameInObject = nameInObject;
     this._value = objectProp._object[nameInObject];
+    if (isNullOrUndefined(objectProp._object[nameInObject])) {
+      this._previousValue = "";
+    } else {
+      this._previousValue = "" + objectProp._object[nameInObject];
+    }
     this._selected = null;
 
     // Holding contents are:
@@ -502,6 +507,10 @@
     //    elements: [<ElementNode>]
     // }
     this._toAttrContexts = {};
+
+    // Holding contents are:
+    //    <ElementNode>
+    this._toClassElements = [];
 
     Object.defineProperty(objectProp._object, nameInObject, {
       enumerable: true,
@@ -637,12 +646,44 @@
     return this;
   };
 
+  PrimitiveProp.prototype.toClass = function () {
+
+    if (!isElementNode(this._selected)) {
+      throw Error("No ElementNode was selected.");
+    }
+
+    const element = this._selected;
+
+    const index = this._toClassElements.indexOf(element);
+
+    // The input of argument has been bound.
+    if (index >= 0) {
+      return;
+    }
+
+    this._toClassElements.push(element);
+    if (!isEmptyString(this._value)) {
+      element.classList.add(this._value);
+    }
+
+    return this;
+  };
+
   /**
    * It propergates value to among the inputs and related object property.
    */
   PrimitiveProp.prototype._propagate = function (source, value) {
 
+    const previousValue = this._previousValue;
+
     if (source !== this) {
+
+      if (isNullOrUndefined(this._value)) {
+        this._previousValue = "";
+      } else {
+        this._previousValue = "" + this._value;
+      }
+
       this._value = value;
     }
 
@@ -675,6 +716,20 @@
           continue;
         }
         element.setAttribute(attrName, value);
+      }
+    }
+
+    for (let i = 0; i < this._toClassElements.length; ++i) {
+      const element = this._toClassElements[i];
+      if (element === source) {
+        continue;
+      }
+      const classList = element.classList;
+      if (!isEmptyString(previousValue)) {
+        classList.remove(previousValue);
+      }
+      if (!isEmptyString(value)) {
+        classList.add(value);
       }
     }
 
