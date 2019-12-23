@@ -159,7 +159,8 @@ define(function (require) {
     },
     username2: "username2",
     a: "http://www.yahoo.co.jp",
-    toClass: "to-class"
+    toClass: "to-class",
+    turnClassOn: true
   };
 
   jht
@@ -169,6 +170,7 @@ define(function (require) {
   jht.stage2(data2).username2.select("input[name='username2']").withValue();
   jht.stage2(data2).a.select("a.to-attr2").toAttr("href");
   jht.stage2(data2).toClass.select("a.to-attr2").toClass();
+  jht.stage2(data2).turnClassOn.select("a.to-attr2").turnClassOn("turn-on");
 
   data2.sub.prop = "yyy";
   data2.username2 = "333";

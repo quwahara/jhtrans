@@ -512,6 +512,15 @@
     //    <ElementNode>
     this._toClassElements = [];
 
+    // Holding contents are:
+    // key = className + ("_on" | "_off")
+    // value = {
+    //    className: <className:string>,
+    //    onOrOff: <onOrOff:boolean>,
+    //    elements: [<ElementNode>]
+    // }
+    this._turnClassContexts = {};
+
     Object.defineProperty(objectProp._object, nameInObject, {
       enumerable: true,
       get: (function (self) {
@@ -669,6 +678,51 @@
     return this;
   };
 
+  PrimitiveProp.prototype.turnClassOn = function (className) {
+    return this.turnClass(className, true);
+  }
+
+  PrimitiveProp.prototype.turnClassOff = function (className) {
+    return this.turnClass(className, false);
+  }
+
+  PrimitiveProp.prototype.turnClass = function (className, onOrOff) {
+
+    if (!isElementNode(this._selected)) {
+      throw Error("No ElementNode was selected.");
+    }
+
+    const element = this._selected;
+    const key = className + "_" + (onOrOff ? "on" : "off");
+
+    let context = this._turnClassContexts[key];
+    if (isNullOrUndefined(context)) {
+      context = {
+        className: className,
+        onOrOff: onOrOff,
+        elements: []
+      }
+      this._turnClassContexts[key] = context;
+    }
+
+    const index = context.elements.indexOf(element);
+
+    // The input of argument has been bound.
+    if (index >= 0) {
+      return;
+    }
+
+    context.elements.push(element);
+    const on = context.onOrOff ? this._value : !this._value;
+    if (on) {
+      element.classList.add(context.className);
+    } else {
+      element.classList.remove(context.className);
+    }
+
+    return this;
+  };
+
   /**
    * It propergates value to among the inputs and related object property.
    */
@@ -730,6 +784,23 @@
       }
       if (!isEmptyString(value)) {
         classList.add(value);
+      }
+    }
+
+    for (let key in this._turnClassContexts) {
+      const context = this._turnClassContexts[key];
+      const elements = context.elements;
+      for (let i = 0; i < elements.length; ++i) {
+        const element = elements[i];
+        if (element === source) {
+          continue;
+        }
+        const on = context.onOrOff ? value : !value;
+        if (on) {
+          element.classList.add(context.className);
+        } else {
+          element.classList.remove(context.className);
+        }
       }
     }
 
