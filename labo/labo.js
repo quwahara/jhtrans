@@ -132,10 +132,10 @@ define(function (require) {
   }
 
   jht
-    .stage(data)
-    .href.select("a.to-attr").toHref()
-    .toClass.select("a.to-attr").toClass()
-    .turnClassOn.select("a.to-attr").turnClassOn("here")
+    .stage(data).select("a.to-attr")
+    .href.toHref()
+    .toClass.toClass()
+    .turnClassOn.turnClassOn("here")
     .list.select("div.each").each(function (elem, item) {
       const rowElm = jht.translate({
         "#": "div", "@class": "row", "@": [
@@ -144,9 +144,9 @@ define(function (require) {
       });
       elem.appendChild(rowElm);
       const a = rowElm.querySelector("a");
-      jht.stage(item)
-        .name.select(a).toText()
-        .href.select(a).toAttr("href")
+      jht.stage(item).select(a)
+        .name.toText()
+        .href.toAttr("href")
         ;
     })
     .user.username.select("input[name='name']").withValue()

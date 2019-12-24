@@ -383,6 +383,7 @@
     this._owner = owner;
     this._nameInOwner = nameInOwner;
     this._object = object;
+    this._selected = null;
     this._propDic = {};
 
     for (let key in object) {
@@ -456,6 +457,21 @@
         });
       })(this);
     }
+  };
+
+  ObjectProp.prototype.select = function (queryOrElement) {
+
+    if (isString(queryOrElement)) {
+      this._selected = document.querySelector(queryOrElement);
+    }
+    else if (isElementNode(queryOrElement)) {
+      this._selected = queryOrElement;
+    }
+    else {
+      throw Error("The queryOrElement requires query string or ElementNode.");
+    }
+
+    return this;
   };
 
   ObjectProp.prototype._propagate = function (source, value) {
@@ -628,6 +644,17 @@
     });
   };
 
+  PrimitiveProp.prototype._assertSelected = function () {
+
+    const selected = this._selected || this._objectProp._selected;
+
+    if (!isElementNode(selected)) {
+      throw Error("No ElementNode was selected.");
+    }
+
+    return selected;
+  };
+
   PrimitiveProp.prototype.select = function (queryOrElement) {
 
     if (isString(queryOrElement)) {
@@ -653,11 +680,13 @@
     // The listener delivers the value of event target to other inputs and
     // property value of related object. 
 
-    if (!isElementNode(this._selected)) {
-      throw Error("No ElementNode was selected.");
-    }
+    const input = this._assertSelected();
 
-    if (!isInputFamily(this._selected)) {
+    // if (!isElementNode(this._selected)) {
+    //   throw Error("No ElementNode was selected.");
+    // }
+
+    if (!isInputFamily(input)) {
       throw Error("Selected NodeElement was not an input, select nor textarea.");
     }
 
@@ -674,7 +703,7 @@
       this._listenerContexts[eventType] = context;
     }
 
-    const input = this._selected;
+    // const input = this._selected;
     const index = context.inputs.indexOf(input);
 
     // The input of argument has been bound.
@@ -691,11 +720,7 @@
 
   PrimitiveProp.prototype.toText = function (source, value) {
 
-    if (!isElementNode(this._selected)) {
-      throw Error("No ElementNode was selected.");
-    }
-
-    const element = this._selected;
+    const element = this._assertSelected();
 
     const index = this._toTextElements.indexOf(element);
 
@@ -720,11 +745,7 @@
 
   PrimitiveProp.prototype.toAttr = function (attrName) {
 
-    if (!isElementNode(this._selected)) {
-      throw Error("No ElementNode was selected.");
-    }
-
-    const element = this._selected;
+    const element = this._assertSelected();
 
     let context = this._toAttrContexts[attrName];
     if (isNullOrUndefined(context)) {
@@ -750,11 +771,7 @@
 
   PrimitiveProp.prototype.toClass = function () {
 
-    if (!isElementNode(this._selected)) {
-      throw Error("No ElementNode was selected.");
-    }
-
-    const element = this._selected;
+    const element = this._assertSelected();
 
     const index = this._toClassElements.indexOf(element);
 
@@ -781,11 +798,8 @@
 
   PrimitiveProp.prototype.turnClass = function (className, onOrOff) {
 
-    if (!isElementNode(this._selected)) {
-      throw Error("No ElementNode was selected.");
-    }
+    const element = this._assertSelected();
 
-    const element = this._selected;
     const key = className + "_" + (onOrOff ? "on" : "off");
 
     let context = this._turnClassContexts[key];
