@@ -132,7 +132,7 @@ define(function (require) {
   }
 
   jht
-    .stage2(data)
+    .stage(data)
     .href.select("a.to-attr").toHref()
     .toClass.select("a.to-attr").toClass()
     .turnClassOn.select("a.to-attr").turnClassOn("here")
@@ -144,7 +144,7 @@ define(function (require) {
       });
       elem.appendChild(rowElm);
       const a = rowElm.querySelector("a");
-      jht.stage2(item)
+      jht.stage(item)
         .name.select(a).toText()
         .href.select(a).toAttr("href")
         ;
@@ -153,69 +153,4 @@ define(function (require) {
     .username.select("span.to-text").toText()
     ;
 
-  /*
-jht
-  .stage(data)
-  .___.spot("href").select("a.to-attr").toHref()
-  .___.spot("toClass").select("a.to-attr").toClass()
-  .___.spot("turnClassOn").select("a.to-attr").turnClassOn("here")
-  .___.spot("list")
-  ._______.select("div.each")
-  ._______.each(function (elem, item) {
-    const rowElm = jht.translate({
-      "#": "div", "@class": "row", "@": [
-        { "#": "a", "@class": "name", "@": "" }
-      ]
-    });
-    elem.appendChild(rowElm);
-    const a = rowElm.querySelector("a");
-    jht.stage(item)
-      .___.spot("name").select(a).toText()
-      .___.spot("href").select(a).toAttr("href")
-      ;
-  })
-  .stage(data.user)
-  .___.spot("username")
-  ._______.select("input[name='name']").withValue()
-  ._______.select("span.to-text").toText()
-  ;
-
-data2 = {
-  sub: {
-    prop: "value"
-  },
-  username2: "username2",
-  a: "http://www.yahoo.co.jp",
-  toClass: "to-class",
-  turnClassOn: true,
-  list: [
-    { name: "Alice", href: "#alice" },
-    { name: "Bob", href: "#bob" },
-  ],
-};
-
-jht
-  .stage2(data2)
-  .sub.prop.select("a.to-attr").toText();
-
-jht.stage2(data2).username2.select("input[name='username2']").withValue();
-jht.stage2(data2).a.select("a.to-attr2").toAttr("href");
-jht.stage2(data2).toClass.select("a.to-attr2").toClass();
-jht.stage2(data2).turnClassOn.select("a.to-attr2").turnClassOn("turn-on");
-jht.stage2(data2).list.select("div.each2").each(function (elem, item) {
-  const rowElm = jht.translate({
-    "#": "div", "@class": "row", "@": [
-      { "#": "a", "@class": "name", "@": "" }
-    ]
-  });
-  elem.appendChild(rowElm);
-  const a = rowElm.querySelector("a");
-  jht.stage2(item).name.select(a).toText();
-  jht.stage2(item).href.select(a).toAttr("href");
-});
-
-data2.sub.prop = "yyy";
-data2.username2 = "333";
-
-*/
 });
