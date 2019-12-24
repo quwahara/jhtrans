@@ -149,8 +149,9 @@ define(function (require) {
         .href.toAttr("href")
         ;
     })
-    .user.username.select("input[name='name']").withValue()
-    .username.select("span.to-text").toText()
+    .user
+    .username.select("input[name='name']").withValue()
+    .and.select("span.to-text").toText()
     ;
 
 });

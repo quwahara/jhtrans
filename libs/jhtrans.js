@@ -385,6 +385,16 @@
     this._object = object;
     this._selected = null;
     this._propDic = {};
+    this._and = null;
+
+    Object.defineProperty(this, "and", {
+      enumerable: false,
+      get: (function (self) {
+        return function () {
+          return self._and;
+        };
+      })(this)
+    });
 
     for (let key in object) {
       const value = object[key];
@@ -426,8 +436,10 @@
       (function (self, key, prop) {
         Object.defineProperty(self, key, {
           enumerable: true,
-          writable: false,
-          value: prop
+          get: function () {
+            self._and = prop;
+            return prop;
+          }
         });
       })(this, key, prop);
     }
