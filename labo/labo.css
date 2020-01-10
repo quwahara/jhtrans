@@ -19,7 +19,7 @@
 }
 
 .pad6 {
-    padding: 6px;
+    padding: 6px 6px 0 6px;
 }
 
 * {
@@ -87,7 +87,7 @@ button, input {
     width: 100%;
     min-height: 1rem;
     /* debug: show off borders */
-    border: 1px solid #6ca;
+    /* border: 1px solid #6ca; */
 }
 
 .row::after {
@@ -111,7 +111,7 @@ button, input {
     width: 100%;
     min-height: 1rem;
     /* debug: show off borders */
-    border: 1px solid #6ac;
+    /* border: 1px solid #6ac; */
 }
 
 /* viewport-width >= 768px: prime width = 768px

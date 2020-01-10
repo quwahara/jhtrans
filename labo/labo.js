@@ -154,4 +154,9 @@ define(function (require) {
     .and.select("span.to-text").toText()
     ;
 
+  let elms = document.querySelectorAll(".row, [class*='col-']");
+  for (let i = 0; i < elms.length; ++i) {
+    elms.item(i).classList.add("debug");
+  }
+
 });
