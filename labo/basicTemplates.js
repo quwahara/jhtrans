@@ -16,6 +16,7 @@
 
     // Basic tags
 
+    "h1": ["h1", { "class": "@class" }, "@"],
     "div": ["div", { "class": "@class" }, "@"],
     "span": ["span", { "class": "@class" }, "@"],
     "a": ["a", { "class": "@class", "href": "@href" }, "@"],
@@ -42,7 +43,7 @@
     "col-11": ["div", { "class": "col-11" }, "@"],
     "col-12": ["div", { "class": "col-12" }, "@"],
 
-    // layouts
+    // Combinations
 
     "pad3": ["div", { "class": "pad3" }, "@"],
     "pad6": ["div", { "class": "pad6" }, "@"],
