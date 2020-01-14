@@ -207,6 +207,24 @@
     return isTextNode(node) && isPlaceholderKey(node.textContent);
   }
 
+  function splitForPlaceholder(str) {
+    const rgx = /@\w*/g;
+    const dump = [];
+    let foundIndex = 0;
+    let results;
+    while ((results = rgx.exec(str)) !== null) {
+      if (results.index > foundIndex) {
+        dump.push(str.substring(foundIndex, results.index));
+      }
+      foundIndex = rgx.lastIndex;
+      dump.push(results[0]);
+    }
+    if (foundIndex < str.length) {
+      dump.push(str.substr(foundIndex, str.length));
+    }
+    return dump;
+  }
+
   function collectPlaceholder(elementNode, outCollections) {
 
     const copies = copyChildNodes(elementNode.childNodes);
@@ -228,6 +246,12 @@
       if (isPlaceholderKey(attrs[i].value)) {
         outCollections.push(attrs[i]);
       }
+
+      if (isString(attrs[i].value)) {
+        let split = splitForPlaceholder(attrs[i].value);
+        console.log(split);
+      }
+
     }
 
     return outCollections;

@@ -45,7 +45,7 @@
 
     // Combinations
 
-    "se14": ["div", { "class": "se14" }, "@"],
+    "se14": ["div", { "class": "se14 @class" }, "@"],
     "row{col-3.col-6.col-3}": {
       "#": "row", "@": [
         { "#": "col-3", "@": "@1" },
