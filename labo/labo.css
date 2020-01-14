@@ -14,13 +14,8 @@
  * # Utility
  ******************************************************************************/
 
-
-.pad3 {
-    padding: 3px;
-}
-
-.pad6 {
-    padding: 6px 6px 0 6px;
+.w14 {
+    padding: 0 0 0 14px;
 }
 
 .se14 {
@@ -60,42 +55,28 @@ button {
     appearance: none;
 }
 
-button,
-input,
-select {
+button, input, select {
     height: 2.4em;
 }
 
-button,
-input[type="button"],
-input[type="submit"] {
+button, input[type="button"], input[type="submit"] {
     padding-top: 0.0em;
     padding-bottom: 0.0em;
     padding-left: 0.8em;
     padding-right: 0.8em;
 }
 
-input[type="text"],
-input[type="password"],
-select {
+input[type="text"], input[type="password"], select {
     padding: 0.5em;
 }
 
-input[type="text"],
-input[type="password"],
-select {
+input[type="text"], input[type="password"], select {
     border: solid 1px #999;
 }
 
 button {
     border: solid 1px #999;
     background-color: #ccc;
-    /* color: white;
-    padding: 15px 32px;
-    text-align: center;
-    text-decoration: none;
-    display: inline-block;
-    font-size: 16px; */
 }
 
 /*
@@ -162,8 +143,48 @@ button {
     float: left;
     width: 100%;
     min-height: 1rem;
-    /* debug: show off borders */
-    /* border: 1px solid #6ac; */
+}
+
+/* viewport-width >= 768px: prime width = 768px
+ **************************************************************************/
+
+@media only screen and (min-width: 320px) {
+    .col-sm-1 {
+        width: 8.33%;
+    }
+    .col-sm-2 {
+        width: 16.66%;
+    }
+    .col-sm-3 {
+        width: 25%;
+    }
+    .col-sm-4 {
+        width: 33.33%;
+    }
+    .col-sm-5 {
+        width: 41.66%;
+    }
+    .col-sm-6 {
+        width: 50%;
+    }
+    .col-sm-7 {
+        width: 58.33%;
+    }
+    .col-sm-8 {
+        width: 66.66%;
+    }
+    .col-sm-9 {
+        width: 75%;
+    }
+    .col-sm-10 {
+        width: 83.33%;
+    }
+    .col-sm-11 {
+        width: 91.66%;
+    }
+    .col-sm-12 {
+        width: 100%;
+    }
 }
 
 /* viewport-width >= 768px: prime width = 768px
@@ -177,15 +198,6 @@ button {
     /*
      * Grid for desktop
      */
-    .contents {
-        /* placeholder */
-    }
-    .row {
-        /* placeholder */
-    }
-    [class*="col-"] {
-        /* placeholder */
-    }
     .col-1 {
         width: 8.33%;
     }

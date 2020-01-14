@@ -243,13 +243,12 @@
 
     const attrs = elementNode.attributes;
     for (let i = 0; i < attrs.length; ++i) {
-      if (isPlaceholderKey(attrs[i].value)) {
-        outCollections.push(attrs[i]);
-      }
-
       if (isString(attrs[i].value)) {
-        let split = splitForPlaceholder(attrs[i].value);
-        console.log(split);
+        let splits = splitForPlaceholder(attrs[i].value);
+        outCollections.push({
+          owner: attrs[i],
+          splits: splits
+        });
       }
 
     }
@@ -327,20 +326,32 @@
           this.processReplacement(textNodes[i], replacements2[i]);
         }
       }
-      else if (isAttr(collection)) {
-        const attr = collection;
-        const placeholder = attr.value;
+      else if (isObject(collection)) {
 
-        if (!desc.hasOwnProperty(placeholder)) {
-          continue;
+        if (isAttr(collection.owner)) {
+          const attr = collection.owner;
+          const splits = collection.splits;
+          let value = "";
+          for (let j = 0; j < splits.length; ++j) {
+            let found = false;
+            const split = splits[j];
+            if (isPlaceholderKey(split)) {
+              const placeholder = split;
+              if (desc.hasOwnProperty(placeholder)) {
+                const replacement = desc[placeholder];
+                if (isString(replacement)) {
+                  value += replacement;
+                  found = true;
+                }
+              }
+            }
+            if (!found) {
+              value += split;
+            }
+          }
+          attr.value = value;
         }
 
-        const replacement = desc[placeholder];
-        if (!isString(replacement)) {
-          continue;
-        }
-
-        attr.value = replacement;
       }
     }
 

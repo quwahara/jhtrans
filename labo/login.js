@@ -5,46 +5,46 @@
     jht.putTemplateAll(basicTemplates);
 
     const contents = jht.translate({
-        "#": "row", "@": [
+        "#": "row", "@class": "", "@": [
             {
-                "#": "row", "@": [
-                    { "#": "col-4", "@": "" },
+                "#": "row", "@class": "", "@": [
+                    { "#": "col-4", "@class": "", "@": "" },
                     {
-                        "#": "col-4", "@": [
+                        "#": "col-4", "@class": "w14", "@": [
                             {
-                                "#": "row", "@": {
-                                    "#": "col-12", "@": {
+                                "#": "row", "@class": "", "@": {
+                                    "#": "col-12", "@class": "", "@": {
                                         "#": "h1", "@": "Log in", "@class": ""
                                     }
                                 }
                             },
                             {
-                                "#": "row", "@": {
+                                "#": "row", "@class": "", "@": {
                                     "#": "labeled", "@label": "Username", "@target":
                                         { "#": "input@text", "@name": "username" }
                                 }
                             },
                             {
-                                "#": "row", "@": {
+                                "#": "row", "@class": "", "@": {
                                     "#": "labeled", "@label": "Password", "@target":
                                         { "#": "input@password", "@name": "password" }
                                 }
                             },
                             {
-                                "#": "row", "@": [
+                                "#": "row", "@class": "", "@": [
                                     {
-                                        "#": "col-6", "@":
+                                        "#": "col-sm-6", "@class": "se14", "@":
                                             { "#": "button@button", "@": "Log in", "@name": "login" }
                                     },
                                     {
-                                        "#": "col-6", "@":
+                                        "#": "col-sm-6", "@class": "se14", "@":
                                             { "#": "button@button", "@": "Cancel", "@name": "cancel" }
                                     },
                                 ]
                             },
                         ]
                     },
-                    { "#": "col-4", "@": "" },
+                    { "#": "col-4", "@class": "", "@": "" },
                 ]
             },
         ]
