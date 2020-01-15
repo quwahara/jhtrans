@@ -230,9 +230,15 @@
     const copies = copyChildNodes(elementNode.childNodes);
 
     for (let i = 0; i < copies.length; ++i) {
-      if (isPlaceholderTextNode(copies[i])) {
-        outCollections.push(copies[i]);
+      const copy = copies[i];
+      if (isTextNode(copy) && isString(copy.textContent)) {
+        let splits = splitForPlaceholder(copy.textContent);
+        outCollections.push({
+          owner: copy,
+          splits: splits
+        });
       }
+
     }
 
     for (let i = 0; i < copies.length; ++i) {
@@ -292,43 +298,53 @@
 
     for (let i = 0; i < collections.length; ++i) {
       const collection = collections[i];
-      if (isTextNode(collection)) {
-        const textNode = collection;
-        const placeholder = textNode.textContent.trim();
+      if (isObject(collection)) {
 
-        if (!desc.hasOwnProperty(placeholder)) {
-          continue;
+        if (isTextNode(collection.owner)) {
+          const textNode = collection.owner;
+          const splits = collection.splits;
+          const buff = [];
+
+          for (let j = 0; j < splits.length; ++j) {
+            let found = false;
+            const split = splits[j];
+            if (isPlaceholderKey(split)) {
+              const placeholder = split;
+              if (desc.hasOwnProperty(placeholder)) {
+                const replacements = desc[placeholder];
+                let replacements2;
+                if (!isArray(replacements)) {
+                  replacements2 = [replacements];
+                } else {
+                  replacements2 = replacements;
+                }
+
+                if (!isNullOrUndefined(replacements2) && replacements2.length > 0) {
+                  found = true;
+                  // Justify number of text node to be equivalent with the array length.
+                  for (let k = 0; k < replacements2.length; ++k) {
+                    buff.push(replacements2[k]);
+                  }
+                }
+              }
+            }
+            if (!found) {
+              buff.push(split);
+            }
+          }
+
+          for (let j = 0; j < (buff.length - 1); ++j) {
+            const createdTextNode = document.createTextNode("");
+            textNode.parentNode.insertBefore(createdTextNode, textNode);
+            this.processReplacement(createdTextNode, buff[j]);
+          }
+
+          if (buff.length >= 1) {
+            this.processReplacement(textNode, buff[buff.length - 1]);
+          }
+
         }
-
-        const replacements = desc[placeholder];
-
-        let replacements2;
-        if (!isArray(replacements)) {
-          replacements2 = [replacements];
-        } else {
-          replacements2 = replacements;
-        }
-
-        if (isNullOrUndefined(replacements2) || replacements2.length === 0) {
-          continue;
-        }
-
-        // Justify number of text node to be equivalent with the array length.
-        const textNodes = [];
-        for (let i = 1; i < replacements2.length; ++i) {
-          const createdTextNode = document.createTextNode("");
-          textNode.parentNode.insertBefore(createdTextNode, textNode);
-          textNodes.push(createdTextNode);
-        }
-        textNodes.push(textNode);
-
-        for (let i = 0; i < replacements2.length; ++i) {
-          this.processReplacement(textNodes[i], replacements2[i]);
-        }
-      }
-      else if (isObject(collection)) {
-
-        if (isAttr(collection.owner)) {
+        else if (isAttr(collection.owner)) {
           const attr = collection.owner;
           const splits = collection.splits;
           let value = "";
