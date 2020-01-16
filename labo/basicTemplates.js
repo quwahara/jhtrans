@@ -24,6 +24,12 @@
     "input@text": ["input", { "type": "text", "name": "@name" }],
     "input@password": ["input", { "type": "password" }],
 
+    // Utilities
+
+    "center-max320": ["div", { "class": "center-max320 @class" }, [
+      ["div", { "class": "@class-inner" }, "@"]
+    ]],
+
     // Grid system, Row
 
     "row": ["div", { "class": "row @class" }, "@"],
