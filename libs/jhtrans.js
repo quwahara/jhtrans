@@ -212,7 +212,7 @@
   }
 
   function splitForPlaceholder(str) {
-    const rgx = /@(\w[\w\-]*|)/g;
+    const rgx = /@[\w\-]*/g;
     const dump = [];
     let foundIndex = 0;
     let results;
