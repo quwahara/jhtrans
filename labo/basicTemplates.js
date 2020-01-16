@@ -66,7 +66,7 @@
 
     // Combinations
 
-    "se14": ["div", { "class": "se14" }, "@"],
+    "pad-se14": ["div", { "class": "pad-se14" }, "@"],
     "row{col-3.col-6.col-3}": {
       "#": "row", "@": [
         { "#": "col-3", "@": "@1" },
@@ -76,7 +76,7 @@
     },
 
     "labeled": {
-      "#": "se14", "@": [
+      "#": "pad-se14", "@": [
         ["lable", null, "@label"],
         "@target"
       ]
