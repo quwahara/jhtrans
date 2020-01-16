@@ -103,6 +103,10 @@
       RECURSION_MAX: 1000,
       USE_PL_AS_RAW_STRING: true,
     };
+
+    // Global replacement dictionary
+    this.globalReplacements = {};
+
     // object to be bound in method chaining
     this._staging = null;
   };
@@ -262,6 +266,11 @@
     return outCollections;
   }
 
+  Jhtrans.prototype.setGlobalReplacement = function (key, value) {
+    this.globalReplacements[key] = value;
+    return this;
+  }
+
   Jhtrans.prototype.translate = function (desc) {
 
     if (!desc.hasOwnProperty("#")) {
@@ -353,13 +362,24 @@
             const split = splits[j];
             if (isPlaceholderKey(split)) {
               const placeholder = split;
+              let replacement = null;
               if (desc.hasOwnProperty(placeholder)) {
-                const replacement = desc[placeholder];
-                if (isString(replacement)) {
-                  value += replacement;
-                  found = true;
-                }
+                replacement = desc[placeholder];
               }
+              else if (this.globalReplacements.hasOwnProperty(placeholder)) {
+                replacement = this.globalReplacements[placeholder];
+              }
+              if (isString(replacement)) {
+                value += replacement;
+                found = true;
+              }
+              // if (desc.hasOwnProperty(placeholder)) {
+              //   const replacement = desc[placeholder];
+              //   if (isString(replacement)) {
+              //     value += replacement;
+              //     found = true;
+              //   }
+              // }
             }
             if (!found) {
               value += split;
