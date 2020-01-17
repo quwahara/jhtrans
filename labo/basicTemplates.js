@@ -78,7 +78,7 @@
     "labeled": {
       "#": "pse14", "@": [
         ["lable", null, "@label"],
-        "@target"
+        "@"
       ]
     }
 

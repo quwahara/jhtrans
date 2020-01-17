@@ -8,8 +8,8 @@
     const contents = jht.translate({
         "#": "center-max320", "@class-inner": "pw14", "@": [
             { "#": "h1", "@": "Log in", "@class": "pse14" },
-            { "#": "labeled", "@label": "Username", "@target": { "#": "input@text", "@name": "username" } },
-            { "#": "labeled", "@label": "Password", "@target": { "#": "input@password", "@name": "password" } },
+            { "#": "labeled", "@label": "Username", "@": { "#": "input@text", "@name": "username" } },
+            { "#": "labeled", "@label": "Password", "@": { "#": "input@password", "@name": "password" } },
             {
                 "#": "row", "@": [
                     {
