@@ -11,7 +11,7 @@
                 "#": "row", "@": [
                     { "#": "col-4", "@": "" },
                     {
-                        "#": "col-4", "@class": "pad-w14", "@": [
+                        "#": "col-4", "@class": "pw14", "@": [
                             {
                                 "#": "row", "@": {
                                     "#": "col-12", "@": {
@@ -34,11 +34,11 @@
                             {
                                 "#": "row", "@": [
                                     {
-                                        "#": "col-sm-6", "@class": "pad-se14", "@":
+                                        "#": "col-sm-6", "@class": "pse14", "@":
                                             { "#": "button@button", "@": "Log in", "@name": "login" }
                                     },
                                     {
-                                        "#": "col-sm-6", "@class": "pad-se14", "@":
+                                        "#": "col-sm-6", "@class": "pse14", "@":
                                             { "#": "button@button", "@": "Cancel", "@name": "cancel" }
                                     },
                                 ]
@@ -49,18 +49,18 @@
                 ]
             },
             {
-                "#": "center-max320", "@class-inner": "pad-w14", "@": [
-                    { "#": "h1", "@": "Log in", "@class": "pad-se14" },
+                "#": "center-max320", "@class-inner": "pw14", "@": [
+                    { "#": "h1", "@": "Log in", "@class": "pse14" },
                     { "#": "labeled", "@label": "Username", "@target": { "#": "input@text", "@name": "username" } },
                     { "#": "labeled", "@label": "Password", "@target": { "#": "input@password", "@name": "password" } },
                     {
                         "#": "row", "@": [
                             {
-                                "#": "col-sm-6", "@class": "pad-se14", "@":
+                                "#": "col-sm-6", "@class": "pse14", "@":
                                     { "#": "button@button", "@": "Log in", "@name": "login" }
                             },
                             {
-                                "#": "col-sm-6", "@class": "pad-se14", "@":
+                                "#": "col-sm-6", "@class": "pse14", "@":
                                     { "#": "button@button", "@": "Cancel", "@name": "cancel" }
                             },
                         ]
