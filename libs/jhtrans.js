@@ -440,7 +440,7 @@
   };
 
   Jhtrans.prototype.stage = function (object) {
-    if (!isObject(data)) {
+    if (!isObject(object)) {
       throw Error("The argument type was not object.");
     }
 
