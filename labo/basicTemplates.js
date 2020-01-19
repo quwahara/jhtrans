@@ -23,6 +23,12 @@
     "button@button": ["button", { "type": "button", "name": "@name" }, "@"],
     "input@text": ["input", { "type": "text", "name": "@name" }],
     "input@password": ["input", { "type": "password" }],
+    "table": ["table", { "class": "@class" }, "@"],
+    "thead": ["thead", { "class": "@class" }, "@"],
+    "tbody": ["tbody", { "class": "@class" }, "@"],
+    "tr": ["tr", { "class": "@class" }, "@"],
+    "th": ["th", { "class": "@class" }, "@"],
+    "td": ["td", { "class": "@class" }, "@"],
 
     // Utilities
 
@@ -80,7 +86,14 @@
         ["lable", null, "@label"],
         "@"
       ]
-    }
+    },
+
+    "table-hb": {
+      "#": "table", "@": [
+        { "#": "thead", "@": "@thead" },
+        { "#": "tbody", "@": "@tbody" },
+      ]
+    },
 
   };
 });
