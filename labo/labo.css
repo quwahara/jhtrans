@@ -22,6 +22,10 @@
     padding: 0 14px 14px 0;
 }
 
+.pnews6 {
+    padding: 6px 6px 6px 6px;
+}
+
 .center-max320 {
     margin-left: auto;
     margin-right: auto;
@@ -43,6 +47,10 @@
 
 .right {
     text-align: right;
+}
+
+border1 {
+    border: solid 1px gray;
 }
 
 * {
@@ -100,6 +108,20 @@ input[type="text"], input[type="password"], select {
 button {
     border: solid 1px #999;
     background-color: #ccc;
+}
+
+/* Table */
+
+table {
+    border-collapse: collapse;
+}
+
+th {
+    background-color: gray;
+}
+
+tr:nth-child(even) {
+    background-color: lightgray;
 }
 
 /*

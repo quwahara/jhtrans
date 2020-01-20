@@ -19,7 +19,7 @@
     "h1": ["h1", { "class": "@class" }, "@"],
     "div": ["div", { "class": "@class" }, "@"],
     "span": ["span", { "class": "@class" }, "@"],
-    "a": ["a", { "class": "@class", "href": "@href" }, "@"],
+    "a": ["a", { "class": "@class", "href": "@href", "target": "@target" }, "@"],
     "button@button": ["button", { "type": "button", "name": "@name" }, "@"],
     "input@text": ["input", { "type": "text", "name": "@name" }],
     "input@password": ["input", { "type": "password" }],
