@@ -21,8 +21,12 @@
     "span": ["span", { "class": "@class" }, "@"],
     "a": ["a", { "class": "@class", "href": "@href", "target": "@target" }, "@"],
     "button@button": ["button", { "type": "button", "name": "@name" }, "@"],
+    "input@checkbox": ["input", { "type": "checkbox", "name": "@name" }],
+    "input@radio": ["input", { "type": "radio", "name": "@name", "value": "@value" }],
     "input@text": ["input", { "type": "text", "name": "@name" }],
     "input@password": ["input", { "type": "password" }],
+    "option": ["option", { "value": "@value" }, "@"],
+    "select": ["select", { "name": "@name" }, "@"],
     "table": ["table", { "class": "@class" }, "@"],
     "thead": ["thead", { "class": "@class" }, "@"],
     "tbody": ["tbody", { "class": "@class" }, "@"],
@@ -83,8 +87,15 @@
 
     "labeled": {
       "#": "pse14", "@": [
-        ["lable", null, "@label"],
+        ["label", null, "@label"],
         "@"
+      ]
+    },
+
+    "radio-caption": {
+      "#": "div", "@class": "radio-caption @class", "@": [
+        { "#": "input@radio" },
+        { "#": "span", "@": "@caption" },
       ]
     },
 
