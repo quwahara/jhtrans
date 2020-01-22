@@ -92,6 +92,13 @@
       ]
     },
 
+    "checkbox-caption": {
+      "#": "div", "@class": "checkbox-caption @class", "@": [
+        { "#": "input@checkbox" },
+        { "#": "span", "@": "@caption" },
+      ]
+    },
+
     "radio-caption": {
       "#": "div", "@class": "radio-caption @class", "@": [
         { "#": "input@radio" },

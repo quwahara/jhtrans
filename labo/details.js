@@ -24,6 +24,11 @@
             },
             {
                 "#": "row", "@class": "", "@": {
+                    "#": "checkbox-caption", "@name": "checkbox1", "@value": "checkbox1", "@caption": "checkbox1"
+                }
+            },
+            {
+                "#": "row", "@class": "", "@": {
                     "#": "radio-caption", "@name": "radio1", "@value": "radio1", "@caption": "radio1"
                 }
             },

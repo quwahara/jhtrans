@@ -103,7 +103,17 @@ button {
     appearance: none;
 }
 
-button, input, select, .radio-caption {
+button, input, select, .checkbox-caption, .radio-caption {
+    height: 2.4em;
+}
+
+input[type='checkbox'] {
+    margin-right: 1.0em;
+}
+
+input[type='checkbox']+span {
+    display: inline-block;
+    vertical-align: text-bottom;
     height: 2.4em;
 }
 
