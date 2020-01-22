@@ -5,6 +5,7 @@
     jht.putTemplateAll(basicTemplates);
 
     jht.setGlobalReplacement("@class", "");
+
     const contents = jht.translate({
         "#": "div", "@class": "pnw14", "@": [
             {
@@ -30,6 +31,11 @@
             {
                 "#": "row", "@class": "", "@": {
                     "#": "radio-caption", "@name": "radio1", "@value": "radio1", "@caption": "radio1"
+                }
+            },
+            {
+                "#": "row", "@class": "", "@": {
+                    "#": "labeled", "@label": "Textarea", "@": { "#": "textarea", "@name": "textarea1" }
                 }
             },
             {

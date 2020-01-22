@@ -28,6 +28,7 @@
     "option": ["option", { "value": "@value" }, "@"],
     "select": ["select", { "name": "@name" }, "@"],
     "table": ["table", { "class": "@class" }, "@"],
+    "textarea": ["textarea", { "class": "@class" }, ""],
     "thead": ["thead", { "class": "@class" }, "@"],
     "tbody": ["tbody", { "class": "@class" }, "@"],
     "tr": ["tr", { "class": "@class" }, "@"],

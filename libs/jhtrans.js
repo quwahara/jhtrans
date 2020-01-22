@@ -373,13 +373,6 @@
                 value += replacement;
                 found = true;
               }
-              // if (desc.hasOwnProperty(placeholder)) {
-              //   const replacement = desc[placeholder];
-              //   if (isString(replacement)) {
-              //     value += replacement;
-              //     found = true;
-              //   }
-              // }
             }
             if (!found) {
               value += split;
