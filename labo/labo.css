@@ -76,7 +76,7 @@
     padding: 0;
 }
 
-html, button, input[type='checkbox'], input[type='text'], input[type='radio'], select, textarea {
+html, button, input[type='checkbox'], input, select, textarea {
     font-family: 'Hiragino Kaku Gothic ProN', 'ヒラギノ角ゴ ProN W3', Meiryo, メイリオ, Osaka, 'MS PGothic', arial, helvetica, sans-serif;
     font-size: 14px;
 }
@@ -90,11 +90,11 @@ label, .label {
     display: block;
 }
 
-button, input[type='text'], input[type='password'], select, textarea {
+input[type='text'], input[type='password'], select, textarea {
     width: 100%;
 }
 
-button {
+button, input[type="button"], input[type="reset"], input[type="submit"] {
     background-color: transparent;
     border: none;
     cursor: pointer;
@@ -131,22 +131,21 @@ input[type='radio']+span {
     height: 2.4em;
 }
 
-button, input[type="button"], input[type="submit"] {
-    padding-top: 0.0em;
-    padding-bottom: 0.0em;
-    padding-left: 0.8em;
-    padding-right: 0.8em;
-}
-
-input[type="text"], input[type="password"], select, textarea {
+button, input[type="button"], input[type="reset"], input[type="submit"], input[type="text"], input[type="password"], select, textarea {
     padding: 0.5em;
 }
 
-input[type="text"], input[type="password"], select, textarea {
+button, input[type="button"], input[type="reset"], input[type="submit"] {
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+}
+
+button, input[type="button"], input[type="reset"], input[type="submit"], input[type="text"], input[type="password"], select, textarea {
     border: solid 1px #999;
 }
 
-button {
+button, input[type="button"], input[type="reset"], input[type="submit"] {
     border: solid 1px #999;
     background-color: #ccc;
 }
@@ -229,6 +228,10 @@ tr:nth-child(even) {
     float: left;
     width: 100%;
     min-height: 1rem;
+}
+
+.w100pc {
+    width: 100%;
 }
 
 /* viewport-width >= 768px: prime width = 768px
