@@ -124,6 +124,13 @@
     return null;
   };
 
+  Jhtrans.prototype.putTemplateAll = function (nameDeclarations) {
+    for (var name in nameDeclarations) {
+      this.putTemplate(name, nameDeclarations[name]);
+    }
+    return this;
+  };
+
   Jhtrans.prototype.putTemplate = function (name, declaration) {
 
     if (isArray(declaration)) {
@@ -141,13 +148,6 @@
     }
 
     throw Error("The declaration was unsupported type.");
-  };
-
-  Jhtrans.prototype.putTemplateAll = function (nameDeclarations) {
-    for (var name in nameDeclarations) {
-      this.putTemplate(name, nameDeclarations[name]);
-    }
-    return this;
   };
 
   Jhtrans.prototype.declarationToElement = function (declaration) {
@@ -382,6 +382,36 @@
         }
 
       }
+    }
+
+    const keys = Object.keys(desc);
+
+    for (let i = 0; i < keys.length; ++i) {
+      const key = keys[i];
+      if (key === "#") {
+        continue;
+      }
+      if (isPlaceholderKey(key)) {
+        continue;
+      }
+
+      const splits = key.split(/\s+/g);
+      const len = splits.length;
+
+      if (len === 1) {
+        elementNode.setAttribute(key, desc[key]);
+        continue;
+      }
+
+      if (len === 2) {
+        const first = splits[0];
+        const second = splits[1];
+        if (first === "-") {
+          elementNode.removeAttribute(second);
+          continue;
+        }
+      }
+      throw Error("The key was unsupported format.");
     }
 
     return elementNode;
