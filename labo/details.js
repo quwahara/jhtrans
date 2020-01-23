@@ -81,7 +81,8 @@
                     "#": "pse14", "@class": "col-12", "@":
                     {
                         "#": jht.declarationToElement(["div", { "data-abc": "ABC", "data-def": "DEF" }, "XXX"]),
-                        "- data-def": null
+                        "- data-def": null,
+                        "+ data-ghi": "GHI",
                     },
                 }
             },

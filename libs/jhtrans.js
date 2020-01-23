@@ -410,6 +410,10 @@
           elementNode.removeAttribute(second);
           continue;
         }
+        if (first === "+") {
+          elementNode.setAttribute(second, desc[key]);
+          continue;
+        }
       }
       throw Error("The key was unsupported format.");
     }
