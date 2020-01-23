@@ -83,7 +83,8 @@
 
     // Combinations
 
-    "pse14": ["div", { "class": "pse14" }, "@"],
+    "pse14": ["div", { "class": "pse14 @class" }, "@"],
+
     "row{col-3.col-6.col-3}": {
       "#": "row", "@": [
         { "#": "col-3", "@": "@1" },

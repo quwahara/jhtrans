@@ -49,25 +49,30 @@
                 }
             },
             {
-                "#": "row", "@class": "", "@": [
-                    { "#": "button@button", "@name": "button_button1", "@": "Button button" },
-                    { "#": "button@submit", "@name": "button_submit1", "@": "Button submit" },
-                    { "#": "input@button", "@name": "input_button1", "@value": "Input button" },
-                    { "#": "input@reset", "@name": "reset1", "@value": "Input reset" },
-                    { "#": "input@submit", "@name": "submit1", "@value": "Input submit" },
-                ]
+                "#": "row", "@class": "", "@":
+                {
+                    "#": "pse14", "@":
+                        [
+                            { "#": "button@button", "@name": "button_button1", "@": "Button button" },
+                            { "#": "button@submit", "@name": "button_submit1", "@": "Button submit" },
+                            { "#": "input@button", "@name": "input_button1", "@value": "Input button" },
+                            { "#": "input@reset", "@name": "reset1", "@value": "Input reset" },
+                            { "#": "input@submit", "@name": "submit1", "@value": "Input submit" },
+                        ]
+                }
             },
             {
                 "#": "row", "@class": "", "@":
-                    { "#": "button@button", "@name": "button_button1", "@": "Button button", "@class": "col-1" },
+                {
+                    "#": "pse14", "@class": "col-12", "@":
+                        { "#": "button@button", "@name": "button_button1", "@": "Button button", "@class": "col-1" },
+                }
             },
             {
                 "#": "row", "@class": "", "@":
-                    { "#": "button@button", "@name": "button_button1", "@": "Button button", "@class": "w100pc" },
-            },
-            {
-                "#": "row", "@class": "", "@": {
-                    "#": "div", "@": "AAA"
+                {
+                    "#": "pse14", "@class": "col-12", "@":
+                        { "#": "button@button", "@name": "button_button1", "@": "Button button", "@class": "w100pc" },
                 }
             },
         ]
