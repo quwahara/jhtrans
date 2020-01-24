@@ -16,30 +16,30 @@
 
     // Basic tags
 
-    "h1": ["h1", { "class": "@class" }, "@"],
-    "div": ["div", { "class": "@class" }, "@"],
-    "span": ["span", { "class": "@class" }, "@"],
-    "a": ["a", { "class": "@class", "href": "@href", "target": "@target" }, "@"],
-    "button@button": ["button", { "type": "button", "name": "@name", "class": "@class" }, "@"],
-    "button@submit": ["button", { "type": "submit", "name": "@name" }, "@"],
-    "input@button": ["input", { "type": "button", "value": "@value" }],
-    "input@checkbox": ["input", { "type": "checkbox", "name": "@name" }],
-    "input@date": ["input", { "type": "date", "name": "@name" }],
-    "input@radio": ["input", { "type": "radio", "name": "@name", "value": "@value" }],
-    "input@text": ["input", { "type": "text", "name": "@name" }],
-    "input@time": ["input", { "type": "time", "name": "@name" }],
+    "h1": ["h1", {}, "@"],
+    "div": ["div", {}, "@"],
+    "span": ["span", {}, "@"],
+    "a": ["a", {}, "@"],
+    "button@button": ["button", { "type": "button" }, "@"],
+    "button@submit": ["button", { "type": "submit" }, "@"],
+    "input@button": ["input", { "type": "button" }],
+    "input@checkbox": ["input", { "type": "checkbox" }],
+    "input@date": ["input", { "type": "date" }],
     "input@password": ["input", { "type": "password" }],
-    "input@reset": ["input", { "type": "reset", "value": "@value" }],
-    "input@submit": ["input", { "type": "submit", "value": "@value" }],
+    "input@radio": ["input", { "type": "radio" }],
+    "input@reset": ["input", { "type": "reset" }],
+    "input@submit": ["input", { "type": "submit" }],
+    "input@text": ["input", { "type": "text" }],
+    "input@time": ["input", { "type": "time" }],
     "option": ["option", { "value": "@value" }, "@"],
-    "select": ["select", { "name": "@name" }, "@"],
-    "table": ["table", { "class": "@class" }, "@"],
-    "textarea": ["textarea", { "class": "@class" }, ""],
-    "thead": ["thead", { "class": "@class" }, "@"],
-    "tbody": ["tbody", { "class": "@class" }, "@"],
-    "tr": ["tr", { "class": "@class" }, "@"],
-    "th": ["th", { "class": "@class" }, "@"],
-    "td": ["td", { "class": "@class" }, "@"],
+    "select": ["select", {}, "@"],
+    "table": ["table", {}, "@"],
+    "textarea": ["textarea", {}, ""],
+    "thead": ["thead", {}, "@"],
+    "tbody": ["tbody", {}, "@"],
+    "tr": ["tr", {}, "@"],
+    "th": ["th", {}, "@"],
+    "td": ["td", {}, "@"],
 
     // Utilities
 
@@ -49,7 +49,7 @@
 
     // Grid system, Row
 
-    "row": ["div", { "class": "row @class" }, "@"],
+    "row": ["div", { "class": "row" }, "@"],
 
     // Grid system, Columns, 1 to 12
 
@@ -83,7 +83,7 @@
 
     // Combinations
 
-    "pse14": ["div", { "class": "pse14 @class" }, "@"],
+    "pse14": ["div", { "class": "pse14" }, "@"],
 
     "row{col-3.col-6.col-3}": {
       "#": "row", "@": [
@@ -102,14 +102,14 @@
 
     "checkbox-caption": {
       "#": "div", "@class": "checkbox-caption @class", "@": [
-        { "#": "input@checkbox" },
+        { "#": "input@checkbox", "name": "@name", "value": "@value" },
         { "#": "span", "@": "@caption" },
       ]
     },
 
     "radio-caption": {
       "#": "div", "@class": "radio-caption @class", "@": [
-        { "#": "input@radio" },
+        { "#": "input@radio", "name": "@name", "value": "@value" },
         { "#": "span", "@": "@caption" },
       ]
     },

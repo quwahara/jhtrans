@@ -6,12 +6,12 @@
 
     jht.setGlobalReplacement("@class", "");
     const contents = jht.translate({
-        "#": "div", "@class": "pw14", "@": [
-            { "#": "h1", "@": "List", "@class": "" },
+        "#": "div", "class +": "pw14", "@": [
+            { "#": "h1", "@": "List" },
             {
-                "#": "row", "@class": "pse14", "@": [
+                "#": "row", "class +": "pse14", "@": [
                     {
-                        "#": "table-hb", "@class": "",
+                        "#": "table-hb",
                         "@thead": { "#": "tr", "@": "" },
                         "@tbody": "",
                     },
@@ -48,7 +48,7 @@
     const musicianCols = schemas.musicians.columns;
     jht.stage(schemas)
         .musicians.columns.select("thead>tr").each(function (elem, item) {
-            const th = jht.translate({ "#": "th", "@class": "pnews6", "@": item.caption });
+            const th = jht.translate({ "#": "th", "class +": "pnews6", "@": item.caption });
             elem.appendChild(th);
         });
 
@@ -62,14 +62,14 @@
                 let content;
 
                 if (col.dstType === "a") {
-                    content = { "#": "a", "@class": "", "@target": "_blank", "@href": value, "@": value };
+                    content = { "#": "a", "target": "_blank", "href": value, "@": value };
                 } else if (col.dstType === "textContent") {
                     content = value;
                 } else {
                     content = "";
                 }
 
-                tds.push({ "#": "td", "@class": "pnews6", "@": content });
+                tds.push({ "#": "td", "class +": "pnews6", "@": content });
             }
             const tr = jht.translate({ "#": "tr", "@": tds });
             elem.appendChild(tr);

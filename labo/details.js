@@ -9,81 +9,90 @@
     const contents = jht.translate({
         "#": "div", "@class": "pnw14", "@": [
             {
-                "#": "row", "@class": "", "@": {
-                    "#": "labeled", "@label": "Fullname", "@": { "#": "input@text", "@name": "fullname", "value": "Alice Cooper" }
+                "#": "row", "@": {
+                    "#": "labeled", "@label": "Fullname", "@": { "#": "input@text", "name": "fullname", "value": "Alice Cooper" }
                 }
             },
             {
-                "#": "row", "@class": "", "@": {
-                    "#": "labeled", "@label": "States", "@": { "#": "select", "@name": "states", "@": "" }
+                "#": "row", "@": {
+                    "#": "labeled", "@label": "States", "@": { "#": "select", "name": "states", "@": "" }
                 }
             },
             {
-                "#": "row", "@class": "", "@": {
-                    "#": "labeled", "@label": "Check", "@": { "#": "input@checkbox", "@name": "check", "@": "" }
+                "#": "row", "@": {
+                    "#": "labeled", "@label": "Check", "@": { "#": "input@checkbox", "name": "check", "@": "" }
                 }
             },
             {
-                "#": "row", "@class": "", "@": {
+                "#": "row", "@": {
                     "#": "checkbox-caption", "@name": "checkbox1", "@value": "checkbox1", "@caption": "checkbox1"
                 }
             },
             {
-                "#": "row", "@class": "", "@": {
+                "#": "row", "@": {
                     "#": "radio-caption", "@name": "radio1", "@value": "radio1", "@caption": "radio1"
                 }
             },
             {
-                "#": "row", "@class": "", "@": {
-                    "#": "labeled", "@label": "Textarea", "@": { "#": "textarea", "@name": "textarea1" }
+                "#": "row", "@": {
+                    "#": "labeled", "@label": "Textarea", "@": { "#": "textarea", "name": "textarea1" }
                 }
             },
             {
-                "#": "row", "@class": "", "@": {
-                    "#": "labeled", "@label": "Date", "@": { "#": "input@date", "@name": "date1" }
+                "#": "row", "@": {
+                    "#": "labeled", "@label": "Date", "@": { "#": "input@date", "name": "date1" }
                 }
             },
             {
-                "#": "row", "@class": "", "@": {
-                    "#": "labeled", "@label": "Time", "@": { "#": "input@time", "@name": "time1" }
+                "#": "row", "@": {
+                    "#": "labeled", "@label": "Time", "@": { "#": "input@time", "name": "time1" }
                 }
             },
             {
-                "#": "row", "@class": "", "@":
+                "#": "row", "@":
                 {
                     "#": "pse14", "@":
                         [
-                            { "#": "button@button", "@name": "button_button1", "@": "Button button" },
-                            { "#": "button@submit", "@name": "button_submit1", "@": "Button submit", "disabled": "" },
-                            { "#": "input@button", "@name": "input_button1", "@value": "Input button" },
-                            { "#": "input@reset", "@name": "reset1", "@value": "Input reset" },
-                            { "#": "input@submit", "@name": "submit1", "@value": "Input submit" },
+                            { "#": "button@button", "name": "button_button2", "@": "Button button" },
+                            { "#": "button@submit", "name": "button_submit2", "@": "Button submit", "disabled": "" },
+                            { "#": "input@button", "name": "input_button2", "value": "Input button2" },
+                            { "#": "input@reset", "name": "reset2", "value": "Input reset2" },
+                            { "#": "input@submit", "name": "submit2", "value": "Input submit" },
                         ]
                 }
             },
             {
-                "#": "row", "@class": "", "@":
+                "#": "row", "@":
                 {
-                    "#": "pse14", "@class": "col-12", "@":
-                        { "#": "button@button", "@name": "button_button1", "@": "Button button", "@class": "col-1" },
+                    "#": "pse14", "class +": "col-12", "@":
+                        { "#": "button@button", "name": "button_button1", "@": "Button button", "class +": "col-1" },
                 }
             },
             {
-                "#": "row", "@class": "", "@":
+                "#": "row", "@":
                 {
-                    "#": "pse14", "@class": "col-12", "@":
-                        { "#": "button@button", "@name": "button_button1", "@": "Button button", "@class": "w100pc" },
+                    "#": "pse14", "class +": "col-12", "@":
+                        { "#": "button@button", "name": "button_button2", "@": "Button button", "class +": "w100pc" },
                 }
             },
             {
-                "#": "row", "@class": "", "@":
+                "#": "row", "@":
                 {
-                    "#": "pse14", "@class": "col-12", "@":
-                    {
-                        "#": jht.declarationToElement(["div", { "data-abc": "ABC", "data-def": "DEF" }, "XXX"]),
-                        "- data-def": null,
-                        "+ data-ghi": "GHI",
-                    },
+                    "#": "pse14", "class +": "col-12", "@": [
+                        {
+                            "#": jht.declarationToElement(["div", { "class": "C1 C2 C3", "data-abc": "ABC", "data-def": "DEF", "data-jkl": "J K L" }, "XXX"]),
+                            "- data-def": null,
+                            "data-ghi =": "GHI",
+                            "data-jkl +": "K M",
+                            "class +": "ADD1 ADD2",
+                            "class -": "C2 C4",
+                        },
+                        {
+                            "#": jht.declarationToElement(["div", { "class": "CCCC", "attr": "A B C" }, "XXX"]),
+                            "class =": "overwrite",
+                            "attr -": "B D",
+                        },
+                    ]
                 }
             },
         ]

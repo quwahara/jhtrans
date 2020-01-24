@@ -301,10 +301,6 @@
 
     const collections = collectPlaceholder(elementNode, []);
 
-    if (collections.length === 0) {
-      return elementNode;
-    }
-
     for (let i = 0; i < collections.length; ++i) {
       const collection = collections[i];
       if (isObject(collection)) {
@@ -398,6 +394,7 @@
       const splits = key.split(/\s+/g);
       const len = splits.length;
 
+      // Overwrite attribute
       if (len === 1) {
         elementNode.setAttribute(key, desc[key]);
         continue;
@@ -406,13 +403,103 @@
       if (len === 2) {
         const first = splits[0];
         const second = splits[1];
+
+        // Remove attribute
         if (first === "-") {
           elementNode.removeAttribute(second);
           continue;
         }
-        if (first === "+") {
-          elementNode.setAttribute(second, desc[key]);
-          continue;
+
+        if (first === "class") {
+
+          // Merge class
+          if (second === "+") {
+            if (isString(desc[key])) {
+              const valueSplits = desc[key].split(/\s+/g);
+              for (let j = 0; j < valueSplits.length; ++j) {
+                elementNode.classList.add(valueSplits[j]);
+              }
+            }
+            continue;
+          }
+
+          // Reduce class
+          if (second === "-") {
+            if (isString(desc[key])) {
+              const valueSplits = desc[key].split(/\s+/g);
+              for (let j = 0; j < valueSplits.length; ++j) {
+                elementNode.classList.remove(valueSplits[j]);
+              }
+            }
+            continue;
+          }
+
+          // Over write class
+          if (second === "=") {
+            if (isString(desc[key])) {
+              elementNode.class = desc[key];
+            }
+            continue;
+          }
+        }
+        else {
+          // Merge attribute value
+          if (second === "+") {
+            if (isString(desc[key])) {
+              let attrS = elementNode.getAttribute(first);
+              if (!isString(attrS)) {
+                attrS = "";
+              }
+              const attrA = attrS.split(/\s+/g);
+              const valueSplits = desc[key].split(/\s+/g);
+              for (let j = 0; j < valueSplits.length; ++j) {
+                if (attrA.indexOf(valueSplits[j]) === -1) {
+                  attrA.push(valueSplits[j]);
+                }
+              }
+              let newAttrS = "";
+              for (let j = 0; j < attrA.length; ++j) {
+                if (j >= 1) {
+                  newAttrS += " ";
+
+                }
+                newAttrS += attrA[j];
+              }
+              elementNode.setAttribute(first, newAttrS);
+            }
+            continue;
+          }
+
+          // Reduce attribute value
+          if (second === "-") {
+            if (isString(desc[key])) {
+              let attrS = elementNode.getAttribute(first);
+              if (!isString(attrS)) {
+                attrS = "";
+              }
+              const attrA = attrS.split(/\s+/g);
+              const valueSplits = desc[key].split(/\s+/g);
+              let newAttrS = "";
+              for (let j = 0; j < attrA.length; ++j) {
+                if (valueSplits.indexOf(attrA[j]) === -1) {
+                  if (newAttrS.length >= 1) {
+                    newAttrS += " ";
+                  }
+                  newAttrS += attrA[j];
+                }
+              }
+              elementNode.setAttribute(first, newAttrS);
+            }
+            continue;
+          }
+
+          // Overwrite attribute value
+          if (second === "=") {
+            if (isString(desc[key])) {
+              elementNode.setAttribute(first, desc[key]);
+            }
+            continue;
+          }
         }
       }
       throw Error("The key was unsupported format.");
