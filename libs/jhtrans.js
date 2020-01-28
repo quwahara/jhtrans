@@ -134,7 +134,7 @@
   Jhtrans.prototype.putTemplate = function (name, declaration) {
 
     if (isArray(declaration)) {
-      var template = this.declarationToElement(declaration);
+      var template = this.elem(declaration);
       this.templates[name] = template;
       return this;
     }
@@ -150,7 +150,7 @@
     throw Error("The declaration was unsupported type.");
   };
 
-  Jhtrans.prototype.declarationToElement = function (declaration) {
+  Jhtrans.prototype.elem = function (declaration) {
 
     if (!isArray(declaration)) {
       throw Error("declaration argument requires an array");
@@ -197,7 +197,7 @@
       } else if (isArray(third)) {
         if (!isTerminalTag(elm)) {
           for (let i = 0; i < third.length; ++i) {
-            var child = this.declarationToElement(third[i]);
+            var child = this.elem(third[i]);
             elm.appendChild(child);
           }
         }
@@ -528,7 +528,7 @@
     }
     else if (isArray(replacement)) {
 
-      const elementNode = this.declarationToElement(replacement);
+      const elementNode = this.elem(replacement);
 
       textNode.parentNode.replaceChild(elementNode, textNode);
 

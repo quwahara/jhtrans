@@ -80,7 +80,7 @@
                 {
                     "#": "pse14", "class +": "col-12", "@": [
                         {
-                            "#": jht.declarationToElement(["div", { "class": "C1 C2 C3", "data-abc": "ABC", "data-def": "DEF", "data-jkl": "J K L" }, "XXX"]),
+                            "#": jht.elem(["div", { "class": "C1 C2 C3", "data-abc": "ABC", "data-def": "DEF", "data-jkl": "J K L" }, "XXX"]),
                             "- data-def": null,
                             "data-ghi =": "GHI",
                             "data-jkl +": "K M",
@@ -88,7 +88,7 @@
                             "class -": "C2 C4",
                         },
                         {
-                            "#": jht.declarationToElement(["div", { "class": "CCCC", "attr": "A B C" }, "XXX"]),
+                            "#": jht.elem(["div", { "class": "CCCC", "attr": "A B C" }, "XXX"]),
                             "class =": "overwrite",
                             "attr -": "B D",
                         },
