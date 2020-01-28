@@ -7,7 +7,7 @@
     jht.setGlobalReplacement("@class", "");
 
     const contents = jht.translate({
-        "#": "div", "@class": "pnw14", "@": [
+        "#": "div", "class": "pnw14", "@": [
             {
                 "#": "row", "@": {
                     "#": "labeled", "@label": "Fullname", "@": { "#": "input@text", "name": "fullname", "value": "Alice Cooper" }
