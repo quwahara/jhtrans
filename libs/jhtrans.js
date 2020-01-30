@@ -207,6 +207,25 @@
     return elm;
   };
 
+  Jhtrans.prototype.endsWithPred = function (key) {
+    return (function (key) {
+      return function (target) {
+        if (!isString(target)) { return false; }
+        const index = target.indexOf(key);
+        return index >= 0 && index === (target.length - key.length);
+      };
+    })(key);
+  };
+
+  Jhtrans.prototype.csvContainsPred = function (key) {
+    return (function (key) {
+      return function (target) {
+        if (!isString(target)) { return false; }
+        return target.split(/\s*,\s*/g).indexOf(key) >= 0;
+      };
+    })(key);
+  };
+
   function isPlaceholderTextNode(node) {
     return isTextNode(node) && isPlaceholderKey(node.textContent);
   }
@@ -791,6 +810,7 @@
       this._previousValue = "" + objectProp._object[nameInObject];
     }
     this._selected = null;
+    this._rules = null;
 
     // Holding contents are:
     // key = eventType
@@ -824,6 +844,15 @@
     //    elements: [<ElementNode>]
     // }
     this._turnClassContexts = {};
+
+    // Holding contents are:
+    // [
+    //    {
+    //      rule: <CSSStyleRule>,
+    //      styleName: <styleName:String>
+    //    }
+    // ]
+    this._toStyleOfRuleAndStyleNames = [];
 
     Object.defineProperty(objectProp._object, nameInObject, {
       enumerable: true,
@@ -915,7 +944,7 @@
     return this._objectProp;
   }
 
-  PrimitiveProp.prototype.toText = function (source, value) {
+  PrimitiveProp.prototype.toText = function () {
 
     const element = this._assertSelected();
 
@@ -1027,6 +1056,73 @@
     return this._objectProp;
   };
 
+  PrimitiveProp.prototype.selectRule = function (hrefPred, ruleSelectorPred) {
+    const rules = [];
+    for (let i = 0; i < document.styleSheets.length; ++i) {
+      const sheet = document.styleSheets[i];
+      if (hrefPred(sheet.href)) {
+        for (let j = 0; j < sheet.cssRules.length; ++j) {
+          const rule = sheet.cssRules[j];
+          if (!rule.selectorText) { continue; }
+          if (ruleSelectorPred(rule.selectorText)) {
+            rules.push(rule);
+          }
+        }
+      }
+    }
+
+    if (rules.length > 0) {
+      this._rules = rules;
+    }
+
+    return this;
+  };
+
+  PrimitiveProp.prototype.toStyleOf = function (styleName) {
+
+    const rules = this._assertRulesAreSelected();
+    const rns = this._toStyleOfRuleAndStyleNames;
+    const newRns = [];
+
+    for (let i = 0; i < rules.length; ++i) {
+      const rule = rules[i];
+      let found = false;
+      for (let j = 0; j < rns.length; ++j) {
+        const rn = rns[j];
+        if (rn.rule === rule && rn.styleName === styleName) {
+          found = true;
+          continue;
+        }
+      }
+      if (!found) {
+        newRns.push({
+          rule: rule,
+          styleName: styleName
+        });
+      }
+    }
+
+    Array.prototype.push.apply(rns, newRns);
+
+    for (let i = 0; i < rns.length; ++i) {
+      const rn = rns[i];
+      rn.rule.style[rn.styleName] = this._value;
+    }
+
+    return this._objectProp;
+  }
+
+  PrimitiveProp.prototype._assertRulesAreSelected = function () {
+
+    const rules = this._rules;
+
+    if (isNullOrUndefined(rules)) {
+      throw Error("No CSSStyleRules were selected.");
+    }
+
+    return rules;
+  };
+
   /**
    * It propergates value to among the inputs and related object property.
    */
@@ -1108,7 +1204,13 @@
       }
     }
 
-  }
+    const rns = this._toStyleOfRuleAndStyleNames;
+    for (let i = 0; i < rns.length; ++i) {
+      const rn = rns[i];
+      rn.rule.style[rn.styleName] = this._value;
+    }
+
+  } // End of _propagate
 
   return Jhtrans;
 });

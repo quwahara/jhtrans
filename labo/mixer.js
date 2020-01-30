@@ -11,18 +11,49 @@
             {
                 "#": "row", "@":
                 {
-                    "#": "pse14", "@":
+                    "#": "col-12", "@":
                         [
                             { "#": "button@button", "name": "incBtn", "@": "Inc" },
                             { "#": "button@button", "name": "decBtn", "@": "Dec" },
                         ]
-                }
+                },
+            },
+            {
+                "#": "row", "@":
+                {
+                    "#": "col-12", "@":
+                        [
+                            { "#": "input@text", "name": "fontSizeTxt" },
+                        ]
+                },
             },
         ]
     });
 
     document.querySelector(".prime").appendChild(contents);
 
+    const data = {
+        style: {
+            fontSize: "30px",
+        }
+    };
+
+    const stagedData = jht.stage(data);
+
+
+    // jht.stage(data)
+    //     .style
+    //     .fontSize.select("input[name='fontSizeTxt']").withValue();
+
+    const fontSize = stagedData
+        .style
+        .fontSize;
+    fontSize.selectRule(jht.endsWithPred("/basic.css"), jht.csvContainsPred("html"));
+    fontSize.toStyleOf("fontSize");
+
+    stagedData
+        .style
+        .fontSize.select("input[name='fontSizeTxt']").withValue();
 
     document.querySelector("button[name='incBtn']").onclick = function () {
         cssCache.html.style.fontSize = parseInt(cssCache.html.style.fontSize, 10) + 1 + "px";
@@ -61,6 +92,9 @@
     }
 
     console.log(cssCache.html);
+
+    // data.style.fontSize = cssCache.html.style.fontSize;
+
 
 
     // console.log(styleSheet.cssRules);
