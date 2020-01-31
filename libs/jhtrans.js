@@ -114,6 +114,9 @@
   // A dictionary to keep unique for ObjectProp instances
   Jhtrans._objectPropDic = {};
 
+  // A dictionary to keep unique for ArrayProp instances
+  Jhtrans._arrayPropDic = {};
+
   Jhtrans._loadObjectProp = function (jht, owner, nameInOwner, value) {
 
     if (!isObject(value)) {
@@ -141,6 +144,38 @@
     }
     else {
       prop = Jhtrans._objectPropDic[value._rid];
+    }
+
+    return prop;
+  };
+
+  Jhtrans._loadArrayProp = function (jht, owner, nameInOwner, value) {
+
+    if (!isArray(value)) {
+      throw Error("The argument type was not array.");
+    }
+
+    let prop;
+
+    if (!value._rid) {
+      let _rid = rid();
+
+      while (Jhtrans._arrayPropDic[_rid]) {
+        _rid = rid();
+      }
+
+      Object.defineProperty(value, "_rid", {
+        enumerable: false,
+        writable: false,
+        value: _rid
+      });
+
+      prop = new ArrayProp(jht, owner, nameInOwner);
+
+      Jhtrans._arrayPropDic[_rid] = prop;
+    }
+    else {
+      prop = Jhtrans._arrayPropDic[value._rid];
     }
 
     return prop;
@@ -635,7 +670,7 @@
         prop = Jhtrans._loadObjectProp(jht, object, key, value);
       }
       else if (isArray(value)) {
-        prop = new ArrayProp(jht, this, key);
+        prop = Jhtrans._loadArrayProp(jht, this, key, value);
       }
       else {
         throw Error("Unsupported type");
