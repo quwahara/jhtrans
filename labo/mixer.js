@@ -34,25 +34,13 @@
 
     const data = {
         style: {
-            fontSize: "30px",
+            fontSize: "14px",
         }
     };
 
-    const stagedData = jht.stage(data);
-
-
-    // jht.stage(data)
-    //     .style
-    //     .fontSize.select("input[name='fontSizeTxt']").withValue();
-
-    const fontSize = stagedData
+    jht.stage(data)
         .style
-        .fontSize;
-    fontSize.selectRule(jht.endsWithPred("/basic.css"), jht.csvContainsPred("html"));
-    fontSize.toStyleOf("fontSize");
-
-    stagedData
-        .style
+        .fontSize.selectRule(jht.endsWithPred("/basic.css"), jht.csvContainsPred("html")).toStyleOf("fontSize")
         .fontSize.select("input[name='fontSizeTxt']").withValue();
 
     document.querySelector("button[name='incBtn']").onclick = function () {
@@ -62,9 +50,6 @@
     document.querySelector("button[name='decBtn']").onclick = function () {
         cssCache.html.style.fontSize = parseInt(cssCache.html.style.fontSize, 10) - 1 + "px";
     }
-
-
-
 
     console.log(document.styleSheets);
 
