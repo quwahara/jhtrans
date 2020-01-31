@@ -111,9 +111,40 @@
     this._staging = null;
   };
 
-  // A dictionary to keep unique for DataStage instances
-  Jhtrans._dataStageDic = {};
+  // A dictionary to keep unique for ObjectProp instances
   Jhtrans._objectPropDic = {};
+
+  Jhtrans._loadObjectProp = function (jht, owner, nameInOwner, value) {
+
+    if (!isObject(value)) {
+      throw Error("The argument type was not object.");
+    }
+
+    let prop;
+
+    if (!value._rid) {
+      let _rid = rid();
+
+      while (Jhtrans._objectPropDic[_rid]) {
+        _rid = rid();
+      }
+
+      Object.defineProperty(value, "_rid", {
+        enumerable: false,
+        writable: false,
+        value: _rid
+      });
+
+      prop = new ObjectProp(jht, owner, nameInOwner, value);
+
+      Jhtrans._objectPropDic[_rid] = prop;
+    }
+    else {
+      prop = Jhtrans._objectPropDic[value._rid];
+    }
+
+    return prop;
+  };
 
   Jhtrans.prototype.getTemplate = function (name) {
 
@@ -573,13 +604,7 @@
   };
 
   Jhtrans.prototype.stage = function (object) {
-    if (!isObject(object)) {
-      throw Error("The argument type was not object.");
-    }
-
-    let prop = new ObjectProp(this, null, null, object);
-
-    return prop;
+    return Jhtrans._loadObjectProp(this, null, null, object);
   }
 
   const ObjectProp = function ObjectProp(jht, owner, nameInOwner, object) {
@@ -607,27 +632,7 @@
         prop = new PrimitiveProp(jht, this, key);
       }
       else if (isObject(value)) {
-
-        if (!value._rid) {
-          let _rid = rid();
-
-          while (Jhtrans._objectPropDic[_rid]) {
-            _rid = rid();
-          }
-
-          Object.defineProperty(value, "_rid", {
-            enumerable: false,
-            writable: false,
-            value: _rid
-          });
-
-          prop = new ObjectProp(jht, object, key, value);
-
-          Jhtrans._objectPropDic[_rid] = prop;
-        }
-        else {
-          prop = Jhtrans._objectPropDic[value._rid];
-        }
+        prop = Jhtrans._loadObjectProp(jht, object, key, value);
       }
       else if (isArray(value)) {
         prop = new ArrayProp(jht, this, key);
