@@ -4,6 +4,7 @@
   "main": "libs/jhtrans.js",
   "license": "MIT",
   "devDependencies": {
+    "distlink": "0.0.1",
     "requirejs": "^2.3.6"
   }
 }
