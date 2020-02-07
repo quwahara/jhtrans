@@ -1,7 +1,8 @@
 let data, data2;
 define(function (require) {
 
-  var Jhtrans = require('../libs/jhtrans');
+  const Jhtrans = require('../libs/jhtrans');
+  const distlink = require('../node_modules/distlink/libs/distlink.js');
   const jht = new Jhtrans();
 
   const gridTemplates = {
@@ -131,22 +132,21 @@ define(function (require) {
     data.user.username = (new Date()).toISOString();
   }
 
-  jht
-    .stage(data).select("a.to-attr")
-    .href.toHref()
-    .toClass.toClass()
-    .turnClassOn.turnClassOn("here")
-    .list.select("div.each").each(function (elem, item) {
+  distlink(data)
+    .href.select("a.to-attr").toHref()
+    .toClass.select("a.to-attr").toClass()
+    .turnClassOn.select("a.to-attr").turnClassOn("here")
+    .list.select("div.each").each(function (item, childElement, index, selectedElement) {
       const rowElm = jht.translate({
         "#": "div", "@class": "row", "@": [
           { "#": "a", "@class": "name", "@": "" }
         ]
       });
-      elem.appendChild(rowElm);
+      selectedElement.appendChild(rowElm);
       const a = rowElm.querySelector("a");
-      jht.stage(item).select(a)
-        .name.toText()
-        .href.toAttr("href")
+      item
+        .name.select(a).toText()
+        .href.select(a).toAttr("href")
         ;
     })
     .user
