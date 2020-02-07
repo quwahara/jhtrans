@@ -131,11 +131,10 @@
         ]
     }
 
-    jht.stage(data)
-        .states.select("select[name='states']").each(function (elem, item) {
-            const option = jht.translate({ "#": "option", "@value": item["postal_abbr"], "@": item["name"] });
-            elem.appendChild(option);
-        })
-        ;
+    distlink(data)
+        .states.select("select[name='states']").each(function (item, childElement, index, selectedElement) {
+            const option = jht.translate({ "#": "option", "@value": item["postal_abbr"]._value, "@": item["name"]._value });
+            selectedElement.appendChild(option);
+        });
 
 })();
