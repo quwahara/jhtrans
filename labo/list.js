@@ -46,19 +46,19 @@
     document.querySelector(".prime").appendChild(contents);
 
     const musicianCols = schemas.musicians.columns;
-    jht.stage(schemas)
-        .musicians.columns.select("thead>tr").each(function (elem, item) {
-            const th = jht.translate({ "#": "th", "class +": "pnews6", "@": item.caption });
-            elem.appendChild(th);
+    distlink(schemas)
+        .musicians.columns.select("thead>tr").each(function (item, childElement, index, selectedElement) {
+            const th = jht.translate({ "#": "th", "class +": "pnews6", "@": item.caption._value });
+            selectedElement.appendChild(th);
         });
 
-    jht.stage(data)
-        .musicians.select("tbody").each(function (elem, item) {
+    distlink(data)
+        .musicians.select("tbody").each(function (item, childElement, index, selectedElement) {
             const tds = [];
             for (let i = 0; i < musicianCols.length; ++i) {
 
                 const col = musicianCols[i];
-                const value = item[col.name];
+                const value = item[col.name]._value;
                 let content;
 
                 if (col.dstType === "a") {
@@ -72,7 +72,7 @@
                 tds.push({ "#": "td", "class +": "pnews6", "@": content });
             }
             const tr = jht.translate({ "#": "tr", "@": tds });
-            elem.appendChild(tr);
+            selectedElement.appendChild(tr);
         })
         ;
 
