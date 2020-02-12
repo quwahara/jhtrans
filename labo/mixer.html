@@ -6,9 +6,11 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <link rel="icon" href="data:,">
   <link rel="stylesheet" type="text/css" href="../css/basic.css">
+  <link rel="stylesheet" type="text/css" href="mixer.css">
   <link rel="stylesheet" type="text/css" href="labo-debug.css">
   <script src="../libs/jhtrans.js"></script>
-  <script src="../node_modules/distlink/libs/distlink.js"></script>
+  <!-- <script src="../node_modules/distlink/libs/distlink.js"></script> -->
+  <script src="../../distlink/libs/distlink.js"></script>
   <title>Labo - Mixer</title>
 </head>
 
@@ -19,9 +21,88 @@
 
       </div>
     </div>
+
+    <div class="control-panel__origin">
+      <div class="control-panel" style="
+    background-color: blueviolet;
+    position: relative;
+    top: 100px;
+    left: 200px;
+    width: 400px;
+    height: 100px;
+    ">
+        <div class="row">
+          <div class="control-panel__title-bar col-12">title bar</div>
+        </div>
+
+        <div class="row">
+          <div class="col-4">
+            font-size
+          </div>
+          <div class="col-8">
+            <input style="width: calc(100% - 120px);" name="fontSizeTxt" type="text">
+            <button class="control-panel__mini-button" name="decBtn" type="button" value="Dec">Dec</button>
+            <button class="control-panel__mini-button" name="incBtn" type="button" value="Inc">Inc</button>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
   </div>
+  </div>>
   <script src="basicTemplates.js"></script>
   <script src="mixer.js"></script>
+  <script>
+
+    const dragContext = {
+      targetStyle: document.querySelector(".control-panel").style,
+      entering: false,
+      dragging: false,
+      beginClientX: 0,
+      beginClientY: 0,
+      beginLeft: 0,
+      beginTop: 0,
+    };
+
+    const cpTitleBar = document.querySelector(".control-panel__title-bar");
+
+    cpTitleBar.addEventListener("mouseenter", function (e) {
+      dragContext.entering = true;
+    });
+
+    cpTitleBar.addEventListener("mouseleave", function (e) {
+      dragContext.entering = false;
+      dragContext.dragging = false;
+    });
+
+    cpTitleBar.addEventListener("mousedown", function (e) {
+      if (dragContext.entering) {
+        dragContext.beginClientX = e.clientX;
+        dragContext.beginClientY = e.clientY;
+        dragContext.beginLeft = parseInt(dragContext.targetStyle.left, 10);
+        dragContext.beginTop = parseInt(dragContext.targetStyle.top, 10);
+        dragContext.dragging = true;
+      }
+    });
+
+    cpTitleBar.addEventListener("mousemove", function (e) {
+      if (dragContext.dragging && dragContext.entering) {
+        dragContext.targetStyle.left = dragContext.beginLeft + (e.clientX - dragContext.beginClientX) + "px";
+        dragContext.targetStyle.top = dragContext.beginTop + (e.clientY - dragContext.beginClientY) + "px";
+      }
+    });
+
+    cpTitleBar.addEventListener("mouseup", function (e) {
+      dragContext.dragging = false;
+    });
+
+
+
+
+
+
+  </script>
 </body>
 
 </html>

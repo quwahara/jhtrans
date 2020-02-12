@@ -1,0 +1,33 @@
+/*
+  宣言の順序
+  関連するプロパティは下記の順序でグルーピングすること。
+
+  1. Positioning（位置関係）
+  2. Box model（ボックスモデル）
+  3. Typographic（フォント関係）
+  4. Visual（見た目）
+
+  refs http://kia-king.com/code-guide/#css-syntax
+ */
+
+/*
+ * # Utility
+ ******************************************************************************/
+
+.control-panel__origin {
+  background-color: aliceblue;
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: 0;
+  width: 0;
+}
+
+.control-panel, .control-panel button, .control-panel input, .control-panel select, .control-panel textarea {
+  font-family: 'Hiragino Kaku Gothic ProN', 'ヒラギノ角ゴ ProN W3', Meiryo, メイリオ, Osaka, 'MS PGothic', arial, helvetica, sans-serif;
+  font-size: 14px;
+}
+
+.control-panel__mini-button {
+  width: 50px;
+}
