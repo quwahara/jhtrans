@@ -55,52 +55,49 @@
   <script src="mixer.js"></script>
   <script>
 
-    const dragContext = {
-      targetStyle: document.querySelector(".control-panel").style,
-      entering: false,
-      dragging: false,
-      beginClientX: 0,
-      beginClientY: 0,
-      beginLeft: 0,
-      beginTop: 0,
-    };
+    (function () {
 
-    const cpTitleBar = document.querySelector(".control-panel__title-bar");
+      // Ref: How TO - Create a Draggable HTML Element
+      // https://www.w3schools.com/howto/howto_js_draggable.asp
 
-    cpTitleBar.addEventListener("mouseenter", function (e) {
-      dragContext.entering = true;
-    });
+      const controlPanel = document.querySelector(".control-panel");
 
-    cpTitleBar.addEventListener("mouseleave", function (e) {
-      dragContext.entering = false;
-      dragContext.dragging = false;
-    });
+      let prevClientX = 0, prevClientY = 0;
 
-    cpTitleBar.addEventListener("mousedown", function (e) {
-      if (dragContext.entering) {
-        dragContext.beginClientX = e.clientX;
-        dragContext.beginClientY = e.clientY;
-        dragContext.beginLeft = parseInt(dragContext.targetStyle.left, 10);
-        dragContext.beginTop = parseInt(dragContext.targetStyle.top, 10);
-        dragContext.dragging = true;
+      // if present, the header is where you move the DIV from:
+      document.querySelector(".control-panel__title-bar").onmousedown = dragStart;
+
+      function dragStart(e) {
+        e = e || window.event;
+        e.preventDefault();
+        // get the mouse cursor position at startup:
+        prevClientX = e.clientX;
+        prevClientY = e.clientY;
+        document.onmouseup = dragEnd;
+        // call a function whenever the cursor moves:
+        document.onmousemove = dragging;
       }
-    });
 
-    cpTitleBar.addEventListener("mousemove", function (e) {
-      if (dragContext.dragging && dragContext.entering) {
-        dragContext.targetStyle.left = dragContext.beginLeft + (e.clientX - dragContext.beginClientX) + "px";
-        dragContext.targetStyle.top = dragContext.beginTop + (e.clientY - dragContext.beginClientY) + "px";
+      function dragging(e) {
+        e = e || window.event;
+        e.preventDefault();
+        // calculate the new cursor position:
+        const leftDelta = prevClientX - e.clientX;
+        const topDelta = prevClientY - e.clientY;
+        prevClientX = e.clientX;
+        prevClientY = e.clientY;
+        // set the element's new position:
+        controlPanel.style.top = (controlPanel.offsetTop - topDelta) + "px";
+        controlPanel.style.left = (controlPanel.offsetLeft - leftDelta) + "px";
       }
-    });
 
-    cpTitleBar.addEventListener("mouseup", function (e) {
-      dragContext.dragging = false;
-    });
+      function dragEnd() {
+        // stop moving when mouse button is released:
+        document.onmouseup = null;
+        document.onmousemove = null;
+      }
 
-
-
-
-
+    })();
 
   </script>
 </body>
