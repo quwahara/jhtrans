@@ -7,7 +7,7 @@
     jht.setGlobalReplacement("@class", "");
 
     const contents = jht.translate({
-        "#": "div", "class": "pnw14", "@": [
+        "#": "div", "class": "", "@": [
             {
                 "#": "row", "@":
                 {

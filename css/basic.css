@@ -203,7 +203,7 @@ tr:nth-child(even) {
 .row {
     display: block;
     width: 100%;
-    min-height: 1rem;
+    min-height: 1.0em;
     /* debug: show off borders */
     /* border: 1px solid #6ca; */
 }
@@ -227,7 +227,7 @@ tr:nth-child(even) {
     display: block;
     float: left;
     width: 100%;
-    min-height: 1rem;
+    min-height: 1.0em;
 }
 
 .w100pc {
@@ -344,33 +344,32 @@ tr:nth-child(even) {
 
 h1 {
     font-size: 2.6rem;
-    margin-top: 1.6rem;
-    margin-bottom: 0.5rem;
+    margin-top: 1.6em;
+    margin-bottom: 0.5em;
 }
 
 h2 {
     font-size: 1.8rem;
-    margin-top: 1.0rem;
-    margin-bottom: 0.5rem;
+    margin-top: 1.0em;
+    margin-bottom: 0.5em;
 }
 
 h3 {
     font-size: 1.2rem;
-    margin-top: 0.8rem;
-    margin-bottom: 0.5rem;
+    margin-top: 0.8em;
+    margin-bottom: 0.5em;
 }
 
 h4 {
     font-size: 1.1rem;
-    margin-top: 0.8rem;
-    margin-bottom: 0.5rem;
+    margin-top: 0.8em;
+    margin-bottom: 0.5em;
 }
 
 h5 {
     font-size: 1.0rem;
-    padding: 0.5rem;
-    border-radius: 5px;
-    background-color: #eee;
+    margin-top: 0.6em;
+    margin-bottom: 0.5em;
 }
 
 a {
