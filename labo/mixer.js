@@ -117,4 +117,40 @@
     document.querySelector("button[name='decBtn']").onclick = function () {
         data.style.fontSize = parseInt(data.style.fontSize, 10) - 1 + "px";
     }
+
+
+    const space = document.querySelector(".control-panel__space");
+
+
+    const rules = [];
+    for (let i = 0; i < document.styleSheets.length; ++i) {
+        const sheet = document.styleSheets[i];
+        console.log(sheet);
+
+        const hrefDiv = jht.fromHtml("<div></div>");
+        hrefDiv.textContent = sheet.href;
+        space.appendChild(hrefDiv);
+
+        for (let j = 0; j < sheet.cssRules.length; ++j) {
+            const rule = sheet.cssRules[j];
+            if (!rule.selectorText) { continue; }
+
+            const selectorTextDiv = jht.fromHtml("<div></div>");
+            selectorTextDiv.textContent = rule.selectorText;
+            space.appendChild(selectorTextDiv);
+        }
+
+
+        // if (hrefPred(sheet.href)) {
+        //     for (let j = 0; j < sheet.cssRules.length; ++j) {
+        //         const rule = sheet.cssRules[j];
+        //         if (!rule.selectorText) { continue; }
+        //         if (ruleSelectorPred(rule.selectorText)) {
+        //             rules.push(rule);
+        //         }
+        //     }
+        // }
+    }
+
+
 })();

@@ -85,6 +85,12 @@
     return (s || "").indexOf(templateMaker) === 0;
   }
 
+  function removeChildren(node) {
+    while (node.firstChild) {
+      node.removeChild(node.firstChild);
+    }
+  }
+
   function copyChildNodes(childNodes) {
     const copies = [];
     copies.length = childNodes.length;
@@ -104,82 +110,85 @@
       USE_PL_AS_RAW_STRING: true,
     };
 
+    this._oven = document.createElement("div");
+
     // Global replacement dictionary
     this.globalReplacements = {};
 
-    // object to be bound in method chaining
-    this._staging = null;
+    // TODO
+    // // object to be bound in method chaining
+    // this._staging = null;
   };
 
-  // A dictionary to keep unique for ObjectProp instances
-  Jhtrans._objectPropDic = {};
+  // // A dictionary to keep unique for ObjectProp instances
+  // Jhtrans._objectPropDic = {};
 
-  // A dictionary to keep unique for ArrayProp instances
-  Jhtrans._arrayPropDic = {};
+  // // A dictionary to keep unique for ArrayProp instances
+  // Jhtrans._arrayPropDic = {};
 
-  Jhtrans._loadObjectProp = function (jht, owner, nameInOwner, value) {
+  // Jhtrans._loadObjectProp = function (jht, owner, nameInOwner, value) {
 
-    if (!isObject(value)) {
-      throw Error("The argument type was not object.");
-    }
+  //   if (!isObject(value)) {
+  //     throw Error("The argument type was not object.");
+  //   }
 
-    let prop;
+  //   let prop;
 
-    if (!value._rid) {
-      let _rid = rid();
+  //   if (!value._rid) {
+  //     let _rid = rid();
 
-      while (Jhtrans._objectPropDic[_rid]) {
-        _rid = rid();
-      }
+  //     while (Jhtrans._objectPropDic[_rid]) {
+  //       _rid = rid();
+  //     }
 
-      Object.defineProperty(value, "_rid", {
-        enumerable: false,
-        writable: false,
-        value: _rid
-      });
+  //     Object.defineProperty(value, "_rid", {
+  //       enumerable: false,
+  //       writable: false,
+  //       value: _rid
+  //     });
 
-      prop = new ObjectProp(jht, owner, nameInOwner, value);
+  //     prop = new ObjectProp(jht, owner, nameInOwner, value);
 
-      Jhtrans._objectPropDic[_rid] = prop;
-    }
-    else {
-      prop = Jhtrans._objectPropDic[value._rid];
-    }
+  //     Jhtrans._objectPropDic[_rid] = prop;
+  //   }
+  //   else {
+  //     prop = Jhtrans._objectPropDic[value._rid];
+  //   }
 
-    return prop;
-  };
+  //   return prop;
+  // };
 
-  Jhtrans._loadArrayProp = function (jht, owner, nameInOwner, value) {
+  // Jhtrans._loadArrayProp = function (jht, owner, nameInOwner, value) {
 
-    if (!isArray(value)) {
-      throw Error("The argument type was not array.");
-    }
+  //   if (!isArray(value)) {
+  //     throw Error("The argument type was not array.");
+  //   }
 
-    let prop;
+  //   let prop;
 
-    if (!value._rid) {
-      let _rid = rid();
+  //   if (!value._rid) {
+  //     let _rid = rid();
 
-      while (Jhtrans._arrayPropDic[_rid]) {
-        _rid = rid();
-      }
+  //     while (Jhtrans._arrayPropDic[_rid]) {
+  //       _rid = rid();
+  //     }
 
-      Object.defineProperty(value, "_rid", {
-        enumerable: false,
-        writable: false,
-        value: _rid
-      });
+  //     Object.defineProperty(value, "_rid", {
+  //       enumerable: false,
+  //       writable: false,
+  //       value: _rid
+  //     });
 
-      prop = new ArrayProp(jht, owner, nameInOwner);
+  //     prop = new ArrayProp(jht, owner, nameInOwner);
 
-      Jhtrans._arrayPropDic[_rid] = prop;
-    }
-    else {
-      prop = Jhtrans._arrayPropDic[value._rid];
-    }
+  //     Jhtrans._arrayPropDic[_rid] = prop;
+  //   }
+  //   else {
+  //     prop = Jhtrans._arrayPropDic[value._rid];
+  //   }
 
-    return prop;
-  };
+  //   return prop;
+  // };
 
   Jhtrans.prototype.getTemplate = function (name) {
 
@@ -272,6 +281,23 @@
 
     return elm;
   };
+
+  Jhtrans.prototype.fromHtml = function (html) {
+    if (typeof html !== "string") {
+      throw Error("The html must be string");
+    }
+
+    this._oven.innerHTML = html;
+
+    const child = this._oven.firstElementChild;
+    if (child) {
+      const removedChild = this._oven.removeChild(child);
+      removeChildren(this._oven);
+      return removedChild;
+    } else {
+      return null;
+    }
+  }
 
   Jhtrans.prototype.endsWithPred = function (key) {
     return (function (key) {
