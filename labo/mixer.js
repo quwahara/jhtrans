@@ -129,6 +129,7 @@
 
         const hrefDiv = jht.fromHtml("<div></div>");
         hrefDiv.textContent = sheet.href;
+        hrefDiv.style.backgroundColor = "lightblue";
         space.appendChild(hrefDiv);
 
         for (let j = 0; j < sheet.cssRules.length; ++j) {
@@ -137,7 +138,32 @@
 
             const selectorTextDiv = jht.fromHtml("<div></div>");
             selectorTextDiv.textContent = rule.selectorText;
+            selectorTextDiv.style.backgroundColor = "lightgray";
             space.appendChild(selectorTextDiv);
+
+            const decls = parseCssText(rule);
+            for (let k = 0; k < decls.length; ++k) {
+                const decl = decls[k];
+                const decltDiv = jht.fromHtml("<div></div>");
+                const propSpan = jht.fromHtml("<span></span>");
+                propSpan.style.display = "inline-block";
+                propSpan.style.width = "50%";
+                propSpan.style.backgroundColor = "darkgray";
+                propSpan.textContent = decl.prop;
+                const valueSpan = jht.fromHtml("<span></span>");
+                valueSpan.style.display = "inline-block";
+                valueSpan.style.width = "50%";
+                valueSpan.style.backgroundColor = "white";
+                valueSpan.textContent = decl.value;
+                decltDiv.appendChild(propSpan);
+                decltDiv.appendChild(valueSpan);
+                space.appendChild(decltDiv);
+            }
+
+            console.log(rule.cssText);
+            console.log(decls);
+
+            // console.log(Object.keys(rule.style));
         }
 
 
@@ -150,6 +176,28 @@
         //         }
         //     }
         // }
+    }
+
+    function parseCssText(cssRule) {
+        const r = cssRule;
+
+        const text1 = r.cssText.substring(r.selectorText.length).trim();
+        const text2 = text1.substring(1, text1.length - 2);
+
+        const decls = [];
+        const lines = text2.split(";");
+        for (let i = 0; i < lines.length; ++i) {
+            const line = lines[i].trim();
+            if (!line) { continue; }
+            const splitLine = line.split(":");
+            if (splitLine.length != 2) { continue; }
+            if (!splitLine[0]) { continue; }
+            decls.push({
+                prop: splitLine[0],
+                value: splitLine[1].trim()
+            });
+        }
+        return decls;
     }
 
 
