@@ -160,8 +160,8 @@
                 space.appendChild(decltDiv);
             }
 
-            console.log(rule.cssText);
-            console.log(decls);
+            // console.log(rule.cssText);
+            // console.log(decls);
 
             // console.log(Object.keys(rule.style));
         }

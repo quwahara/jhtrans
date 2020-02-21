@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="icon" href="data:,">
+    <link rel="stylesheet" type="text/css" href="../css/basic.css">
+    <link rel="stylesheet" type="text/css" href="mixer.css">
+    <link rel="stylesheet" type="text/css" href="labo-debug.css">
+    <script src="../libs/jhtrans.js"></script>
+    <!-- <script src="../node_modules/distlink/libs/distlink.js"></script> -->
+    <script src="../../distlink/libs/distlink.js"></script>
+    <title>Labo - Mixer</title>
+</head>
+
+<body>
+    <div class="ground">
+        <div class="content-ground">Contents</div>
+        <div class="control-panel-ground"> </div>
+        <div class="ground-border">
+            
+        </div>
+
+    </div>
+
+
+    <script src="basicTemplates.js"></script>
+    <script>
+        console.log("xxx.html");
+
+        window.addEventListener("load", function (event) {
+
+            const contentGround = document.querySelector(".content-ground");
+            const groundBorder = document.querySelector(".ground-border");
+            const controlPanelGround = document.querySelector(".control-panel-ground");
+
+            groundBorder.style.left = contentGround.clientWidth + "px";
+
+            // refs: https://www.w3schools.com/howto/howto_js_draggable.asp
+            function dragBorderGround() {
+                let deltaX = 0, prevClientX = 0;
+                groundBorder.onmousedown = dragStart;
+
+                function dragStart(event) {
+                    event = event || window.event;
+                    event.preventDefault();
+                    prevClientX = event.clientX;
+                    document.onmouseup = dragEnd;
+                    document.onmousemove = dragging;
+                }
+
+                function dragging(event) {
+                    event = event || window.event;
+                    event.preventDefault();
+
+                    // 右に動くと正になる
+                    deltaX = event.clientX - prevClientX;
+                    prevClientX = event.clientX;
+
+                    groundBorder.style.left = (groundBorder.offsetLeft + deltaX) + "px";
+                    const widthInt = controlPanelGround.clientWidth - deltaX;
+                    contentGround.style.width = "calc(100vw - " + widthInt + "px)";
+                    controlPanelGround.style.width = widthInt + "px";
+                }
+
+                function dragEnd() {
+                    document.onmouseup = null;
+                    document.onmousemove = null;
+                }
+            }
+
+            dragBorderGround();
+
+        });
+
+
+    </script>
+</body>
+
+</html>
