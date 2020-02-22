@@ -16,14 +16,18 @@
 
 <body>
     <div class="ground">
-        <div class="content-ground">Contents</div>
-        <div class="control-panel-ground"> </div>
-        <div class="ground-border">
-
+        <div class="content-ground">
+            <!-- 仮想端末画面想定タグ -->
+            <div class="content-base">
+                Contents
+            </div>
         </div>
+        <!-- 左右領域幅変更ハンドル用タグ -->
+        <div class="ground-border"> </div>
+        <!-- コントロールパネルタグ -->
+        <div class="control-panel-ground"> </div>
 
     </div>
-
 
     <script src="basicTemplates.js"></script>
     <script>
@@ -31,13 +35,12 @@
 
         (function () {
 
-            const contentGround = document.querySelector(".content-ground");
-            const groundBorder = document.querySelector(".ground-border");
-            const controlPanelGround = document.querySelector(".control-panel-ground");
-
+            // 領域幅変更
             window.addEventListener("load", function (event) {
 
-                groundBorder.style.left = contentGround.clientWidth + "px";
+                const contentGround = document.querySelector(".content-ground");
+                const groundBorder = document.querySelector(".ground-border");
+                const controlPanelGround = document.querySelector(".control-panel-ground");
 
                 // refs: https://www.w3schools.com/howto/howto_js_draggable.asp
                 function dragBorderGround() {
@@ -60,9 +63,8 @@
                         deltaX = event.clientX - prevClientX;
                         prevClientX = event.clientX;
 
-                        groundBorder.style.left = (groundBorder.offsetLeft + deltaX) + "px";
                         const widthInt = controlPanelGround.clientWidth - deltaX;
-                        contentGround.style.width = "calc(100vw - " + widthInt + "px)";
+                        contentGround.style.width = "calc(100vw - " + groundBorder.clientWidth + "px - " + widthInt + "px)";
                         controlPanelGround.style.width = widthInt + "px";
                     }
 
@@ -76,12 +78,7 @@
 
             });
 
-            window.addEventListener("resize", function (event) {
-                groundBorder.style.left = contentGround.clientWidth + "px";
-            });
-
         })();
-
 
     </script>
 </body>
