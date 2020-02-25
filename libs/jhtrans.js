@@ -145,24 +145,27 @@
   };
 
   Jhtrans.prototype.putTemplate = function (name, declaration) {
+    this.templates[name] = this.translate(declaration);
+    return this;
+  };
+
+  Jhtrans.prototype.translate = function (declaration) {
 
     if (isArray(declaration)) {
-      var template = this.fromArray(declaration);
-      this.templates[name] = template;
-      return this;
+      return this.fromArray(declaration);
     }
     else if (isElementNode(declaration)) {
-      this.templates[name] = declaration;
-      return this;
+      return declaration;
     }
     else if (isObject(declaration)) {
-      this.templates[name] = this.fromObject(declaration);
-      return this;
+      return this.fromObject(declaration);
+    }
+    else if (isTagString(declaration)) {
+      return this.fromHtml(declaration);
     }
 
     throw Error("The declaration was unsupported type.");
-  };
-
+  }
 
   Jhtrans.prototype.fromArray = function (declaration) {
     if (!isArray(declaration)) {
@@ -316,24 +319,6 @@
   Jhtrans.prototype.setGlobalReplacement = function (key, value) {
     this.globalReplacements[key] = value;
     return this;
-  }
-
-  Jhtrans.prototype.translate = function (declaration) {
-
-    if (isArray(declaration)) {
-      return this.fromArray(declaration);
-    }
-    else if (isElementNode(declaration)) {
-      return declaration;
-    }
-    else if (isObject(declaration)) {
-      return this.fromObject(declaration);
-    }
-    else if (isTagString(declaration)) {
-      return this.fromHtml(declaration);
-    }
-
-    throw Error("The declaration was unsupported type.");
   }
 
   Jhtrans.prototype.fromObject = function (desc) {
