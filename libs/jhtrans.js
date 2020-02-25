@@ -154,14 +154,14 @@
     if (isArray(declaration)) {
       return this.fromArray(declaration);
     }
-    else if (isElementNode(declaration)) {
-      return declaration;
-    }
     else if (isObject(declaration)) {
       return this.fromObject(declaration);
     }
     else if (isTagString(declaration)) {
       return this.fromHtml(declaration);
+    }
+    else if (isElementNode(declaration)) {
+      return declaration;
     }
 
     throw Error("The declaration was unsupported type.");
@@ -219,106 +219,6 @@
     }
 
     return elm;
-  }
-
-  Jhtrans.prototype.fromHtml = function (html) {
-    if (typeof html !== "string") {
-      throw Error("The html must be string");
-    }
-
-    this._oven.innerHTML = html;
-
-    const child = this._oven.firstElementChild;
-    if (child) {
-      const removedChild = this._oven.removeChild(child);
-      removeChildren(this._oven);
-      return removedChild;
-    } else {
-      return null;
-    }
-  }
-
-  Jhtrans.prototype.endsWithPred = function (key) {
-    return (function (key) {
-      return function (target) {
-        if (!isString(target)) { return false; }
-        const index = target.indexOf(key);
-        return index >= 0 && index === (target.length - key.length);
-      };
-    })(key);
-  };
-
-  Jhtrans.prototype.csvContainsPred = function (key) {
-    return (function (key) {
-      return function (target) {
-        if (!isString(target)) { return false; }
-        return target.split(/\s*,\s*/g).indexOf(key) >= 0;
-      };
-    })(key);
-  };
-
-  function isPlaceholderTextNode(node) {
-    return isTextNode(node) && isPlaceholderKey(node.textContent);
-  }
-
-  function splitForPlaceholder(str) {
-    const rgx = /@[\w\-]*/g;
-    const dump = [];
-    let foundIndex = 0;
-    let results;
-    while ((results = rgx.exec(str)) !== null) {
-      if (results.index > foundIndex) {
-        dump.push(str.substring(foundIndex, results.index));
-      }
-      foundIndex = rgx.lastIndex;
-      dump.push(results[0]);
-    }
-    if (foundIndex < str.length) {
-      dump.push(str.substr(foundIndex, str.length));
-    }
-    return dump;
-  }
-
-  function collectPlaceholder(elementNode, outCollections) {
-
-    const copies = copyChildNodes(elementNode.childNodes);
-
-    for (let i = 0; i < copies.length; ++i) {
-      const copy = copies[i];
-      if (isTextNode(copy) && isString(copy.textContent)) {
-        let splits = splitForPlaceholder(copy.textContent);
-        outCollections.push({
-          owner: copy,
-          splits: splits
-        });
-      }
-
-    }
-
-    for (let i = 0; i < copies.length; ++i) {
-      if (isElementNode(copies[i])) {
-        collectPlaceholder(copies[i], outCollections);
-      }
-    }
-
-    const attrs = elementNode.attributes;
-    for (let i = 0; i < attrs.length; ++i) {
-      if (isString(attrs[i].value)) {
-        let splits = splitForPlaceholder(attrs[i].value);
-        outCollections.push({
-          owner: attrs[i],
-          splits: splits
-        });
-      }
-
-    }
-
-    return outCollections;
-  }
-
-  Jhtrans.prototype.setGlobalReplacement = function (key, value) {
-    this.globalReplacements[key] = value;
-    return this;
   }
 
   Jhtrans.prototype.fromObject = function (desc) {
@@ -556,6 +456,106 @@
     }
 
     return elementNode;
+  }
+
+  Jhtrans.prototype.fromHtml = function (html) {
+    if (typeof html !== "string") {
+      throw Error("The html must be string");
+    }
+
+    this._oven.innerHTML = html;
+
+    const child = this._oven.firstElementChild;
+    if (child) {
+      const removedChild = this._oven.removeChild(child);
+      removeChildren(this._oven);
+      return removedChild;
+    } else {
+      return null;
+    }
+  }
+
+  Jhtrans.prototype.endsWithPred = function (key) {
+    return (function (key) {
+      return function (target) {
+        if (!isString(target)) { return false; }
+        const index = target.indexOf(key);
+        return index >= 0 && index === (target.length - key.length);
+      };
+    })(key);
+  };
+
+  Jhtrans.prototype.csvContainsPred = function (key) {
+    return (function (key) {
+      return function (target) {
+        if (!isString(target)) { return false; }
+        return target.split(/\s*,\s*/g).indexOf(key) >= 0;
+      };
+    })(key);
+  };
+
+  function isPlaceholderTextNode(node) {
+    return isTextNode(node) && isPlaceholderKey(node.textContent);
+  }
+
+  function splitForPlaceholder(str) {
+    const rgx = /@[\w\-]*/g;
+    const dump = [];
+    let foundIndex = 0;
+    let results;
+    while ((results = rgx.exec(str)) !== null) {
+      if (results.index > foundIndex) {
+        dump.push(str.substring(foundIndex, results.index));
+      }
+      foundIndex = rgx.lastIndex;
+      dump.push(results[0]);
+    }
+    if (foundIndex < str.length) {
+      dump.push(str.substr(foundIndex, str.length));
+    }
+    return dump;
+  }
+
+  function collectPlaceholder(elementNode, outCollections) {
+
+    const copies = copyChildNodes(elementNode.childNodes);
+
+    for (let i = 0; i < copies.length; ++i) {
+      const copy = copies[i];
+      if (isTextNode(copy) && isString(copy.textContent)) {
+        let splits = splitForPlaceholder(copy.textContent);
+        outCollections.push({
+          owner: copy,
+          splits: splits
+        });
+      }
+
+    }
+
+    for (let i = 0; i < copies.length; ++i) {
+      if (isElementNode(copies[i])) {
+        collectPlaceholder(copies[i], outCollections);
+      }
+    }
+
+    const attrs = elementNode.attributes;
+    for (let i = 0; i < attrs.length; ++i) {
+      if (isString(attrs[i].value)) {
+        let splits = splitForPlaceholder(attrs[i].value);
+        outCollections.push({
+          owner: attrs[i],
+          splits: splits
+        });
+      }
+
+    }
+
+    return outCollections;
+  }
+
+  Jhtrans.prototype.setGlobalReplacement = function (key, value) {
+    this.globalReplacements[key] = value;
+    return this;
   }
 
   Jhtrans.prototype.processReplacement = function (textNode, replacement) {
