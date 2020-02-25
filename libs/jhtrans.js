@@ -66,6 +66,18 @@
     return !isNullOrUndefined(v) && (v.tagName === "INPUT" || v.tagName === "TEXTAREA" || v.tagName === "HR");
   }
 
+  function isTagString(v) {
+    return /^\s*<.+>\s*$/g.test(v);
+  }
+
+  function startsWith(v, key) {
+    return isString(v) && v.indexOf(key) === 0;
+  }
+
+  function endsWith(v, key) {
+    return isString(v) && v.indexOf(key) === (v.length - key.length);
+  }
+
   var RID_MIN = 100000000000000;
   var RID_MAX = RID_MIN * 10 - 1;
 
@@ -144,7 +156,7 @@
       return this;
     }
     else if (isObject(declaration)) {
-      this.templates[name] = this.translate(declaration);
+      this.templates[name] = this.fromObject(declaration);
       return this;
     }
 
@@ -185,8 +197,6 @@
       }
     }
 
-    // declaration[1] must be object which represents attributes,
-    // or null if it is not attributes
     if (declaration.length >= 3) {
       var third = declaration[2];
       if (isString(third)) {
@@ -309,6 +319,10 @@
   }
 
   Jhtrans.prototype.translate = function (desc) {
+    return this.fromObject(desc);
+  }
+
+  Jhtrans.prototype.fromObject = function (desc) {
 
     if (!desc.hasOwnProperty("#")) {
       throw Error("'#' was not found for the desc object.");
@@ -557,7 +571,7 @@
         throw Error("'#' was not found for the replacement object.");
       }
 
-      const translated = this.translate(replacement);
+      const translated = this.fromObject(replacement);
 
       textNode.parentNode.replaceChild(translated, textNode);
 
