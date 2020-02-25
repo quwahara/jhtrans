@@ -103,15 +103,6 @@
     }
   }
 
-  function copyChildNodes(childNodes) {
-    const copies = [];
-    copies.length = childNodes.length;
-    for (let i = 0; i < childNodes.length; ++i) {
-      copies[i] = childNodes[i];
-    }
-    return copies;
-  }
-
   const Jhtrans = function Jhtrans() {
     // Dictionary for templates
     this.templates = {};
@@ -499,7 +490,7 @@
 
   function collectPlaceholder(elementNode, outCollections) {
 
-    const copies = copyChildNodes(elementNode.childNodes);
+    const copies = copyNodeList(elementNode.childNodes);
 
     for (let i = 0; i < copies.length; ++i) {
       const copy = copies[i];
@@ -532,6 +523,21 @@
     }
 
     return outCollections;
+  }
+
+  /**
+   * Create shallow copy of NodeList to array.
+   * To keep away from changing the NodeList.
+   * 
+   * @param {NodeList} nodeList 
+   */
+  function copyNodeList(nodeList) {
+    const copies = [];
+    copies.length = nodeList.length;
+    for (let i = 0; i < nodeList.length; ++i) {
+      copies[i] = nodeList[i];
+    }
+    return copies;
   }
 
   Jhtrans.prototype.setGlobalReplacement = function (key, value) {
