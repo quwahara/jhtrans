@@ -99,14 +99,14 @@
             selectedElement.appendChild(tr);
         })
         .style
-        .fontSize.selectRule(jht.endsWithPred("/basic.css"), jht.csvContainsPred("html")).toStyleOf("fontSize")
+        .fontSize.selectRule(distlink.endsWithPred("/basic.css"), distlink.csvContainsPred("html")).toStyleOf("fontSize")
         // .fontSize.select("input[name='fontSizeTxt']").withValue()
         .fontSize.select("input[name='fontSizeTxt']").withValue()
         ;
 
     // distlink(data)
     //     .style
-    //     .fontSize.selectRule(jht.endsWithPred("/basic.css"), jht.csvContainsPred("html")).toStyleOf("fontSize")
+    //     .fontSize.selectRule(distlink.endsWithPred("/basic.css"), distlink.csvContainsPred("html")).toStyleOf("fontSize")
     //     .fontSize.select("input[name='fontSizeTxt']").withValue()
     //     ;
 

@@ -475,25 +475,6 @@
     }
   }
 
-  Jhtrans.prototype.endsWithPred = function (key) {
-    return (function (key) {
-      return function (target) {
-        if (!isString(target)) { return false; }
-        const index = target.indexOf(key);
-        return index >= 0 && index === (target.length - key.length);
-      };
-    })(key);
-  };
-
-  Jhtrans.prototype.csvContainsPred = function (key) {
-    return (function (key) {
-      return function (target) {
-        if (!isString(target)) { return false; }
-        return target.split(/\s*,\s*/g).indexOf(key) >= 0;
-      };
-    })(key);
-  };
-
   function isPlaceholderTextNode(node) {
     return isTextNode(node) && isPlaceholderKey(node.textContent);
   }
