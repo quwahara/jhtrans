@@ -318,8 +318,22 @@
     return this;
   }
 
-  Jhtrans.prototype.translate = function (desc) {
-    return this.fromObject(desc);
+  Jhtrans.prototype.translate = function (declaration) {
+
+    if (isArray(declaration)) {
+      return this.fromArray(declaration);
+    }
+    else if (isElementNode(declaration)) {
+      return declaration;
+    }
+    else if (isObject(declaration)) {
+      return this.fromObject(declaration);
+    }
+    else if (isTagString(declaration)) {
+      return this.fromHtml(declaration);
+    }
+
+    throw Error("The declaration was unsupported type.");
   }
 
   Jhtrans.prototype.fromObject = function (desc) {
