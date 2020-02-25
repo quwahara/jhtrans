@@ -470,24 +470,37 @@
     return isTextNode(node) && isPlaceholderKey(node.textContent);
   }
 
-  function splitForPlaceholder(str) {
-    const rgx = /@[\w\-]*/g;
-    const dump = [];
-    let foundIndex = 0;
-    let results;
-    while ((results = rgx.exec(str)) !== null) {
-      if (results.index > foundIndex) {
-        dump.push(str.substring(foundIndex, results.index));
-      }
-      foundIndex = rgx.lastIndex;
-      dump.push(results[0]);
-    }
-    if (foundIndex < str.length) {
-      dump.push(str.substr(foundIndex, str.length));
-    }
-    return dump;
-  }
-
+  /**
+   * Collect placeholders under the element.
+   * 
+   * Below string items are collected as a placeholder.
+   * - textNode.textContent
+   * - Attribute value
+   * 
+   * Those string items are split by below regex:
+   * `@[\w\-]*`
+   * 
+   * Found placeholders are collected into the array: outCollections
+   * 
+   * The structure is n case of textNode:
+   * ```
+   *  {
+   *      owner: textNode,
+   *      splits: [string]    // -- splits of string items 
+   *  }
+   * ```
+   * 
+   * The structure is in case of attribute:
+   * ```
+   *  {
+   *      owner: attribute,
+   *      splits: [string]    // -- splits of string items 
+   *  }
+   * ```
+   * 
+   * @param {Element} elementNode a target element to be searched
+   * @param {array} outCollections holder for search results
+   */
   function collectPlaceholder(elementNode, outCollections) {
 
     const copies = copyNodeList(elementNode.childNodes);
@@ -538,6 +551,24 @@
       copies[i] = nodeList[i];
     }
     return copies;
+  }
+
+  function splitForPlaceholder(str) {
+    const rgx = /@[\w\-]*/g;
+    const dump = [];
+    let foundIndex = 0;
+    let results;
+    while ((results = rgx.exec(str)) !== null) {
+      if (results.index > foundIndex) {
+        dump.push(str.substring(foundIndex, results.index));
+      }
+      foundIndex = rgx.lastIndex;
+      dump.push(results[0]);
+    }
+    if (foundIndex < str.length) {
+      dump.push(str.substr(foundIndex, str.length));
+    }
+    return dump;
   }
 
   Jhtrans.prototype.setGlobalReplacement = function (key, value) {
