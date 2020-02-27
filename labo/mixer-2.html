@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="icon" href="data:,">
+    <link rel="stylesheet" type="text/css" href="../css/basic.css">
+    <link rel="stylesheet" type="text/css" href="mixer.css">
+    <link rel="stylesheet" type="text/css" href="labo-debug.css">
+    <script src="../libs/jhtrans.js"></script>
+    <!-- <script src="../node_modules/distlink/libs/distlink.js"></script> -->
+    <script src="../../distlink/libs/distlink.js"></script>
+    <title>Labo - Mixer</title>
+</head>
+
+<body>
+
+
+    <script src="basicTemplates.js"></script>
+    <script>
+        (function () {
+            "use strict";
+
+            const jht = new Jhtrans();
+
+            function prepareBorder() {
+                const contentGround = document.querySelector(".content-ground");
+                const groundBorder = document.querySelector(".ground-border");
+                const controlPanelGround = document.querySelector(".control-panel-ground");
+
+                // refs: https://www.w3schools.com/howto/howto_js_draggable.asp
+                function dragBorderGround() {
+                    let deltaX = 0, prevClientX = 0;
+                    groundBorder.onmousedown = dragStart;
+
+                    function dragStart(event) {
+                        event = event || window.event;
+                        event.preventDefault();
+                        prevClientX = event.clientX;
+                        document.onmouseup = dragEnd;
+                        document.onmousemove = dragging;
+                    }
+
+                    function dragging(event) {
+                        event = event || window.event;
+                        event.preventDefault();
+
+                        // 右に動くと正になる
+                        deltaX = event.clientX - prevClientX;
+                        prevClientX = event.clientX;
+
+                        const widthInt = Math.floor(controlPanelGround.offsetWidth - deltaX);
+                        contentGround.style.width = "calc(100vw - " + groundBorder.offsetWidth + "px - " + widthInt + "px)";
+                        controlPanelGround.style.width = widthInt + "px";
+                    }
+
+                    function dragEnd() {
+                        document.onmouseup = null;
+                        document.onmousemove = null;
+                    }
+                }
+                dragBorderGround();
+            }
+
+            function prepareControlPanel() {
+                const space = document.querySelector(".control-panel__space");
+                const rules = [];
+                for (let i = 0; i < document.styleSheets.length; ++i) {
+                    const sheet = document.styleSheets[i];
+                    console.log(sheet);
+
+                    const hrefDiv = jht.fromHtml("<div></div>");
+                    hrefDiv.textContent = sheet.href;
+                    hrefDiv.style.backgroundColor = "lightblue";
+                    space.appendChild(hrefDiv);
+
+                    for (let j = 0; j < sheet.cssRules.length; ++j) {
+                        const rule = sheet.cssRules[j];
+                        if (!rule.selectorText) { continue; }
+
+                        const selectorTextDiv = jht.fromHtml("<div class='row'></div>");
+                        // const selectorTextDiv = jht.fromHtml("<div></div>");
+                        selectorTextDiv.textContent = rule.selectorText;
+                        selectorTextDiv.style.backgroundColor = "lightgray";
+                        selectorTextDiv.style.overflowX = "hidden";
+                        space.appendChild(selectorTextDiv);
+
+                        const decls = parseCssText(rule);
+                        for (let k = 0; k < decls.length; ++k) {
+                            const decl = decls[k];
+                            const decltDiv = jht.fromHtml("<div></div>");
+                            const propSpan = jht.fromHtml("<div class='col-6'></div>");
+                            // const propSpan = jht.fromHtml("<span></span>");
+                            propSpan.style.display = "inline-block";
+                            propSpan.style.width = "50%";
+                            propSpan.style.backgroundColor = "darkgray";
+                            propSpan.style.overflowX = "hidden";
+                            propSpan.textContent = decl.prop;
+                            const valueSpan = jht.fromHtml("<div class='col-6'></div>");
+                            // const valueSpan = jht.fromHtml("<span></span>");
+                            valueSpan.style.display = "inline-block";
+                            valueSpan.style.width = "50%";
+                            valueSpan.style.backgroundColor = "white";
+                            valueSpan.style.overflowX = "hidden";
+                            valueSpan.textContent = decl.value;
+                            decltDiv.appendChild(propSpan);
+                            decltDiv.appendChild(valueSpan);
+                            space.appendChild(decltDiv);
+                        }
+
+                        // console.log(rule.cssText);
+                        // console.log(decls);
+
+                        // console.log(Object.keys(rule.style));
+                    }
+                }
+            }
+
+            function parseCssText(cssRule) {
+                const r = cssRule;
+
+                const text1 = r.cssText.substring(r.selectorText.length).trim();
+                const text2 = text1.substring(1, text1.length - 2);
+
+                const decls = [];
+                const lines = text2.split(";");
+                for (let i = 0; i < lines.length; ++i) {
+                    const line = lines[i].trim();
+                    if (!line) { continue; }
+                    const splitLine = line.split(":");
+                    if (splitLine.length != 2) { continue; }
+                    if (!splitLine[0]) { continue; }
+                    decls.push({
+                        prop: splitLine[0],
+                        value: splitLine[1].trim()
+                    });
+                }
+                return decls;
+            }
+
+
+            window.addEventListener("load", function (event) {
+                console.log("mixer-2.html");
+                const ground = jht.translate(
+                    '<div class="ground">' +
+                    '    <div class="content-ground">' +
+                    '        <!-- 仮想端末画面想定タグ -->' +
+                    '        <div class="content-base">' +
+                    '        </div>' +
+                    '    </div>' +
+                    '    <!-- 左右領域幅変更ハンドル用タグ -->' +
+                    '    <div class="ground-border"> </div>' +
+                    '    <!-- コントロールパネルタグ -->' +
+                    '    <div class="control-panel-ground"> </div>' +
+                    '</div>' +
+                    '');
+
+                document.body.appendChild(ground);
+
+                prepareBorder();
+
+                const contents = jht.translate(
+                    '<div class="contents">' +
+                    '    <div class="prime pnw14">' +
+                    '    <div class="row">' +
+                    '        <h1>H1, Header example, 0123456789</h1>' +
+                    '        <h2>H2, Header example, 0123456789</h2>' +
+                    '        <h3>H3, Header example, 0123456789</h3>' +
+                    '        <h4>H4, Header example, 0123456789</h4>' +
+                    '        <h5>H5, Header example, 0123456789</h5>' +
+                    '    </div>' +
+                    '    <div class="row">' +
+                    '        <div>DIV, Div example, 1</div>' +
+                    '        <div>DIV, Div example, 2</div>' +
+                    '        <div>DIV, Div example, 3</div>' +
+                    '        <div>' +
+                    '        <p>P, P example, 1</p>' +
+                    '        <p>P, P example, 2</p>' +
+                    '        <p>P, P example, 3</p>' +
+                    '        </div>' +
+                    '    </div>' +
+                    '    </div>' +
+                    '</div>' +
+                    '');
+
+                ground.querySelector(".content-base").appendChild(contents);
+
+                const controlPpanel = jht.translate(
+                    // '<div class="control-panel__origin">' +
+                    '    <div class="control-panel" style="' +
+                    // 'background-color: blueviolet;' +
+                    // 'position: relative;' +
+                    // 'top: 100px;' +
+                    // 'left: 200px;' +
+                    // 'width: 400px;' +
+                    // 'height: 300px;' +
+                    '">' +
+                    '    <div class="row">' +
+                    '        <div class="control-panel__title-bar col-12">title bar</div>' +
+                    '    </div>' +
+                    '' +
+                    // '    <div style="height: calc(100% - 21.6px); overflow-y: scroll;">' +
+                    '    <div>' +
+                    '        <div class="row">' +
+                    '        <div class="col-4">' +
+                    '            font-size' +
+                    '        </div>' +
+                    '        <div class="col-8">' +
+                    '            <input style="width: calc(100% - 120px);" name="fontSizeTxt" type="text">' +
+                    '            <button class="control-panel__mini-button" name="decBtn" type="button" value="Dec">Dec</button>' +
+                    '            <button class="control-panel__mini-button" name="incBtn" type="button" value="Inc">Inc</button>' +
+                    '        </div>' +
+                    '        </div>' +
+                    '' +
+                    '        <div class="row control-panel__space">' +
+                    '        </div>' +
+                    '' +
+                    '    </div>' +
+                    '' +
+                    '    </div>' +
+                    // '</div>' +
+                    '');
+
+                ground.querySelector(".control-panel-ground").appendChild(controlPpanel);
+
+                prepareControlPanel();
+            });
+        })();
+
+    </script>
+</body>
+
+</html>
