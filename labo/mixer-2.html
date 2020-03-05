@@ -9,14 +9,12 @@
     <link rel="stylesheet" type="text/css" href="mixer.css">
     <link rel="stylesheet" type="text/css" href="labo-debug.css">
     <script src="../libs/jhtrans.js"></script>
-    <!-- <script src="../node_modules/distlink/libs/distlink.js"></script> -->
+    <script src="../node_modules/distlink/libs/distlink.js"></script>
     <script src="../../distlink/libs/distlink.js"></script>
     <title>Labo - Mixer</title>
 </head>
 
 <body>
-
-
     <script src="basicTemplates.js"></script>
     <script>
         (function () {
@@ -64,57 +62,141 @@
             }
 
             function prepareControlPanel() {
-                const space = document.querySelector(".control-panel__space");
-                const rules = [];
+
+                const sheetsModel = {
+                    sheets: []
+                };
+
                 for (let i = 0; i < document.styleSheets.length; ++i) {
                     const sheet = document.styleSheets[i];
-                    console.log(sheet);
 
-                    const hrefDiv = jht.fromHtml("<div></div>");
-                    hrefDiv.textContent = sheet.href;
-                    hrefDiv.style.backgroundColor = "lightblue";
-                    space.appendChild(hrefDiv);
+                    const sheetModel = {};
+                    sheetModel.href = sheet.href;
+                    sheetModel.rules = [];
 
                     for (let j = 0; j < sheet.cssRules.length; ++j) {
                         const rule = sheet.cssRules[j];
                         if (!rule.selectorText) { continue; }
 
-                        const selectorTextDiv = jht.fromHtml("<div class='row'></div>");
-                        // const selectorTextDiv = jht.fromHtml("<div></div>");
-                        selectorTextDiv.textContent = rule.selectorText;
-                        selectorTextDiv.style.backgroundColor = "lightgray";
-                        selectorTextDiv.style.overflowX = "hidden";
-                        space.appendChild(selectorTextDiv);
-
-                        const decls = parseCssText(rule);
-                        for (let k = 0; k < decls.length; ++k) {
-                            const decl = decls[k];
-                            const decltDiv = jht.fromHtml("<div></div>");
-                            const propSpan = jht.fromHtml("<div class='col-6'></div>");
-                            // const propSpan = jht.fromHtml("<span></span>");
-                            propSpan.style.display = "inline-block";
-                            propSpan.style.width = "50%";
-                            propSpan.style.backgroundColor = "darkgray";
-                            propSpan.style.overflowX = "hidden";
-                            propSpan.textContent = decl.prop;
-                            const valueSpan = jht.fromHtml("<div class='col-6'></div>");
-                            // const valueSpan = jht.fromHtml("<span></span>");
-                            valueSpan.style.display = "inline-block";
-                            valueSpan.style.width = "50%";
-                            valueSpan.style.backgroundColor = "white";
-                            valueSpan.style.overflowX = "hidden";
-                            valueSpan.textContent = decl.value;
-                            decltDiv.appendChild(propSpan);
-                            decltDiv.appendChild(valueSpan);
-                            space.appendChild(decltDiv);
-                        }
-
-                        // console.log(rule.cssText);
-                        // console.log(decls);
-
-                        // console.log(Object.keys(rule.style));
+                        const ruleModel = {};
+                        ruleModel.selectorText = rule.selectorText;
+                        ruleModel.decls = parseCssText(rule);
+                        sheetModel.rules.push(ruleModel);
                     }
+
+                    sheetsModel.sheets.push(sheetModel);
                 }
+
+                console.log(["sheetsMode", sheetsModel]);
+
+                distlink(sheetsModel)
+                    .sheets.select(".control-panel__space")
+                    .each(function (item, childElement, index, selectedElement) {
+                        // console.log(arguments);
+
+                        const hrefElm = jht.translate("<div class='row control-panel__href'></div>");
+                        childElement.appendChild(hrefElm);
+                        hrefElm.style.backgroundColor = "lightblue";
+
+                        item.href.select(hrefElm).toText();
+
+                        const rulesElm = jht.translate(
+                            "<div class='control-panel__rules'>" +
+                            "   <div class='control-panel__rule'></div>" +
+                            "</div>"
+                        );
+                        childElement.appendChild(rulesElm);
+
+                        item.rules.select(rulesElm)
+                            .each(function (item, childElement, index, selectedElement) {
+                                // console.log(arguments);
+
+                                const selectorTextElm = jht.translate("<div class='row control-panel__selector-text'></div>");
+                                childElement.appendChild(selectorTextElm);
+                                selectorTextElm.style.backgroundColor = "lightgray";
+
+                                item.selectorText.select(selectorTextElm).toText();
+
+                                const rulesElm = jht.translate(
+                                    "<div class='control-panel__decls'>" +
+                                    "   <div class='control-panel__decl'></div>" +
+                                    "</div>"
+                                );
+                                childElement.appendChild(rulesElm);
+
+                                item.decls.select(rulesElm)
+                                    .each(function (item, childElement, index, selectedElement) {
+                                        // console.log(arguments);
+
+                                        const propElm = jht.translate("<div class='col-6 control-panel__decl-prop'></div>");
+                                        item.prop.select(propElm).toText();
+
+                                        const valueElm = jht.translate("<div class='col-6 control-panel__decl-value'></div>");
+                                        item.value.select(valueElm).toText();
+
+                                        const declElm = jht.translate("<div class='row'></div>");
+                                        declElm.appendChild(propElm);
+                                        declElm.appendChild(valueElm);
+                                        childElement.appendChild(declElm);
+
+                                    }); // End of decls
+
+                            }); // End of rules
+
+                    }); // End of sheets
+
+                // const space = document.querySelector(".control-panel__space");
+                // const rules = [];
+                // for (let i = 0; i < document.styleSheets.length; ++i) {
+
+                //     const sheet = document.styleSheets[i];
+                //     console.log(sheet);
+
+                //     const hrefDiv = jht.fromHtml("<div></div>");
+                //     hrefDiv.textContent = sheet.href;
+                //     hrefDiv.style.backgroundColor = "lightblue";
+                //     space.appendChild(hrefDiv);
+
+                //     for (let j = 0; j < sheet.cssRules.length; ++j) {
+                //         const rule = sheet.cssRules[j];
+                //         if (!rule.selectorText) { continue; }
+
+                //         const selectorTextDiv = jht.fromHtml("<div class='row'></div>");
+                //         // const selectorTextDiv = jht.fromHtml("<div></div>");
+                //         selectorTextDiv.textContent = rule.selectorText;
+                //         selectorTextDiv.style.backgroundColor = "lightgray";
+                //         selectorTextDiv.style.overflowX = "hidden";
+                //         space.appendChild(selectorTextDiv);
+
+                //         const decls = parseCssText(rule);
+                //         for (let k = 0; k < decls.length; ++k) {
+                //             const decl = decls[k];
+                //             const decltDiv = jht.fromHtml("<div></div>");
+                //             const propSpan = jht.fromHtml("<div class='col-6'></div>");
+                //             // const propSpan = jht.fromHtml("<span></span>");
+                //             propSpan.style.display = "inline-block";
+                //             propSpan.style.width = "50%";
+                //             propSpan.style.backgroundColor = "darkgray";
+                //             propSpan.style.overflowX = "hidden";
+                //             propSpan.textContent = decl.prop;
+                //             const valueSpan = jht.fromHtml("<div class='col-6'></div>");
+                //             // const valueSpan = jht.fromHtml("<span></span>");
+                //             valueSpan.style.display = "inline-block";
+                //             valueSpan.style.width = "50%";
+                //             valueSpan.style.backgroundColor = "white";
+                //             valueSpan.style.overflowX = "hidden";
+                //             valueSpan.textContent = decl.value;
+                //             decltDiv.appendChild(propSpan);
+                //             decltDiv.appendChild(valueSpan);
+                //             space.appendChild(decltDiv);
+                //         }
+
+                //         // console.log(rule.cssText);
+                //         // console.log(decls);
+
+                //         // console.log(Object.keys(rule.style));
+                //     }
+                // }
             }
 
             function parseCssText(cssRule) {
@@ -214,6 +296,7 @@
                     '        </div>' +
                     '' +
                     '        <div class="row control-panel__space">' +
+                    '           <div class="control-panel__sheet"></div>' +
                     '        </div>' +
                     '' +
                     '    </div>' +

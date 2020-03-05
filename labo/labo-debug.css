@@ -57,6 +57,19 @@ div {
     overflow-y: auto;
 }
 
+.control-panel__href, .control-panel__selector-text, .control-panel__decl-prop, .control-panel__decl-value {
+    overflow-x: hidden;
+    /* overflow-x: auto; */
+}
+
+.control-panel__decl-prop {
+    background-color: darkgray;
+}
+
+.control-panel__decl-value {
+    background-color: white;
+}
+
 /* 
 .control-panel-origin {
     position: fixed;
