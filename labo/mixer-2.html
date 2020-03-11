@@ -76,9 +76,10 @@
 
                     for (let j = 0; j < sheet.cssRules.length; ++j) {
                         const rule = sheet.cssRules[j];
-                        if (!rule.selectorText) { continue; }
+                        if (rule.constructor !== CSSStyleRule) { continue; }
 
                         const ruleModel = {};
+                        ruleModel.index = j;
                         ruleModel.selectorText = rule.selectorText;
                         ruleModel.decls = parseCssText(rule);
                         sheetModel.rules.push(ruleModel);
@@ -91,8 +92,7 @@
 
                 distlink(sheetsModel)
                     .sheets.select(".control-panel__space")
-                    .each(function (item, childElement, index, selectedElement) {
-                        // console.log(arguments);
+                    .each(function (item, childElement, iSheet, selectedElement) {
 
                         const hrefElm = jht.translate("<div class='row control-panel__href'></div>");
                         childElement.appendChild(hrefElm);
@@ -109,7 +109,6 @@
 
                         item.rules.select(rulesElm)
                             .each(function (item, childElement, index, selectedElement) {
-                                // console.log(arguments);
 
                                 const selectorTextElm = jht.translate("<div class='row control-panel__selector-text'></div>");
                                 childElement.appendChild(selectorTextElm);
@@ -124,15 +123,17 @@
                                 );
                                 childElement.appendChild(rulesElm);
 
+                                const iRule = item.index._value;
+
                                 item.decls.select(rulesElm)
-                                    .each(function (item, childElement, index, selectedElement) {
-                                        // console.log(arguments);
+                                    .each(function (item, childElement, iDecl, selectedElement) {
 
                                         const propElm = jht.translate("<div class='col-6 control-panel__decl-prop'></div>");
                                         item.prop.select(propElm).toText();
 
-                                        const valueElm = jht.translate("<div class='col-6 control-panel__decl-value'></div>");
-                                        item.value.select(valueElm).toText();
+                                        const valueElm = jht.translate("<div class='col-6 control-panel__decl-value'><input type='text'></div>");
+                                        item.value.select(valueElm.firstElementChild).withValue();
+                                        item.value.selectRule(document.styleSheets[iSheet].cssRules[iRule]).toStyleOf(item.prop._value);
 
                                         const declElm = jht.translate("<div class='row'></div>");
                                         declElm.appendChild(propElm);
@@ -144,59 +145,6 @@
                             }); // End of rules
 
                     }); // End of sheets
-
-                // const space = document.querySelector(".control-panel__space");
-                // const rules = [];
-                // for (let i = 0; i < document.styleSheets.length; ++i) {
-
-                //     const sheet = document.styleSheets[i];
-                //     console.log(sheet);
-
-                //     const hrefDiv = jht.fromHtml("<div></div>");
-                //     hrefDiv.textContent = sheet.href;
-                //     hrefDiv.style.backgroundColor = "lightblue";
-                //     space.appendChild(hrefDiv);
-
-                //     for (let j = 0; j < sheet.cssRules.length; ++j) {
-                //         const rule = sheet.cssRules[j];
-                //         if (!rule.selectorText) { continue; }
-
-                //         const selectorTextDiv = jht.fromHtml("<div class='row'></div>");
-                //         // const selectorTextDiv = jht.fromHtml("<div></div>");
-                //         selectorTextDiv.textContent = rule.selectorText;
-                //         selectorTextDiv.style.backgroundColor = "lightgray";
-                //         selectorTextDiv.style.overflowX = "hidden";
-                //         space.appendChild(selectorTextDiv);
-
-                //         const decls = parseCssText(rule);
-                //         for (let k = 0; k < decls.length; ++k) {
-                //             const decl = decls[k];
-                //             const decltDiv = jht.fromHtml("<div></div>");
-                //             const propSpan = jht.fromHtml("<div class='col-6'></div>");
-                //             // const propSpan = jht.fromHtml("<span></span>");
-                //             propSpan.style.display = "inline-block";
-                //             propSpan.style.width = "50%";
-                //             propSpan.style.backgroundColor = "darkgray";
-                //             propSpan.style.overflowX = "hidden";
-                //             propSpan.textContent = decl.prop;
-                //             const valueSpan = jht.fromHtml("<div class='col-6'></div>");
-                //             // const valueSpan = jht.fromHtml("<span></span>");
-                //             valueSpan.style.display = "inline-block";
-                //             valueSpan.style.width = "50%";
-                //             valueSpan.style.backgroundColor = "white";
-                //             valueSpan.style.overflowX = "hidden";
-                //             valueSpan.textContent = decl.value;
-                //             decltDiv.appendChild(propSpan);
-                //             decltDiv.appendChild(valueSpan);
-                //             space.appendChild(decltDiv);
-                //         }
-
-                //         // console.log(rule.cssText);
-                //         // console.log(decls);
-
-                //         // console.log(Object.keys(rule.style));
-                //     }
-                // }
             }
 
             function parseCssText(cssRule) {

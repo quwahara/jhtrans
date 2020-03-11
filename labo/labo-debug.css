@@ -63,11 +63,18 @@ div {
 }
 
 .control-panel__decl-prop {
+    height: 100%;
     background-color: darkgray;
 }
 
 .control-panel__decl-value {
     background-color: white;
+    padding: 0;
+}
+
+.control-panel__decl-value>input[type="text"] {
+    height: 18px;
+    padding: 2px;
 }
 
 /* 
