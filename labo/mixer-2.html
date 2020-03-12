@@ -74,7 +74,7 @@
 
                     for (let j = 0; j < sheet.cssRules.length; ++j) {
                         const rule = sheet.cssRules[j];
-                        if (rule.constructor !== CSSStyleRule) { continue; }
+                        if (rule.type !== CSSRule.STYLE_RULE) { continue; }
 
                         const ruleModel = {};
                         ruleModel.index = j;
