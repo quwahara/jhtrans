@@ -123,7 +123,7 @@
                                 );
                                 childElement.appendChild(rulesElm);
 
-                                const iRule = item.index._value;
+                                const iRule = item.index.value;
 
                                 item.decls.select(rulesElm)
                                     .each(function (item, childElement, iDecl, selectedElement) {
@@ -133,7 +133,7 @@
 
                                         const valueElm = jht.translate("<div class='col-6 control-panel__decl-value'><input type='text'></div>");
                                         item.value.select(valueElm.firstElementChild).withValue();
-                                        item.value.selectRule(document.styleSheets[iSheet].cssRules[iRule]).toStyleOf(item.prop._value);
+                                        item.value.selectRule(document.styleSheets[iSheet].cssRules[iRule]).toStyleOf(item.prop.value);
 
                                         const declElm = jht.translate("<div class='row'></div>");
                                         declElm.appendChild(propElm);

@@ -77,28 +77,6 @@ div {
     padding: 2px;
 }
 
-/* 
-.control-panel-origin {
-    position: fixed;
-    left: 0px;
-    top: 0px;
-    width: 100%;
-    height: 100%;
-}
- */
-
-/*  
-.control-panel {
-    position: absolute;
-    right: 0px;
-    top: 0px;
-    width: 100px;
-    height: 100%;
-    transition: 0.5s;
-    background-color: bisque;
-}
- */
-
 .row.debug {
     /* debug: show off borders */
     border: 1px solid #6ca;
