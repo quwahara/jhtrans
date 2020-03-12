@@ -5,9 +5,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel="icon" href="data:,">
-    <link rel="stylesheet" type="text/css" href="../css/basic.css">
     <link rel="stylesheet" type="text/css" href="mixer.css">
-    <link rel="stylesheet" type="text/css" href="labo-debug.css">
     <script src="../libs/jhtrans.js"></script>
     <script src="../node_modules/distlink/libs/distlink.js"></script>
     <script src="../../distlink/libs/distlink.js"></script>
@@ -174,13 +172,16 @@
                 console.log("mixer-2.html");
                 const ground = jht.translate(
                     '<div class="ground">' +
+                    '' +
                     '    <div class="content-ground">' +
                     '        <!-- 仮想端末画面想定タグ -->' +
                     '        <div class="content-base">' +
                     '        </div>' +
                     '    </div>' +
+                    '' +
                     '    <!-- 左右領域幅変更ハンドル用タグ -->' +
                     '    <div class="ground-border"> </div>' +
+                    '' +
                     '    <!-- コントロールパネルタグ -->' +
                     '    <div class="control-panel-ground"> </div>' +
                     '</div>' +
@@ -217,20 +218,11 @@
                 ground.querySelector(".content-base").appendChild(contents);
 
                 const controlPpanel = jht.translate(
-                    // '<div class="control-panel__origin">' +
-                    '    <div class="control-panel" style="' +
-                    // 'background-color: blueviolet;' +
-                    // 'position: relative;' +
-                    // 'top: 100px;' +
-                    // 'left: 200px;' +
-                    // 'width: 400px;' +
-                    // 'height: 300px;' +
-                    '">' +
+                    '    <div class="control-panel">' +
                     '    <div class="row">' +
                     '        <div class="control-panel__title-bar col-12">title bar</div>' +
                     '    </div>' +
                     '' +
-                    // '    <div style="height: calc(100% - 21.6px); overflow-y: scroll;">' +
                     '    <div>' +
                     '        <div class="row">' +
                     '        <div class="col-4">' +
@@ -250,7 +242,6 @@
                     '    </div>' +
                     '' +
                     '    </div>' +
-                    // '</div>' +
                     '');
 
                 ground.querySelector(".control-panel-ground").appendChild(controlPpanel);
