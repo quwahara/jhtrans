@@ -194,17 +194,42 @@
                     dynamicStyleElement = createStyle();
                 }
 
-                let result = getItemFromLocaStorage("css");
+                let result = getItemFromLocaStorage("rulesJson");
                 if (result && result.caught) {
                     return;
                 }
 
-                let css = result;
-                if (css == null) {
-                    css = ".xxx { font-size: 14px; }";
+                let rulesJson = result;
+                if (rulesJson == null) {
+                    rulesJson = JSON.stringify([".xxx { font-size: 14px; }"]);
                 }
 
-                dynamicStyleElement.textContent = css;
+                let rules = JSON.parse(rulesJson);
+
+                deleteRuleAll(dynamicStyleElement);
+                insertRuleAll(rules, dynamicStyleElement)
+            }
+
+            function deleteRuleAll(styleElement) {
+                if (!styleElement || !styleElement.sheet || !styleElement.sheet.cssRules) {
+                    return null;
+                }
+
+                const sheet = styleElement.sheet;
+
+                while (sheet.cssRules.length > 0) {
+                    sheet.deleteRule(sheet.cssRules.length - 1);
+                }
+            }
+
+            function insertRuleAll(rulesArray, styleElement) {
+                if (!styleElement || !styleElement.sheet || !styleElement.sheet.cssRules) {
+                    return null;
+                }
+                const sheet = styleElement.sheet;
+                for (let i = rulesArray.length - 1; i >= 0; --i) {
+                    sheet.insertRule(rulesArray[i], 0);
+                }
             }
 
             function createStyle() {
@@ -239,8 +264,8 @@
                     return;
                 }
 
-                const css = styleSheetToString(dynamicStyleElement);
-                setItemToLocalStorage("css", css);
+                const rulesJson = styleSheetToJSON(dynamicStyleElement);
+                setItemToLocalStorage("rulesJson", rulesJson);
             }
 
             function setItemToLocalStorage(key, value) {
@@ -274,19 +299,19 @@
                 }
             }
 
-            function styleSheetToString(style) {
-                if (!style || !style.sheet || !style.sheet.cssRules) {
+            function styleSheetToJSON(styleElement) {
+                if (!styleElement || !styleElement.sheet || !styleElement.sheet.cssRules) {
                     return null;
                 }
 
-                const rules = style.sheet.cssRules;
+                const rules = styleElement.sheet.cssRules;
 
-                let css = "";
+                let rulesArray = [];
                 for (let i = 0; i < rules.length; ++i) {
-                    css += rules[i].cssText + "\r\n";
+                    rulesArray.push(rules[i].cssText);
                 }
 
-                return css;
+                return JSON.stringify(rulesArray);
             }
 
             function prepareBorder() {
