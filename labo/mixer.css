@@ -480,3 +480,13 @@ tr:nth-child(even) {
   height: 18px;
   padding: 2px 4px 2px 4px;
 }
+
+.toast-panel {
+  position: fixed;
+  left: 0px;
+  bottom: 0;
+  width: 100vw;
+  height: 0;
+  transition: height 0.3s linear;
+  background-color: lightgray;
+}

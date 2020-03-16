@@ -20,6 +20,275 @@
 
             const jht = new Jhtrans();
 
+            window.addEventListener("load", function (event) {
+                console.log("mixer-2.html");
+
+                loadDynamicStyle();
+
+                const ground = jht.translate(
+                    '<div class="ground">' +
+                    '' +
+                    '    <div class="content-ground">' +
+                    '        <!-- 仮想端末画面想定タグ -->' +
+                    '        <div class="content-base">' +
+                    '        </div>' +
+                    '    </div>' +
+                    '' +
+                    '    <!-- 左右領域幅変更ハンドル用タグ -->' +
+                    '    <div class="ground-border"> </div>' +
+                    '' +
+                    '    <!-- コントロールパネルタグ -->' +
+                    '    <div class="control-panel-ground"> </div>' +
+                    '' +
+                    '    <!-- Toast -->' +
+                    '    <div class="toast-ground"> </div>' +
+                    '</div>' +
+                    '');
+
+                document.body.appendChild(ground);
+
+                prepareBorder();
+
+                const contents = jht.translate(
+                    '<div class="contents">' +
+                    '    <div class="prime pnw14">' +
+                    '    <div class="row">' +
+                    '        <h1>H1, Header example, 0123456789</h1>' +
+                    '        <h2>H2, Header example, 0123456789</h2>' +
+                    '        <h3>H3, Header example, 0123456789</h3>' +
+                    '        <h4>H4, Header example, 0123456789</h4>' +
+                    '        <h5>H5, Header example, 0123456789</h5>' +
+                    '    </div>' +
+                    '    <div class="row">' +
+                    '        <div>DIV, Div example, 1</div>' +
+                    '        <div>DIV, Div example, 2</div>' +
+                    '        <div>DIV, Div example, 3</div>' +
+                    '        <div>' +
+                    '        <p>P, P example, 1</p>' +
+                    '        <p>P, P example, 2</p>' +
+                    '        <p class="xxx">P, P example, 3</p>' +
+                    '        </div>' +
+                    '    </div>' +
+                    '    </div>' +
+                    '</div>' +
+                    '');
+
+                ground.querySelector(".content-base").appendChild(contents);
+
+                const controlPpanel = jht.translate(
+                    '    <div class="control-panel">' +
+                    '    <div class="row">' +
+                    '        <div class="control-panel__title-bar col-12">title bar</div>' +
+                    '    </div>' +
+                    '' +
+                    '    <div>' +
+                    '        <div class="row">' +
+                    '        <div class="col-12">' +
+                    '            <button class="control-panel__mini-button" name="load" type="button">Load</button>' +
+                    '            <button class="control-panel__mini-button" name="save" type="button">Save</button>' +
+                    '            <button class="control-panel__mini-button" name="test" type="button">Test</button>' +
+                    '        </div>' +
+                    '        </div>' +
+                    '' +
+                    '        <div class="row">' +
+                    '        <div class="col-4">' +
+                    '            font-size' +
+                    '        </div>' +
+                    '        <div class="col-8">' +
+                    '            <input style="width: calc(100% - 120px);" name="fontSizeTxt" type="text">' +
+                    '            <button class="control-panel__mini-button" name="decBtn" type="button" value="Dec">Dec</button>' +
+                    '            <button class="control-panel__mini-button" name="incBtn" type="button" value="Inc">Inc</button>' +
+                    '        </div>' +
+                    '        </div>' +
+                    '' +
+                    '        <div class="row control-panel__space">' +
+                    '           <div class="control-panel__sheet"></div>' +
+                    '        </div>' +
+                    '' +
+                    '    </div>' +
+                    '' +
+                    '    </div>' +
+                    '');
+
+                ground.querySelector(".control-panel-ground").appendChild(controlPpanel);
+
+                prepareControlPanel();
+
+                document.querySelector("button[name='load']").onclick = function (e) {
+                    loadDynamicStyle();
+                    toastShowMessageAndHideOnTimeout("It's loaded.");
+                };
+
+                document.querySelector("button[name='save']").onclick = function (e) {
+                    const err = saveDynamicStyle();
+                    let m;
+                    if (err == null) {
+                        m = "Save has succeeded."
+                    } else {
+                        m = "Save has failed."
+                    }
+                    toastShowMessageAndHideOnTimeout(m);
+                };
+
+                document.querySelector("button[name='test']").onclick = function (e) {
+                    toastShowMessageAndHideOnTimeout("This is a test.");
+                };
+
+                const toastPanel = jht.translate(
+                    '    <div class="toast-panel">' +
+                    '       <div class="">' +
+                    '           <button name="toastPanel__close">&times;</button>' +
+                    '       </div>' +
+                    '       <div class="toast-panel__message">' +
+                    '       ' +
+                    '       </div>' +
+                    '    </div>' +
+                    '');
+
+                toastPanel.style.height = "0";
+
+                ground.querySelector(".toast-ground").appendChild(toastPanel);
+
+                document.querySelector("button[name='toastPanel__close']").onclick = function (e) {
+                    toastHide();
+                };
+
+                function toastShowMessageAndHideOnTimeout(message, delayMs) {
+                    toastHide();
+                    toastSetMessage(message);
+                    toastShow();
+                    toastHideWithTimeout(delayMs);
+                }
+
+                function toastHideWithTimeout(delayMs) {
+
+                    if (delayMs == null) {
+                        delayMs = 4000;
+                    }
+
+                    setTimeout(function () {
+                        toastHide();
+                    }, delayMs);
+                }
+
+                function toastShow() {
+                    toastPanel.style.height = "100px";
+                }
+
+                function toastHide() {
+                    toastPanel.style.height = "0";
+                }
+
+                function toastSetMessage(message) {
+                    const t = toastPanel.querySelector(".toast-panel__message");
+                    t.textContent = message;
+                }
+
+            });
+
+            let dynamicStyleElement = null;
+
+            function loadDynamicStyle() {
+
+                if (!dynamicStyleElement) {
+                    dynamicStyleElement = createStyle();
+                }
+
+                let result = getItemFromLocaStorage("css");
+                if (result && result.caught) {
+                    return;
+                }
+
+                let css = result;
+                if (css == null) {
+                    css = ".xxx { font-size: 14px; }";
+                }
+
+                dynamicStyleElement.textContent = css;
+            }
+
+            function createStyle() {
+                const style = document.createElement('style');
+                style.type = 'text/css';
+                document.head.appendChild(style);
+                return style;
+            }
+
+            function getItemFromLocaStorage(key) {
+                const storage = getStorage("localStorage");
+                if (storage.caught) {
+                    return storage;
+                }
+
+                return getItemFromStorage(storage, key);
+            }
+
+            function getItemFromStorage(storage, key) {
+                try {
+                    return storage.getItem(key);
+                    return null;
+                } catch (e) {
+                    return { caught: e };
+                }
+
+            }
+
+            function saveDynamicStyle() {
+
+                if (!dynamicStyleElement) {
+                    return;
+                }
+
+                const css = styleSheetToString(dynamicStyleElement);
+                setItemToLocalStorage("css", css);
+            }
+
+            function setItemToLocalStorage(key, value) {
+                const storage = getStorage("localStorage");
+                if (storage.caught) {
+                    return storage.caught;
+                }
+
+                return setItemToStorage(storage, key, value);
+            }
+
+            function setItemToStorage(storage, key, value) {
+                try {
+                    storage.setItem(key, value);
+                    return null;
+                } catch (e) {
+                    return e;
+                }
+            }
+
+            function getStorage(storageType) {
+                try {
+                    const storage = window[storageType];
+                    const x = '__storage_test__';
+                    storage.setItem(x, x);
+                    storage.removeItem(x);
+                    return storage;
+                }
+                catch (e) {
+                    return { caught: e };
+                }
+            }
+
+            function styleSheetToString(style) {
+                if (!style || !style.sheet || !style.sheet.cssRules) {
+                    return null;
+                }
+
+                const rules = style.sheet.cssRules;
+
+                let css = "";
+                for (let i = 0; i < rules.length; ++i) {
+                    css += rules[i].cssText + "\r\n";
+                }
+
+                return css;
+            }
+
             function prepareBorder() {
                 const contentGround = document.querySelector(".content-ground");
                 const groundBorder = document.querySelector(".ground-border");
@@ -130,7 +399,8 @@
                                         item.prop.select(propElm).toText();
 
                                         const valueElm = jht.translate("<div class='col-6 control-panel__decl-value'><input type='text'></div>");
-                                        item.value.select(valueElm.firstElementChild).withValue();
+                                        // item.value.select(valueElm.firstElementChild).withValue();
+                                        item.value.select(valueElm.firstElementChild).withValue("keydown");
                                         item.value.selectRule(document.styleSheets[iSheet].cssRules[iRule]).toStyleOf(item.prop.value);
 
                                         const declElm = jht.translate("<div class='row'></div>");
@@ -168,86 +438,33 @@
             }
 
 
-            window.addEventListener("load", function (event) {
-                console.log("mixer-2.html");
-                const ground = jht.translate(
-                    '<div class="ground">' +
-                    '' +
-                    '    <div class="content-ground">' +
-                    '        <!-- 仮想端末画面想定タグ -->' +
-                    '        <div class="content-base">' +
-                    '        </div>' +
-                    '    </div>' +
-                    '' +
-                    '    <!-- 左右領域幅変更ハンドル用タグ -->' +
-                    '    <div class="ground-border"> </div>' +
-                    '' +
-                    '    <!-- コントロールパネルタグ -->' +
-                    '    <div class="control-panel-ground"> </div>' +
-                    '</div>' +
-                    '');
 
-                document.body.appendChild(ground);
+            /**
+            * Copy cssRule to Object.
+            * Aimed for serialization.
+            */
+            function cssRuleToObject(rule) {
 
-                prepareBorder();
+                if (rule.type === CSSRule.STYLE_RULE) {
+                    return copyToObject(rule, ["type", "cssText"]);
+                }
 
-                const contents = jht.translate(
-                    '<div class="contents">' +
-                    '    <div class="prime pnw14">' +
-                    '    <div class="row">' +
-                    '        <h1>H1, Header example, 0123456789</h1>' +
-                    '        <h2>H2, Header example, 0123456789</h2>' +
-                    '        <h3>H3, Header example, 0123456789</h3>' +
-                    '        <h4>H4, Header example, 0123456789</h4>' +
-                    '        <h5>H5, Header example, 0123456789</h5>' +
-                    '    </div>' +
-                    '    <div class="row">' +
-                    '        <div>DIV, Div example, 1</div>' +
-                    '        <div>DIV, Div example, 2</div>' +
-                    '        <div>DIV, Div example, 3</div>' +
-                    '        <div>' +
-                    '        <p>P, P example, 1</p>' +
-                    '        <p>P, P example, 2</p>' +
-                    '        <p>P, P example, 3</p>' +
-                    '        </div>' +
-                    '    </div>' +
-                    '    </div>' +
-                    '</div>' +
-                    '');
+                return null;
+            }
 
-                ground.querySelector(".content-base").appendChild(contents);
+            function copyToObject(src, propNames, dst) {
+                if (!dst) {
+                    dst = {};
+                }
+                for (let i = 0; i < propNames.length; ++i) {
+                    const propName = propNames[i];
+                    dst[propName] = src[propName];
+                }
+                return dst;
+            }
 
-                const controlPpanel = jht.translate(
-                    '    <div class="control-panel">' +
-                    '    <div class="row">' +
-                    '        <div class="control-panel__title-bar col-12">title bar</div>' +
-                    '    </div>' +
-                    '' +
-                    '    <div>' +
-                    '        <div class="row">' +
-                    '        <div class="col-4">' +
-                    '            font-size' +
-                    '        </div>' +
-                    '        <div class="col-8">' +
-                    '            <input style="width: calc(100% - 120px);" name="fontSizeTxt" type="text">' +
-                    '            <button class="control-panel__mini-button" name="decBtn" type="button" value="Dec">Dec</button>' +
-                    '            <button class="control-panel__mini-button" name="incBtn" type="button" value="Inc">Inc</button>' +
-                    '        </div>' +
-                    '        </div>' +
-                    '' +
-                    '        <div class="row control-panel__space">' +
-                    '           <div class="control-panel__sheet"></div>' +
-                    '        </div>' +
-                    '' +
-                    '    </div>' +
-                    '' +
-                    '    </div>' +
-                    '');
 
-                ground.querySelector(".control-panel-ground").appendChild(controlPpanel);
 
-                prepareControlPanel();
-            });
         })();
 
     </script>
