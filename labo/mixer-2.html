@@ -18,6 +18,8 @@
         (function () {
             "use strict";
 
+            let sheetsModelOL = null;
+
             const jht = new Jhtrans();
 
             window.addEventListener("load", function (event) {
@@ -131,7 +133,22 @@
                 };
 
                 document.querySelector("button[name='test']").onclick = function (e) {
-                    toastShowMessageAndHideOnTimeout("This is a test.");
+
+                    console.log(sheetsModelOL);
+
+                    const decls = sheetsModelOL
+                        // dynamic sheet
+                        .sheets.links[1]
+                        // rule
+                        .rules.links[0]
+                        .decls
+                        ;
+
+                    console.log(decls);
+
+                    decls.remove(0);
+
+
                 };
 
                 const toastPanel = jht.translate(
@@ -382,7 +399,10 @@
 
                 console.log(["sheetsMode", sheetsModel]);
 
-                distlink(sheetsModel)
+                sheetsModelOL = distlink(sheetsModel);
+
+                // distlink(sheetsModel)
+                sheetsModelOL
                     .sheets.select(".control-panel__space")
                     .each(function (item, childElement, iSheet, selectedElement) {
 
