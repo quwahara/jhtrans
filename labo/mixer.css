@@ -454,7 +454,7 @@ tr:nth-child(even) {
   overflow-y: auto;
 }
 
-.control-panel, .control-panel input[type="text"] {
+.control-panel, .control-panel input[type="text"], .control-panel button {
   font-family: "Menlo", "Monaco", "Consolas", monospace;
   font-size: 12px;
 }
@@ -479,6 +479,11 @@ tr:nth-child(even) {
 .control-panel__decl-value>input[type="text"] {
   height: 18px;
   padding: 2px 4px 2px 4px;
+}
+
+.control-panel button {
+  height: 18px;
+  padding: 0;
 }
 
 .toast-panel {

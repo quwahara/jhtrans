@@ -136,17 +136,27 @@
 
                     console.log(sheetsModelOL);
 
-                    const decls = sheetsModelOL
+                    const rules = sheetsModelOL
                         // dynamic sheet
                         .sheets.links[1]
                         // rule
-                        .rules.links[0]
-                        .decls
-                        ;
+                        .rules;
 
-                    console.log(decls);
+                    console.log(rules);
 
-                    decls.remove(0);
+                    rules.remove(0);
+
+                    // const decls = sheetsModelOL
+                    //     // dynamic sheet
+                    //     .sheets.links[1]
+                    //     // rule
+                    //     .rules.links[0]
+                    //     .decls
+                    //     ;
+
+                    // console.log(decls);
+
+                    // decls.remove(0);
 
 
                 };
@@ -412,6 +422,7 @@
 
                         item.href.select(hrefElm).toText();
 
+
                         const rulesElm = jht.translate(
                             "<div class='control-panel__rules'>" +
                             "   <div class='control-panel__rule'></div>" +
@@ -456,6 +467,37 @@
                                     }); // End of decls
 
                             }); // End of rules
+
+                        const buttonsElm = jht.translate("<div class='row'><button class='add-a-rule'>Add a rule</button></div>");
+
+                        buttonsElm.querySelector(".add-a-rule").addEventListener("click", function (event) {
+                            console.log((new Date()).toISOString());
+
+                            const selectorText = ".t" + (new Date()).getTime();
+                            const rule = " {}";
+                            dynamicStyleElement.sheetsModel.insertRule(selectorText + rule, 0);
+
+
+                            const rules = sheetsModelOL
+                                // dynamic sheet
+                                .sheets.links[1]
+                                // rules
+                                .rules;
+
+                            //TODO ArrayLink に要素を追加する仕組みが実装できていない。
+                            // const ruleModel = {};
+                            // ruleModel.index = rules.length;
+                            // ruleModel.selectorText = selectorText;
+                            // ruleModel.decls = parseCssText(rule);
+
+                            // const obj = {};
+                            // rules.append(ruleModel);
+
+                        });
+
+                        childElement.appendChild(buttonsElm);
+
+
 
                     }); // End of sheets
             }
