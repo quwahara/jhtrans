@@ -474,9 +474,12 @@
                             console.log((new Date()).toISOString());
 
                             const selectorText = ".t" + (new Date()).getTime();
-                            const rule = " {}";
-                            dynamicStyleElement.sheetsModel.insertRule(selectorText + rule, 0);
+                            const rule = " {background-color:blue;}";
+                            const sheet = dynamicStyleElement.sheet;
+                            sheet.insertRule(selectorText + rule, sheet.cssRules.length);
 
+                            const index = sheet.cssRules.length - 1;
+                            const cssRule = sheet.cssRules[index];
 
                             const rules = sheetsModelOL
                                 // dynamic sheet
@@ -484,15 +487,11 @@
                                 // rules
                                 .rules;
 
-                            //TODO ArrayLink に要素を追加する仕組みが実装できていない。
-                            // const ruleModel = {};
-                            // ruleModel.index = rules.length;
-                            // ruleModel.selectorText = selectorText;
-                            // ruleModel.decls = parseCssText(rule);
-
-                            // const obj = {};
-                            // rules.append(ruleModel);
-
+                            const ruleModel = {};
+                            ruleModel.index = index;
+                            ruleModel.selectorText = cssRule.selectorText;
+                            ruleModel.decls = parseCssText(cssRule);
+                            rules.push(ruleModel);
                         });
 
                         childElement.appendChild(buttonsElm);
