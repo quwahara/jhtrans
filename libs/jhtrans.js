@@ -119,9 +119,13 @@
     this.globalReplacements = {};
   };
 
+  Jhtrans.prototype.hasTemplate = function (name) {
+    return this.templates.hasOwnProperty(name);
+  };
+
   Jhtrans.prototype.getTemplate = function (name) {
 
-    if (this.templates.hasOwnProperty(name)) {
+    if (this.hasTemplate(name)) {
       return this.templates[name].cloneNode(true);
     }
 

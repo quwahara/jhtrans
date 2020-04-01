@@ -439,11 +439,31 @@
 
                                 item.selectorText.select(selectorTextElm).toText();
 
+
+                                if (!jht.hasTemplate("control-panel__decl")) {
+                                    jht.putTemplate(
+                                        "control-panel__decl",
+                                        "" +
+                                        "   <div class='control-panel__decl'>" +
+                                        "       <div class='row'>" +
+                                        "           <div class='col-6 control-panel__decl-prop'></div>" +
+                                        "           <div class='col-6 control-panel__decl-value'><input type='text'></div>" +
+                                        "       </div>" +
+                                        "   </div>" +
+                                        "" +
+                                        ""
+                                    );
+                                }
+
+                                const declElm = jht.getTemplate("control-panel__decl");
+
                                 const rulesElm = jht.translate(
                                     "<div class='control-panel__decls'>" +
-                                    "   <div class='control-panel__decl'></div>" +
                                     "</div>"
                                 );
+
+                                rulesElm.appendChild(declElm);
+
                                 childElement.appendChild(rulesElm);
 
                                 const iRule = item.index.value;
@@ -451,18 +471,9 @@
                                 item.decls.select(rulesElm)
                                     .each(function (item, childElement, iDecl, selectedElement) {
 
-                                        const propElm = jht.translate("<div class='col-6 control-panel__decl-prop'></div>");
-                                        item.prop.select(propElm).toText();
-
-                                        const valueElm = jht.translate("<div class='col-6 control-panel__decl-value'><input type='text'></div>");
-                                        // item.value.select(valueElm.firstElementChild).withValue();
-                                        item.value.select(valueElm.firstElementChild).withValue("keydown");
+                                        item.prop.select(childElement.querySelector(".control-panel__decl-prop")).toText();
+                                        item.value.select(childElement.querySelector(".control-panel__decl-value input")).withValue("keydown");
                                         item.value.selectRule(document.styleSheets[iSheet].cssRules[iRule]).toStyleOf(item.prop.value);
-
-                                        const declElm = jht.translate("<div class='row'></div>");
-                                        declElm.appendChild(propElm);
-                                        declElm.appendChild(valueElm);
-                                        childElement.appendChild(declElm);
 
                                     }); // End of decls
 
