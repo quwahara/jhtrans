@@ -414,53 +414,31 @@
                         childElement.appendChild(hrefElm);
 
                         item.href.select(hrefElm).toText();
-
-
                         const rulesElm = jht.translate(
                             "<div class='control-panel__rules'>" +
-                            "   <div class='control-panel__rule'></div>" +
+                            "   <div class='control-panel__rule'>" +
+                            "       <div class='row control-panel__selector-text'>" +
+                            "       </div>" +
+                            "       <div class='control-panel__decls'>" +
+                            "           <div class='control-panel__decl'>" +
+                            "               <div class='row'>" +
+                            "                   <div class='col-6 control-panel__decl-prop'></div>" +
+                            "                   <div class='col-6 control-panel__decl-value'><input type='text'></div>" +
+                            "               </div>" +
+                            "           </div>" +
+                            "       </div>" +
+                            "   </div>" +
                             "</div>"
                         );
+
                         childElement.appendChild(rulesElm);
 
                         item.rules.select(rulesElm)
                             .each(function (item, childElement, index, selectedElement) {
 
-                                const selectorTextElm = jht.translate("<div class='row control-panel__selector-text'></div>");
-                                childElement.appendChild(selectorTextElm);
-
-                                item.selectorText.select(selectorTextElm).toText();
-
-
-                                if (!jht.hasTemplate("control-panel__decl")) {
-                                    jht.putTemplate(
-                                        "control-panel__decl",
-                                        "" +
-                                        "   <div class='control-panel__decl'>" +
-                                        "       <div class='row'>" +
-                                        "           <div class='col-6 control-panel__decl-prop'></div>" +
-                                        "           <div class='col-6 control-panel__decl-value'><input type='text'></div>" +
-                                        "       </div>" +
-                                        "   </div>" +
-                                        "" +
-                                        ""
-                                    );
-                                }
-
-                                const declElm = jht.getTemplate("control-panel__decl");
-
-                                const rulesElm = jht.translate(
-                                    "<div class='control-panel__decls'>" +
-                                    "</div>"
-                                );
-
-                                rulesElm.appendChild(declElm);
-
-                                childElement.appendChild(rulesElm);
-
+                                item.selectorText.select(".control-panel__selector-text").toText();
                                 const iRule = item.index.value;
-
-                                item.decls.select(rulesElm)
+                                item.decls.select(childElement.querySelector("div.control-panel__decls"))
                                     .each(function (item, childElement, iDecl, selectedElement) {
 
                                         item.prop.select(childElement.querySelector(".control-panel__decl-prop")).toText();
