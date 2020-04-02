@@ -464,6 +464,14 @@ tr:nth-child(even) {
   padding: 2px 4px 2px 4px;
 }
 
+.control-panel__href {
+  background-color: lightblue;
+}
+
+.control-panel__selector-text {
+  background-color: lightgray;
+}
+
 .control-panel__decl-prop {
   height: 18px;
   padding: 2px 4px 2px 4px;

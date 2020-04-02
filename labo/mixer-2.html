@@ -396,12 +396,7 @@
                     for (let j = 0; j < sheet.cssRules.length; ++j) {
                         const rule = sheet.cssRules[j];
                         if (rule.type !== CSSRule.STYLE_RULE) { continue; }
-
-                        const ruleModel = {};
-                        ruleModel.index = j;
-                        ruleModel.selectorText = rule.selectorText;
-                        ruleModel.decls = parseCssText(rule);
-                        sheetModel.rules.push(ruleModel);
+                        sheetModel.rules.push(createRuleModelByRule(rule, j));
                     }
 
                     sheetsModel.sheets.push(sheetModel);
@@ -411,14 +406,12 @@
 
                 sheetsModelOL = distlink(sheetsModel);
 
-                // distlink(sheetsModel)
                 sheetsModelOL
                     .sheets.select(".control-panel__space")
                     .each(function (item, childElement, iSheet, selectedElement) {
 
                         const hrefElm = jht.translate("<div class='row control-panel__href'></div>");
                         childElement.appendChild(hrefElm);
-                        hrefElm.style.backgroundColor = "lightblue";
 
                         item.href.select(hrefElm).toText();
 
@@ -435,7 +428,6 @@
 
                                 const selectorTextElm = jht.translate("<div class='row control-panel__selector-text'></div>");
                                 childElement.appendChild(selectorTextElm);
-                                selectorTextElm.style.backgroundColor = "lightgray";
 
                                 item.selectorText.select(selectorTextElm).toText();
 
@@ -477,6 +469,32 @@
 
                                     }); // End of decls
 
+                                const buttonsElm = jht.translate("<div class='row'><button class='add-decl'>Add decl</button></div>");
+
+                                buttonsElm.querySelector(".add-decl").addEventListener("click", (function (cssRule, decls) {
+                                    return function (event) {
+
+                                        const currentDecls = parseCssText(cssRule);
+                                        currentDecls.push({
+                                            prop: "background-color",
+                                            value: "white"
+                                        });
+
+                                        const cssText = cssRule.selectorText + " { " + declArrayToText(currentDecls) + " } ";
+
+                                        cssRule.cssText = cssText;
+
+                                        console.log((new Date()).toISOString(), cssText, cssRule);
+
+                                        // decls.push({
+                                        //     prop: "font-size",
+                                        //     value: "36px"
+                                        // });
+                                    };
+                                })(document.styleSheets[iSheet].cssRules[iRule], item.decls));
+
+                                childElement.appendChild(buttonsElm);
+
                             }); // End of rules
 
                         const buttonsElm = jht.translate("<div class='row'><button class='add-a-rule'>Add a rule</button></div>");
@@ -507,9 +525,19 @@
 
                         childElement.appendChild(buttonsElm);
 
-
-
                     }); // End of sheets
+            }
+
+            function createRuleModelByRule(rule, index) {
+                return createRuleModel(rule.selectorText, parseCssText(rule), index);
+            }
+
+            function createRuleModel(selectorText, decls, index) {
+                const ruleModel = {};
+                ruleModel.selectorText = selectorText;
+                ruleModel.decls = decls;
+                ruleModel.index = index;
+                return ruleModel;
             }
 
             function parseCssText(cssRule) {
@@ -534,7 +562,14 @@
                 return decls;
             }
 
-
+            function declArrayToText(decls) {
+                let text = "";
+                for (let i = 0; i < decls.length; i++) {
+                    const decl = decls[i];
+                    text += decl.prop + ":" + decl.value + ";";
+                }
+                return text;
+            }
 
             /**
             * Copy cssRule to Object.
