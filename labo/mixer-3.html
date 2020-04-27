@@ -7,7 +7,6 @@
     <link rel="icon" href="data:,">
     <link rel="stylesheet" type="text/css" href="mixer.css">
     <script src="../libs/jhtrans.js"></script>
-    <script src="../node_modules/distlink/libs/distlink.js"></script>
     <script src="../../distlink/libs/distlink.js"></script>
     <title>Labo - Mixer</title>
 </head>
@@ -437,13 +436,16 @@
                             .each(function (item, childElement, index, selectedElement) {
 
                                 item.selectorText.select(".control-panel__selector-text").toText();
-                                const iRule = item.index.value;
+                                const iRule = item.index.getValue();
+                                // const iRule = item.index.value;
                                 item.decls.select(childElement.querySelector("div.control-panel__decls"))
                                     .each(function (item, childElement, iDecl, selectedElement) {
 
                                         item.prop.select(childElement.querySelector(".control-panel__decl-prop")).toText();
+                                        // item.value.select(childElement.querySelector(".control-panel__decl-value input")).withValue();
                                         item.value.select(childElement.querySelector(".control-panel__decl-value input")).withValue("keydown");
-                                        item.value.selectRule(document.styleSheets[iSheet].cssRules[iRule]).toStyleOf(item.prop.value);
+                                        item.value.selectRule(document.styleSheets[iSheet].cssRules[iRule]).toStyleOf(item.prop.getValue());
+                                        // item.value.selectRule(document.styleSheets[iSheet].cssRules[iRule]).toStyleOf(item.prop.value);
 
                                     }); // End of decls
 
